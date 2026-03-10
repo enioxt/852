@@ -37,21 +37,32 @@
 - [x] Report Store (`src/lib/report-store.ts`): localStorage persistence, share/delete controls
 - [x] /reports page refactored: shared reports tab + AI report generator tab
 - [x] Landing page: 4-feature grid + reports CTA link
+- [x] Navigation: Home icon no header do /chat + links Home/Relatórios no sidebar
+- [x] Fix: análise IA injetada no chat ao clicar sugestão (nada se perde)
+- [x] Telemetry events: report_shared, report_deleted, report_review
+- [x] AGENTS.md v2.0: system map completo, capabilities, roadmap, user flow
+- [x] README.md v2.0: features, stack, system map, deploy, roadmap
 
 ## ⏭️ Backlog
 
 - [ ] Ativar Supabase para 852: criar tabela telemetry_852 (migration pronta), adicionar env vars
 - [ ] Supabase real + RLS para persistência server-side de conversas e relatórios
 - [ ] Migrar report-store de localStorage para Supabase (reports_852 table)
-- [ ] Memória persistente + tools
+- [ ] Session hashing: cada interação gera um hash único rastreável
+- [ ] Memória persistente do agente entre sessões (user context)
 - [ ] Dashboard com métricas reais (substituir mock data)
+- [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
 - [ ] ETHIK/Gamificação com dados reais
-- [ ] Relatórios HTML avançados
+- [ ] Admin auth para telemetry/reports (NextAuth ou Supabase Auth)
+- [ ] Relatórios HTML avançados + PDF automático de dados agregados
 - [ ] Refinar OG image para proporção 1200x630 real
-- [ ] Decompose `chat/page.tsx` (~420 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
+- [ ] Decompose `chat/page.tsx` (~440 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [ ] CI/CD pipeline (lint + build + smoke on push/PR)
 - [ ] Consolidar package manager (remover vestígios de bun, manter npm)
 - [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
 - [ ] ATRiAN dashboard: visualizar violations no /admin/telemetry
 - [ ] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
 - [ ] Admin view para relatórios compartilhados (autenticado)
+- [ ] Tool use: web search para dados institucionais (AI SDK tools)
+- [ ] Voice input (speech-to-text via Browser API)
+- [ ] Proactive collaboration suggestions (agent sugere temas durante a conversa)

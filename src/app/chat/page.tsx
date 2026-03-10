@@ -1,11 +1,12 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useChat } from '@ai-sdk/react';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import {
   Send, Download, Share2, Copy, Check,
-  FileText, MessageCircle, AlertTriangle, Zap, ChevronDown, Menu
+  FileText, MessageCircle, AlertTriangle, Zap, ChevronDown, Menu, Home
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
@@ -216,6 +217,9 @@ export default function ChatPage() {
             >
               <Menu className="w-5 h-5" />
             </button>
+            <Link href="/" className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition" title="Página inicial">
+              <Home className="w-4 h-4" />
+            </Link>
             <h1 className="text-sm font-semibold text-white">852 Inteligência</h1>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-900/40 text-green-400 font-medium">Anônimo</span>
           </div>
@@ -411,8 +415,19 @@ export default function ChatPage() {
           messages={messages.map(m => ({ role: m.role, content: getMessageText(m) }))}
           conversationId={activeConvId}
           onClose={() => setShowReportReview(false)}
-          onSuggestionClick={(suggestion) => {
+          onSuggestionClick={(suggestion, reviewSummary) => {
             setShowReportReview(false);
+            // Inject AI analysis as an assistant message so nothing is lost
+            if (reviewSummary) {
+              const analysisMsg = {
+                id: `review-${Date.now()}`,
+                role: 'assistant' as const,
+                content: reviewSummary,
+                parts: [{ type: 'text' as const, text: reviewSummary }],
+                createdAt: new Date(),
+              };
+              setMessages(prev => [...prev, analysisMsg]);
+            }
             setInput(suggestion);
             inputRef.current?.focus();
           }}

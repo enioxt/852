@@ -18,6 +18,9 @@ export type TelemetryEventType =
   | 'rate_limit_hit'
   | 'report_generation'
   | 'report_error'
+  | 'report_shared'
+  | 'report_deleted'
+  | 'report_review'
   | 'provider_unavailable'
   | 'atrian_violation';
 

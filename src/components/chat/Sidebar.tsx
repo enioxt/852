@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock, Home, FileText } from 'lucide-react';
 import { listConversations, deleteConversation, type Conversation } from '@/lib/chat-store';
 
 interface SidebarProps {
@@ -125,7 +126,25 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-neutral-800">
+      <div className="p-3 border-t border-neutral-800 space-y-1">
+        <Link
+          href="/"
+          className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
+            ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
+          title="Página inicial"
+        >
+          <Home className="w-4 h-4 flex-shrink-0" />
+          {isOpen && <span>Página Inicial</span>}
+        </Link>
+        <Link
+          href="/reports"
+          className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
+            ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
+          title="Relatórios"
+        >
+          <FileText className="w-4 h-4 flex-shrink-0" />
+          {isOpen && <span>Relatórios</span>}
+        </Link>
         <button
           onClick={onShowFAQ}
           className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition

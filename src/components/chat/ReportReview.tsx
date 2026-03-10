@@ -25,10 +25,30 @@ interface Props {
   messages: Array<{ role: string; content: string }>;
   conversationId: string;
   onClose: () => void;
-  onSuggestionClick?: (suggestion: string) => void;
+  onSuggestionClick?: (suggestion: string, reviewSummary?: string) => void;
 }
 
 type Step = 'scanning' | 'pii_review' | 'ai_review' | 'ready' | 'shared';
+
+function formatReviewForChat(data: ReviewData): string {
+  const lines: string[] = [
+    `**Análise do Relatório** (completude: ${data.completude}/10)`,
+    '',
+    `**Resumo:** ${data.resumo}`,
+  ];
+  if (data.temas.length > 0) {
+    lines.push('', `**Temas identificados:** ${data.temas.join(', ')}`);
+  }
+  if (data.pontosCegos.length > 0) {
+    lines.push('', '**Pontos que podem ser explorados:**');
+    data.pontosCegos.forEach(p => lines.push(`- ${p}`));
+  }
+  if (data.impacto) {
+    lines.push('', `**Impacto:** ${data.impacto}`);
+  }
+  lines.push('', '---', '*Continuando a conversa com base na análise acima...*');
+  return lines.join('\n');
+}
 
 export default function ReportReview({ messages, conversationId, onClose, onSuggestionClick }: Props) {
   const [step, setStep] = useState<Step>('scanning');
@@ -338,7 +358,11 @@ export default function ReportReview({ messages, conversationId, onClose, onSugg
                             {reviewData.sugestoes.map((s, i) => (
                               <button
                                 key={i}
-                                onClick={() => onSuggestionClick?.(s)}
+                                onClick={() => {
+                                  // Build a summary of the AI review to inject into conversation
+                                  const summary = reviewData ? formatReviewForChat(reviewData) : undefined;
+                                  onSuggestionClick?.(s, summary);
+                                }}
                                 className="w-full text-left p-2.5 rounded-xl bg-neutral-800/50 border border-neutral-800 hover:border-blue-700 hover:bg-blue-900/10 text-xs text-neutral-300 hover:text-white transition group flex items-start gap-2"
                               >
                                 <MessageCircle className="w-3.5 h-3.5 text-neutral-600 group-hover:text-blue-400 mt-0.5 flex-shrink-0" />

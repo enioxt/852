@@ -2,57 +2,43 @@
 
 > Canal de inteligência institucional para os **852 municípios** de Minas Gerais.
 
-Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estruturação e análise de relatos de Policiais Civis, em parceria com o Sindpol-MG.
+Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estruturação e análise de relatos de Policiais Civis.
 
-## System Map
+## Features
+
+- **Chatbot Anônimo** — Streaming token-by-token com IA (Qwen-plus / Gemini 2.0 fallback)
+- **ATRiAN Truth Layer** — Validação ética de output: sem fabricação de dados, siglas inventadas ou promessas falsas
+- **PII Scanner** — Detecção automática de CPF, RG, MASP, telefones, emails, REDS, placas e nomes
+- **Revisão por IA** — Análise de completude da conversa, pontos cegos e sugestões de aprofundamento
+- **Report Sharing** — Compartilhamento de relatos sanitizados (link + WhatsApp) com controle total do usuário
+- **Histórico Local** — Conversas persistidas no navegador com sidebar colapsável
+- **Exportação** — PDF, DOCX, Markdown
+- **Markdown Renderizado** — GFM completo nas respostas da IA
+- **Telemetria** — Microsoft Clarity + structured JSON logs + admin dashboard
+- **Mobile First & Dark Mode** — Design Palantir/Linear para inteligência policial
+- **API Hardening** — Rate limit, validação de payload, fallback explícito de provider
+
+## User Flow
 
 ```text
-852-inteligencia/
-├── .egos/                     # Local symlink → /home/enio/.egos (shared governance SSOT)
-├── .guarani/                  # Local governance overrides
-│   ├── IDENTITY.md            # Agent 852 identity & mission
-│   └── PREFERENCES.md         # Repo-specific rules and exceptions
-├── .windsurf/                 # Local symlinked workflows/skills via egos-gov
-├── docker-compose.yml         # VPS runtime contract (source of truth)
-├── LICENSE                    # MIT license for public reuse
-├── .husky/
-│   └── pre-commit             # Pre-commit hook (tsc + lint + .env guard + egos-gov)
-├── public/
-│   └── brand/                 # Logo, avatar, OG image, background pattern
-├── docs/
-│   └── AUTORESEARCH_TRIGGERS.md  # Trigger system architecture (Karpathy-inspired)
-├── sql/
-│   ├── schema.sql             # Supabase schema (chats, messages, insights + RLS)
-│   └── ethik.sql              # ETHIK gamification schema (contributors, txs, contests)
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── chat/
-│   │   │       ├── route.ts       # POST /api/chat — AI streaming (Qwen/Gemini/GPT)
-│   │   │       └── info/
-│   │   │           └── route.ts   # GET /api/chat/info — Model metadata & cost
-│   │   ├── chat/
-│   │   │   └── page.tsx           # Chat UI (history, markdown, export, mobile drawer)
-│   │   ├── dashboard/
-│   │   │   └── page.tsx           # Insights dashboard (Recharts)
-│   │   ├── ethik/
-│   │   │   └── page.tsx           # ETHIK leaderboard + gamification rules
-│   │   ├── layout.tsx             # Root layout (metadata, icons, OG, pt-BR)
-│   │   ├── page.tsx               # Landing page + navigation
-│   │   └── globals.css            # Tailwind base styles
-│   ├── components/chat/
-│   │   ├── FAQModal.tsx           # FAQ modal
-│   │   ├── MarkdownMessage.tsx    # GFM markdown renderer
-│   │   └── Sidebar.tsx            # History sidebar
-│   └── lib/
-│       ├── chat-store.ts          # localStorage conversation persistence
-│       ├── prompt.ts              # System prompt (Agente 852)
-│       ├── rate-limit.ts          # In-memory rate limiting for public chat
-│       └── ethik.ts               # ETHIK engine (points, rules, mock data)
-├── AGENTS.md                  # Repo map + deploy surface + governance entrypoint
-├── TASKS.md                   # SSOT for tasks (P0/P1/P2)
-├── .windsurfrules             # EGOS workspace governance
-└── package.json               # 852-inteligencia
+Landing (/)
+  ├── "Iniciar conversa" → /chat
+  │     ├── Quick Actions → starts conversation
+  │     ├── Free text → AI streaming response
+  │     ├── Export (PDF/DOCX/MD)
+  │     ├── "Enviar Relatório" → 3-step review
+  │     │     ├── Step 1: PII scan + user accepts removals
+  │     │     ├── Step 2: AI review (completude, sugestões)
+  │     │     │     └── Click suggestion → analysis injected into chat
+  │     │     └── Step 3: Share (link, WhatsApp, delete)
+  │     ├── Sidebar (history, Home, Reports, FAQ)
+  │     └── Home icon → back to /
+  │
+  ├── "Ver relatórios" → /reports
+  │     ├── Relatos Compartilhados (view/delete)
+  │     └── Gerador de Relatórios (AI HTML reports)
+  │
+  └── /dashboard, /ethik, /admin/telemetry
 ```
 
 ## Stack
@@ -63,41 +49,96 @@ Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estrutura�
 | **Runtime** | Node 20 / npm |
 | **AI** | Vercel AI SDK v6 (`@ai-sdk/openai` + `@ai-sdk/react`) |
 | **LLM Primary** | Alibaba Qwen-plus via DashScope |
-| **LLM Fallback** | Google Gemini 2.0 Flash via OpenRouter (paid) / GPT-4o Mini |
-| **Database** | Supabase PostgreSQL (RLS enforced) |
+| **LLM Fallback** | Google Gemini 2.0 Flash via OpenRouter (paid) |
+| **Ethics** | ATRiAN validation (prompt + output filter) |
+| **Privacy** | PII Scanner (regex + heuristics) |
 | **UI** | TailwindCSS 4 + Lucide Icons + Recharts |
 | **Export** | jsPDF + docx + file-saver |
+| **Analytics** | Microsoft Clarity |
 | **Deploy** | Contabo VPS + Docker Compose + Caddy |
 
-## Features
+## System Map
 
-- **Chatbot Anônimo** — Canal seguro com streaming token-by-token estilo ChatGPT
-- **Agente 852** — IA treinada para ocultar dados sensíveis (nomes, CPF, processos) e conduzir relatos estruturados
-- **Histórico Local** — Conversas persistidas no navegador com sidebar colapsável
-- **Markdown Renderizado** — Respostas com listas, negrito, código e tabelas
-- **Model Transparency** — Painel mostrando qual LLM está em uso e custo estimado
-- **Exportação** — PDF, DOCX, Markdown + compartilhamento WhatsApp
-- **Dashboard de Insights** — Visualização de padrões por categoria, cargo e região
-- **Mobile First & Dark Mode** — Design Palantir/Linear para inteligência policial
-- **Privacy by Design** — RLS no Supabase, sem coleta de PII, anonimato total
-- **API Hardening** — Rate limit, validação de payload e fallback explícito de provider
+```text
+src/
+├── app/
+│   ├── api/chat/route.ts         # POST /api/chat — AI streaming + ATRiAN
+│   ├── api/chat/info/route.ts    # GET  /api/chat/info — model metadata
+│   ├── api/review/route.ts       # POST /api/review — AI conversation review
+│   ├── api/report/route.ts       # POST /api/report — AI HTML report gen
+│   ├── api/telemetry/route.ts    # GET  /api/telemetry — stats
+│   ├── chat/page.tsx             # Chat UI + report review modal
+│   ├── reports/page.tsx          # Shared reports + AI report generator
+│   ├── dashboard/page.tsx        # Insights dashboard
+│   ├── ethik/page.tsx            # Gamification leaderboard
+│   ├── admin/telemetry/page.tsx  # Admin telemetry
+│   ├── layout.tsx                # Root layout (Clarity, fonts, metadata)
+│   └── page.tsx                  # Landing page
+├── components/chat/
+│   ├── Sidebar.tsx               # History + nav (Home, Reports, FAQ)
+│   ├── ReportReview.tsx          # 3-step PII → AI → Share modal
+│   ├── FAQModal.tsx              # FAQ
+│   └── MarkdownMessage.tsx       # GFM renderer
+└── lib/
+    ├── ai-provider.ts            # Shared provider config (DRY)
+    ├── atrian.ts                 # ATRiAN ethical output validation
+    ├── chat-store.ts             # localStorage conversations
+    ├── pii-scanner.ts            # PII detection (CPF, RG, MASP, etc.)
+    ├── prompt.ts                 # System prompt + truth layer
+    ├── rate-limit.ts             # In-memory rate limiting
+    ├── report-store.ts           # localStorage reports (Supabase-ready)
+    ├── telemetry.ts              # Dual telemetry (Supabase + JSON logs)
+    └── ethik.ts                  # ETHIK gamification engine
+```
 
 ## Quick Start
 
 ```bash
-git clone <repo> && cd 852
+git clone https://github.com/enioxt/852.git && cd 852
 npm install
-cp .env.example .env   # Configure suas API keys
+cp .env.example .env   # Configure API keys
 npm run dev            # http://localhost:3000
 ```
 
 ## Environment Variables
 
 ```env
-DASHSCOPE_API_KEY=sk-xxx          # Alibaba DashScope (primary)
-OPENROUTER_API_KEY=sk-or-xxx      # OpenRouter paid Gemini 2.0 fallback
-OPENAI_API_KEY=sk-xxx             # Optional tertiary fallback
+DASHSCOPE_API_KEY=sk-xxx              # Alibaba DashScope (primary LLM)
+OPENROUTER_API_KEY=sk-or-xxx          # OpenRouter Gemini 2.0 (fallback)
+NEXT_PUBLIC_CLARITY_ID=xxx            # Microsoft Clarity project ID
+# Optional:
+SUPABASE_URL=https://xxx.supabase.co  # Server-side persistence
+SUPABASE_SERVICE_ROLE_KEY=xxx         # Supabase service key
 ```
+
+## Deploy
+
+```bash
+# Build
+npm run build
+
+# VPS deploy (Contabo)
+rsync -avz --exclude='node_modules' --exclude='.next' --exclude='.env' \
+  --exclude='.git' --exclude='.egos' ./ contabo:/opt/852/
+ssh contabo "cd /opt/852 && docker compose build --no-cache && docker compose up -d"
+
+# Smoke test
+curl -I https://852.egos.ia.br
+```
+
+## Roadmap
+
+| Priority | Feature |
+|----------|---------|
+| **P1** | Supabase persistence (conversations + reports server-side) |
+| **P1** | Dashboard with real aggregated metrics |
+| **P1** | Admin auth for telemetry/reports |
+| **P2** | Session hashing (unique hash per interaction) |
+| **P2** | Agent memory across sessions |
+| **P2** | ETHIK gamification with real data |
+| **P2** | ATRiAN v2: NeMo Guardrails integration |
+| **P3** | Tool use: web search for institutional data |
+| **P3** | Voice input (speech-to-text) |
 
 ## License
 
