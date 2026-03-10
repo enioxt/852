@@ -44,6 +44,10 @@ export default function ChatPage() {
 
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error, setInput } = useChat({
     api: '/api/chat',
+    streamProtocol: 'text',
+    onError: (err) => {
+      console.error('[852-chat] useChat error:', err.message, err);
+    },
     onFinish: () => {
       // persist after AI responds
     },
@@ -346,7 +350,7 @@ export default function ChatPage() {
                   <div className="w-7 h-7 rounded-lg bg-red-900/30 flex items-center justify-center flex-shrink-0">
                     <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
                   </div>
-                  <p className="text-sm text-red-400 py-2">Erro ao processar. Tente novamente.</p>
+                  <p className="text-sm text-red-400 py-2">Erro ao processar: {error?.message || 'Tente novamente.'}</p>
                 </div>
               )}
               <div ref={messagesEndRef} />

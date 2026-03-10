@@ -103,7 +103,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return result.toUIMessageStreamResponse({
+    return result.toTextStreamResponse({
       headers: {
         'X-Model-Id': modelId,
         'X-Provider': providerLabel,
