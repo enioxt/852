@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ShieldAlert, Bot, ArrowRight, MessageSquare, BookOpen, ShieldCheck } from 'lucide-react';
+import { ShieldAlert, Bot, ArrowRight, MessageSquare, BookOpen, ShieldCheck, Trophy, BarChart3 } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -40,6 +40,15 @@ export default function Home() {
           Iniciar Relato Seguro
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </Link>
+
+        <div className="flex gap-3 mt-4">
+          <Link href="/ethik" className="flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300 border border-yellow-500/20 px-4 py-2 rounded-xl hover:bg-yellow-500/5 transition">
+            <Trophy className="w-4 h-4" /> ETHIK Leaderboard
+          </Link>
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 border border-purple-500/20 px-4 py-2 rounded-xl hover:bg-purple-500/5 transition">
+            <BarChart3 className="w-4 h-4" /> Dashboard
+          </Link>
+        </div>
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 w-full text-left">
