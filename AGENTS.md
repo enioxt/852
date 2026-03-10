@@ -47,6 +47,7 @@
 ├── .windsurf/
 │   ├── workflows/                # Synced Windsurf workflows (local symlinks)
 │   └── skills/                   # Synced skills (local symlinks)
+├── docker-compose.yml            # VPS runtime contract (source of truth)
 ├── public/brand/                 # Logo, avatar, OG image, background pattern
 ├── src/app/
 │   ├── api/chat/route.ts         # Main streaming chat endpoint
@@ -108,7 +109,10 @@ curl -s -N -X POST https://852.egos.ia.br/api/chat \
   -d '{"messages":[{"role":"user","content":"oi"}]}'
 
 # VPS deploy
-rsync -avz --exclude='node_modules' --exclude='.next' --exclude='.env' --exclude='.git' ./ contabo:/opt/852/
+rsync -avz --exclude='node_modules' --exclude='.next' --exclude='.env' --exclude='.git' \
+  --exclude='.egos' --exclude='.agent' --exclude='.windsurf' \
+  --exclude='.guarani/orchestration' --exclude='.guarani/philosophy' \
+  --exclude='.guarani/prompts' --exclude='.guarani/refinery' ./ contabo:/opt/852/
 ssh contabo "cd /opt/852 && docker compose build --no-cache && docker compose up -d --force-recreate"
 ```
 

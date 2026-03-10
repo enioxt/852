@@ -13,6 +13,7 @@ Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estrutura�
 │   ├── IDENTITY.md            # Agent 852 identity & mission
 │   └── PREFERENCES.md         # Repo-specific rules and exceptions
 ├── .windsurf/                 # Local symlinked workflows/skills via egos-gov
+├── docker-compose.yml         # VPS runtime contract (source of truth)
 ├── LICENSE                    # MIT license for public reuse
 ├── .husky/
 │   └── pre-commit             # Pre-commit hook (tsc + lint + .env guard + egos-gov)
