@@ -3,6 +3,7 @@ import { agentPrompt } from '@/lib/prompt';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { getProvider, getModelId, getProviderLabel, hasAvailableProvider, PRICING } from '@/lib/ai-provider';
 import { recordChatCompletion, recordRateLimitHit, recordChatError, recordEvent } from '@/lib/telemetry';
+import { validateAndLog } from '@/lib/atrian';
 
 export const maxDuration = 60;
 
@@ -98,7 +99,7 @@ export async function POST(req: Request) {
       system: agentPrompt,
       messages,
       temperature: 0.7,
-      onFinish: async ({ usage }) => {
+      onFinish: async ({ text, usage }) => {
         const inputTokens = usage?.inputTokens || 0;
         const outputTokens = usage?.outputTokens || 0;
         const cost = pricing.free ? 0 : (inputTokens / 1000) * pricing.input + (outputTokens / 1000) * pricing.output;
@@ -107,6 +108,10 @@ export async function POST(req: Request) {
           tokensIn: inputTokens, tokensOut: outputTokens,
           costUsd: cost, clientIp: ip,
         });
+        // ATRiAN: validate completed response and log violations
+        if (text) {
+          validateAndLog(text, ip);
+        }
       },
     });
 

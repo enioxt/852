@@ -18,7 +18,8 @@ export type TelemetryEventType =
   | 'rate_limit_hit'
   | 'report_generation'
   | 'report_error'
-  | 'provider_unavailable';
+  | 'provider_unavailable'
+  | 'atrian_violation';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;

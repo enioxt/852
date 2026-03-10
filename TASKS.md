@@ -28,11 +28,13 @@
 - [x] Fix: stream protocol mismatch (toTextStreamResponse + streamProtocol:'text')
 - [x] DRY refactor: ai-provider.ts shared module (eliminates 3x duplication)
 - [x] Telemetria: Clarity + Supabase + structured JSON logs + admin dashboard (/admin/telemetry)
+- [x] Configurar Microsoft Clarity: projeto vtsny72z0w ativado, NEXT_PUBLIC_CLARITY_ID no .env local e VPS
+- [x] Camada de Verdade ATRiAN: reescrita completa do system prompt (remover Sindpol, epistemic humility, sem siglas inventadas)
+- [x] Módulo ATRiAN (`src/lib/atrian.ts`): validação ética de output com telemetria integrada
 
 ## ⏭️ Backlog
 
 - [ ] Ativar Supabase para 852: criar tabela telemetry_852 (migration pronta), adicionar env vars
-- [ ] Configurar Microsoft Clarity: criar projeto, adicionar NEXT_PUBLIC_CLARITY_ID ao .env
 - [ ] Supabase real + RLS para persistência server-side de conversas
 - [ ] Memória persistente + tools
 - [ ] Dashboard com métricas reais (substituir mock data)
@@ -42,3 +44,6 @@
 - [ ] Decompose `chat/page.tsx` (395 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [ ] CI/CD pipeline (lint + build + smoke on push/PR)
 - [ ] Consolidar package manager (remover vestígios de bun, manter npm)
+- [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
+- [ ] ATRiAN dashboard: visualizar violations no /admin/telemetry
+- [ ] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
