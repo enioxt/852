@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ShieldAlert, Bot, ArrowRight, MessageSquare, BookOpen, ShieldCheck, Trophy, BarChart3 } from 'lucide-react';
+import { ShieldAlert, Bot, ArrowRight, MessageSquare, BookOpen, ShieldCheck, Trophy, BarChart3, FileText } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -47,6 +47,9 @@ export default function Home() {
           </Link>
           <Link href="/dashboard" className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 border border-purple-500/20 px-4 py-2 rounded-xl hover:bg-purple-500/5 transition">
             <BarChart3 className="w-4 h-4" /> Dashboard
+          </Link>
+          <Link href="/reports" className="flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 border border-cyan-500/20 px-4 py-2 rounded-xl hover:bg-cyan-500/5 transition">
+            <FileText className="w-4 h-4" /> Relatórios
           </Link>
         </div>
 
