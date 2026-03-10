@@ -6,14 +6,18 @@ Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estrutura�
 
 ## System Map
 
-```
+```text
 852-inteligencia/
 ├── .guarani/                  # EGOS governance layer
-│   ├── IDENTITY.md            # Agent identity & mission
+│   ├── IDENTITY.md            # Agent 852 identity & mission
 │   └── PREFERENCES.md         # Coding standards & rules
-├── .windsurf/                 # IDE workflows
+├── .husky/
+│   └── pre-commit             # Pre-commit hook (tsc + lint + .env guard)
+├── docs/
+│   └── AUTORESEARCH_TRIGGERS.md  # Trigger system architecture (Karpathy-inspired)
 ├── sql/
-│   └── schema.sql             # Supabase schema (chats, messages, insights + RLS)
+│   ├── schema.sql             # Supabase schema (chats, messages, insights + RLS)
+│   └── ethik.sql              # ETHIK gamification schema (contributors, txs, contests)
 ├── src/
 │   ├── app/
 │   │   ├── api/
@@ -25,11 +29,14 @@ Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estrutura�
 │   │   │   └── page.tsx           # Chat UI (streaming, export, model info)
 │   │   ├── dashboard/
 │   │   │   └── page.tsx           # Insights dashboard (Recharts)
+│   │   ├── ethik/
+│   │   │   └── page.tsx           # ETHIK leaderboard + gamification rules
 │   │   ├── layout.tsx             # Root layout (pt-BR, dark mode)
-│   │   ├── page.tsx               # Landing page
+│   │   ├── page.tsx               # Landing page + navigation
 │   │   └── globals.css            # Tailwind base styles
 │   └── lib/
-│       └── prompt.ts              # System prompt (Agente 852)
+│       ├── prompt.ts              # System prompt (Agente 852)
+│       └── ethik.ts               # ETHIK engine (points, rules, mock data)
 ├── TASKS.md                   # SSOT for tasks (P0/P1/P2)
 ├── .windsurfrules             # EGOS workspace governance
 └── package.json               # 852-inteligencia
