@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import random
 import sys
 import urllib.error
 import urllib.request
@@ -11,13 +12,13 @@ LIMIT = 12
 ATTEMPTS = 14
 
 
-def post(base_url: str) -> int:
+def post(base_url: str, client_ip: str) -> int:
     request = urllib.request.Request(
         f"{base_url.rstrip('/')}/api/chat",
         data=json.dumps({'messages': [{'role': 'user', 'content': 'teste'}]}).encode(),
         headers={
             'Content-Type': 'application/json',
-            'X-Forwarded-For': '203.0.113.10',
+            'X-Forwarded-For': client_ip,
         },
         method='POST',
     )
@@ -29,13 +30,19 @@ def post(base_url: str) -> int:
         return error.code
 
 
+def make_client_ip() -> str:
+    return f"203.0.113.{random.randint(1, 254)}"
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         print('Usage: python3 scripts/verify_rate_limit.py <base-url>', file=sys.stderr)
         return 1
 
     base_url = sys.argv[1]
-    codes = [post(base_url) for _ in range(ATTEMPTS)]
+    client_ip = make_client_ip()
+    print(f'Client IP: {client_ip}')
+    codes = [post(base_url, client_ip) for _ in range(ATTEMPTS)]
 
     for index, code in enumerate(codes, start=1):
         print(f'{index}: {code}')

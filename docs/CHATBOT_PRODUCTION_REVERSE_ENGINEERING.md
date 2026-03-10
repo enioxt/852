@@ -179,6 +179,8 @@ Fix now implemented:
   - `npm run brand:import -- /path/to/stitch.zip`
 - **Local smoke**
   - `npm run smoke:local`
+- **Local production verification**
+  - `npm run verify:local-prod`
 - **Local rate-limit verification**
   - `npm run smoke:rate-limit`
 - **Public smoke**
@@ -195,11 +197,10 @@ Fix now implemented:
 5. Implement only after reading authoritative repo surfaces
 6. Run `npm run lint`
 7. Run `npm run build`
-8. Run `npm run smoke:local`
-9. Run `npm run smoke:rate-limit`
-10. Run `npm run release:prod`
-11. Run `/disseminate`
-12. Run `/end`
+8. Run `npm run verify:local-prod`
+9. Run `npm run release:prod`
+10. Run `/disseminate`
+11. Run `/end`
 
 ## Preventive Heuristics From This Conversation
 
