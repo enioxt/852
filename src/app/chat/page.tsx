@@ -4,13 +4,14 @@ import { useChat } from '@ai-sdk/react';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import {
   Send, Download, Share2, Shield, Bot, Copy, Check,
-  FileText, MessageCircle, AlertTriangle, Zap, ChevronDown
+  FileText, MessageCircle, AlertTriangle, Zap, ChevronDown, Menu
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 import Sidebar from '@/components/chat/Sidebar';
 import FAQModal from '@/components/chat/FAQModal';
+import MarkdownMessage from '@/components/chat/MarkdownMessage';
 import {
   listConversations, getConversation, createConversation,
   updateConversation, generateTitle, type StoredMessage
@@ -24,7 +25,13 @@ const quickActions = [
 ];
 
 export default function ChatPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+    setSidebarOpen(window.innerWidth > 768);
+  }, []);
   const [showFAQ, setShowFAQ] = useState(false);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -169,7 +176,16 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-screen bg-neutral-950 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
+      <div className={`${sidebarOpen ? 'fixed inset-y-0 left-0 z-40 md:relative md:z-auto' : 'hidden md:block'}`}>
       <Sidebar
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
@@ -178,12 +194,20 @@ export default function ChatPage() {
         onNewConversation={handleNewConversation}
         onShowFAQ={() => setShowFAQ(true)}
       />
+      </div>
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
         <header className="flex items-center justify-between px-4 h-14 border-b border-neutral-800/50 bg-neutral-950 flex-shrink-0">
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition md:hidden"
+              title="Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <h1 className="text-sm font-semibold text-white">852 Inteligência</h1>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-900/40 text-green-400 font-medium">Anônimo</span>
           </div>
@@ -282,7 +306,13 @@ export default function ChatPage() {
                             ? 'bg-blue-600 text-white rounded-2xl rounded-tr-md px-4 py-3'
                             : 'text-neutral-200'
                         }`}>
-                          <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">{text}</div>
+                          {isUser ? (
+                            <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">{text}</div>
+                          ) : (
+                            <div className="text-sm leading-relaxed break-words prose-sm">
+                              <MarkdownMessage content={text} />
+                            </div>
+                          )}
                         </div>
                         {/* Action buttons (assistant only) */}
                         {!isUser && (
