@@ -53,6 +53,11 @@ architecture: "MCP-FIRST + NEXUS-ZERO + INTELINK + RHO"
 ### Privacy & PII
 Agents MUST mask CPF/email, specific names, and process numbers in all output.
 
+### Deploy Contract
+`docker-compose.yml` (repo root) é SSOT do runtime no Contabo.
+Deploy por rsync DEVE excluir symlinks/artefatos locais do mesh EGOS.
+Se o Caddy fizer proxy por nome de container, o app DEVE compartilhar a rede reversa correta.
+
 ### SSOT Tasks
 ```
 TASKS.md (root)     ← ÚNICO local para tasks

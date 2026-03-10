@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "governance:check": "bash -lc 'if [ -x \"$HOME/.egos/bin/egos-gov\" ]; then export PATH=\"$HOME/.egos/bin:$PATH\" && egos-gov check; else echo \"egos-gov not found\"; fi'",
+    "governance:sync": "bash -lc 'if [ -x \"$HOME/.egos/bin/egos-gov\" ]; then export PATH=\"$HOME/.egos/bin:$PATH\" && egos-gov sync; else echo \"egos-gov not found\"; fi'",
+    "brand:import": "python3 scripts/import_stitch_assets.py",
+    "smoke:local": "bash scripts/smoke_852.sh local",
+    "smoke:vps": "bash scripts/smoke_852.sh vps",
+    "smoke:public": "bash scripts/smoke_852.sh public",
+    "release:prod": "bash scripts/release_contabo.sh"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
