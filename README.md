@@ -11,8 +11,10 @@ Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estrutura�
 ├── .guarani/                  # EGOS governance layer
 │   ├── IDENTITY.md            # Agent 852 identity & mission
 │   └── PREFERENCES.md         # Coding standards & rules
+├── LICENSE                    # MIT license for public reuse
 ├── .husky/
 │   └── pre-commit             # Pre-commit hook (tsc + lint + .env guard)
+├── netlify.toml               # Web deploy configuration
 ├── docs/
 │   └── AUTORESEARCH_TRIGGERS.md  # Trigger system architecture (Karpathy-inspired)
 ├── sql/
@@ -50,11 +52,11 @@ Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estrutura�
 | **Runtime** | Bun |
 | **AI** | Vercel AI SDK v6 (`@ai-sdk/openai` + `@ai-sdk/react`) |
 | **LLM Primary** | Alibaba Qwen-plus via DashScope |
-| **LLM Fallback** | Google Gemini 2.0 Flash (OpenRouter) / GPT-4o Mini |
+| **LLM Fallback** | Google Gemini 2.0 Flash via OpenRouter (paid) / GPT-4o Mini |
 | **Database** | Supabase PostgreSQL (RLS enforced) |
 | **UI** | TailwindCSS 4 + Lucide Icons + Recharts |
 | **Export** | jsPDF + docx + file-saver |
-| **Deploy** | Vercel |
+| **Deploy** | Netlify or Vercel |
 
 ## Features
 
@@ -79,10 +81,10 @@ bun run dev             # http://localhost:3000
 
 ```env
 DASHSCOPE_API_KEY=sk-xxx          # Alibaba DashScope (primary)
-OPENROUTER_API_KEY=sk-or-xxx      # OpenRouter fallback
-OPENAI_API_KEY=sk-xxx             # OpenAI fallback
+OPENROUTER_API_KEY=sk-or-xxx      # OpenRouter paid Gemini 2.0 fallback
+OPENAI_API_KEY=sk-xxx             # Optional tertiary fallback
 ```
 
 ## License
 
-EGOS Ecosystem — Internal Use
+MIT

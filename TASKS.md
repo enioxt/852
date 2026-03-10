@@ -1,32 +1,34 @@
 # TASKS — 852 Inteligência
 
-## 🚨 P0 - Blockers
+## 🚨 P0 - Go Live
 
-- [x] Inicializar projeto Next.js 16 + Turbopack
-- [x] Fix: Chat não responde (API route + AI SDK v6 compatibility)
-- [ ] Configurar Supabase RLS (anônimo + admin)
+- [x] Fix: chatbot responde e faz streaming token-by-token
+- [x] Alibaba DashScope como modelo primário
+- [x] OpenRouter Gemini 2.0 como fallback pago
+- [x] Auditoria de segredos e vazamentos
+- [x] Repositório público sanitizado `enioxt/852`
+- [x] Deploy v1 no VPS Contabo via Docker (porta 3001, Caddy reverse proxy)
+- [x] UI/UX overhaul: sidebar colapsável, histórico, persistência localStorage, FAQ, quick actions
+- [x] Landing page redesenhada (tema escuro neutro)
+- [ ] **DNS:** Configurar A record `852.egos.ia.br → 217.216.95.126` (Registro.br)
+- [ ] Assets visuais: logo, favicon, OG image (Google Stitch)
 
-## 🏃 P1 - Sprint
+## 🏃 P1 - Polimento
 
-- [x] Chatbot Mobile First (Dark Mode / Police Intelligence)
-- [x] Agent AI: Vercel AI SDK v6 + DashScope (Qwen-plus) + fallback OpenRouter/GPT
-- [x] System prompt (Agente 852): anonimização, condução, multiplicação
-- [x] Exportação de conversa (.md, .pdf, .docx) + WhatsApp
-- [x] Dashboard de Insights (Recharts mockup)
-- [x] Landing page Mobile First
-- [x] Rename: Sindpol Inteligência → 852 Inteligência (todos os arquivos)
-- [x] Model info panel (modelo, provider, custo) + API /api/chat/info
-- [x] README + System Map completo + pre-commit hooks
-- [x] ETHIK Token Distribution: leaderboard, gamificação, SQL schema, regras
-- [x] Geração de relatórios HTML a partir de prompts (/reports + /api/report)
-- [x] Knowledge base: livros (police intelligence + agentic AI) + autoresearch Karpathy
-- [x] Trigger system: arquitetura 4 níveis (docs/AUTORESEARCH_TRIGGERS.md)
+- [x] Chat UI mobile-first com tipografia Geist
+- [x] Prompt institucional com anonimização
+- [x] Exportação PDF/DOCX/Markdown (dropdown)
+- [x] Compartilhamento WhatsApp dinâmico
+- [x] README/.env.example/License para repo público
+- [ ] Markdown rendering nas respostas da IA (bold, listas, código)
+- [ ] Mobile responsive sidebar (drawer no mobile)
+- [ ] Favicon e meta tags OG
 
-## 📝 P2 - Backlog
+## ⏭️ Backlog
 
-- [ ] Conectar Supabase PostgreSQL (chats + insights + ETHIK)
-- [ ] Memória persistente + tools no chatbot
-- [ ] Agentes VPS + Mycelium orquestração em tempo real
-- [ ] Trigger system: implementação Level 0 (data triggers automáticos)
-- [ ] ETHIK: integração real com GitHub API para pontuação automática
-- [ ] ETHIK: wallet registration + on-chain distribution
+- [ ] Supabase real + RLS para persistência server-side
+- [ ] Memória persistente + tools
+- [ ] Dashboard com métricas
+- [ ] ETHIK/Gamificação
+- [ ] Relatórios HTML avançados
+- [ ] Sync repo público GitHub com últimas mudanças

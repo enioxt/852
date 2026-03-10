@@ -2,32 +2,71 @@
 
 import { useChat } from '@ai-sdk/react';
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { Send, Download, Share2, ShieldAlert, Bot, Info, X, Cpu, Zap } from 'lucide-react';
+import {
+  Send, Download, Share2, Shield, Bot, Copy, Check,
+  FileText, MessageCircle, AlertTriangle, Zap, ChevronDown
+} from 'lucide-react';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
+import Sidebar from '@/components/chat/Sidebar';
+import FAQModal from '@/components/chat/FAQModal';
+import {
+  listConversations, getConversation, createConversation,
+  updateConversation, generateTitle, type StoredMessage
+} from '@/lib/chat-store';
 
-interface ModelMeta { modelId: string; provider: string; free: boolean; pricing: { input: number; output: number } }
+const quickActions = [
+  { icon: AlertTriangle, label: 'Relatar problema operacional', prompt: 'Quero relatar um problema operacional que afeta o trabalho da equipe na delegacia.' },
+  { icon: FileText, label: 'Sugerir melhoria de processo', prompt: 'Tenho uma sugestão para melhorar um processo interno que está causando atrasos.' },
+  { icon: MessageCircle, label: 'Falar sobre condições de trabalho', prompt: 'Preciso falar sobre as condições de trabalho na minha unidade.' },
+  { icon: Zap, label: 'Problema com sistema/tecnologia', prompt: 'Estou enfrentando problemas com sistemas ou tecnologia utilizados no serviço.' },
+];
 
 export default function ChatPage() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
-    api: '/api/chat',
-  });
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showFAQ, setShowFAQ] = useState(false);
+  const [activeConvId, setActiveConvId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [showModelInfo, setShowModelInfo] = useState(false);
-  const [modelMeta, setModelMeta] = useState<ModelMeta | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    fetch('/api/chat/info').then(r => r.json()).then(setModelMeta).catch(() => {});
+  const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error, setInput } = useChat({
+    api: '/api/chat',
+    onFinish: () => {
+      // persist after AI responds
+    },
+  });
+
+  // Auto-resize textarea
+  const adjustTextarea = useCallback(() => {
+    const el = inputRef.current;
+    if (el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+    }
   }, []);
+
+  useEffect(() => { adjustTextarea(); }, [input, adjustTextarea]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
+
+  // Persist messages to localStorage
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    if (messages.length === 0 || !activeConvId) return;
+    const stored: StoredMessage[] = messages.map(m => ({
+      id: m.id,
+      role: m.role as 'user' | 'assistant',
+      content: getMessageText(m),
+    }));
+    const title = stored.length > 0 ? generateTitle(stored[0].content) : 'Nova conversa';
+    updateConversation(activeConvId, stored, title);
+  }, [messages, activeConvId]);
 
   const getMessageText = (m: any): string => {
     if (typeof m.content === 'string' && m.content) return m.content;
@@ -37,14 +76,65 @@ export default function ChatPage() {
     return '';
   };
 
+  const handleNewConversation = useCallback(() => {
+    const conv = createConversation();
+    setActiveConvId(conv.id);
+    setMessages([]);
+    setInput('');
+    inputRef.current?.focus();
+  }, [setMessages, setInput]);
+
+  const handleSelectConversation = useCallback((id: string) => {
+    const conv = getConversation(id);
+    if (!conv) return;
+    setActiveConvId(id);
+    const restored = conv.messages.map(m => ({
+      id: m.id,
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+      parts: [{ type: 'text' as const, text: m.content }],
+      createdAt: new Date(),
+    }));
+    setMessages(restored);
+  }, [setMessages]);
+
+  const handleQuickAction = (prompt: string) => {
+    if (!activeConvId) {
+      const conv = createConversation();
+      setActiveConvId(conv.id);
+    }
+    setInput(prompt);
+    inputRef.current?.focus();
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    if (!activeConvId) {
+      const conv = createConversation();
+      setActiveConvId(conv.id);
+    }
+    handleSubmit(e);
+  };
+
+  const copyMessage = async (text: string, id: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  // Export functions
   const generateMarkdown = () => {
     return messages.map((m: any) => `**${m.role === 'user' ? 'Policial' : '852-IA'}**:\n${getMessageText(m)}\n`).join('\n---\n');
   };
 
   const exportPDF = () => {
     const doc = new jsPDF();
-    const splitText = doc.splitTextToSize(generateMarkdown(), 180);
-    doc.text(splitText, 10, 10);
+    const text = messages.map((m: any) => `${m.role === 'user' ? 'Policial' : '852-IA'}: ${getMessageText(m)}`).join('\n\n');
+    const splitText = doc.splitTextToSize(text, 180);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(splitText, 15, 15);
     doc.save('relato-852.pdf');
   };
 
@@ -52,7 +142,7 @@ export default function ChatPage() {
     const doc = new Document({
       sections: [{
         properties: {},
-        children: messages.map((m: any) => 
+        children: messages.map((m: any) =>
           new Paragraph({
             children: [
               new TextRun({ text: `${m.role === 'user' ? 'Policial' : '852-IA'}: `, bold: true }),
@@ -72,143 +162,205 @@ export default function ChatPage() {
   };
 
   const shareWhatsApp = () => {
-    const text = encodeURIComponent("Colega, relatei nossos problemas de forma anônima pro Agente 852 Inteligência. Acessa aí e relata também a sua realidade: https://852.ia.br/chat");
+    const shareUrl = `${window.location.origin}/chat`;
+    const text = encodeURIComponent(`Colega, relatei nossos problemas de forma anônima pelo 852 Inteligência. Acessa aí e relata também: ${shareUrl}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950 text-slate-200">
-      <header className="flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800 shadow-sm sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-600/20 rounded-full">
-            <Bot className="w-6 h-6 text-blue-500" />
-          </div>
-          <div>
-            <h1 className="font-bold text-lg leading-tight text-white">852 Inteligência</h1>
-            <p className="text-xs text-slate-400 flex items-center gap-1">
-              <ShieldAlert className="w-3 h-3 text-green-500" /> Canal Seguro e Anônimo
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={() => setShowModelInfo(!showModelInfo)} className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition" title="Info do Modelo">
-            <Info className="w-5 h-5" />
-          </button>
-          <button onClick={shareWhatsApp} className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition">
-            <Share2 className="w-5 h-5" />
-          </button>
-        </div>
-      </header>
+    <div className="flex h-screen bg-neutral-950 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
+      {/* Sidebar */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        activeConversationId={activeConvId}
+        onSelectConversation={handleSelectConversation}
+        onNewConversation={handleNewConversation}
+        onShowFAQ={() => setShowFAQ(true)}
+      />
 
-      {/* Model Info Panel */}
-      {showModelInfo && (
-        <div className="bg-slate-900 border-b border-slate-800 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2"><Cpu className="w-4 h-4 text-blue-400" /> Modelo de IA</h3>
-            <button onClick={() => setShowModelInfo(false)} className="text-slate-400 hover:text-white"><X className="w-4 h-4" /></button>
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Bar */}
+        <header className="flex items-center justify-between px-4 h-14 border-b border-neutral-800/50 bg-neutral-950 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-sm font-semibold text-white">852 Inteligência</h1>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-900/40 text-green-400 font-medium">Anônimo</span>
           </div>
-          {modelMeta ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">Modelo:</span>
-                <span className="text-xs font-mono text-white bg-slate-800 px-2 py-0.5 rounded">{modelMeta.modelId}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">Provider:</span>
-                <span className="text-xs text-slate-300">{modelMeta.provider}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">Custo:</span>
-                {modelMeta.free ? (
-                  <span className="text-xs font-semibold text-green-400 flex items-center gap-1"><Zap className="w-3 h-3" /> Gratuito</span>
-                ) : (
-                  <span className="text-xs text-orange-400">~$0.002/conversa curta</span>
+          <div className="flex items-center gap-1">
+            {messages.length > 0 && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowExport(!showExport)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-neutral-400 hover:text-white hover:bg-neutral-800 transition"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Exportar</span>
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+                {showExport && (
+                  <div className="absolute right-0 top-full mt-1 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl py-1 z-20 min-w-[140px]">
+                    <button onClick={() => { exportPDF(); setShowExport(false); }} className="w-full px-3 py-2 text-xs text-left text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2">
+                      <FileText className="w-3.5 h-3.5" /> PDF
+                    </button>
+                    <button onClick={() => { exportDocx(); setShowExport(false); }} className="w-full px-3 py-2 text-xs text-left text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2">
+                      <FileText className="w-3.5 h-3.5" /> DOCX
+                    </button>
+                    <button onClick={() => { exportMD(); setShowExport(false); }} className="w-full px-3 py-2 text-xs text-left text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2">
+                      <FileText className="w-3.5 h-3.5" /> Markdown
+                    </button>
+                  </div>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-2">Conversas anônimas. Nenhum dado pessoal armazenado.</p>
+            )}
+            <button onClick={shareWhatsApp} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition" title="Compartilhar">
+              <Share2 className="w-4 h-4" />
+            </button>
+          </div>
+        </header>
+
+        {/* Messages Area */}
+        <main className="flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            /* Welcome Screen */
+            <div className="flex flex-col items-center justify-center h-full px-4">
+              <div className="max-w-2xl w-full text-center space-y-8">
+                <div className="space-y-3">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center mx-auto shadow-lg shadow-blue-900/30">
+                    <Shield className="w-8 h-8 text-white" />
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                    Como posso ajudar?
+                  </h2>
+                  <p className="text-sm text-neutral-500 max-w-md mx-auto leading-relaxed">
+                    Canal seguro e anônimo de inteligência institucional. Relate problemas, sugira melhorias — sem identificação.
+                  </p>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg mx-auto">
+                  {quickActions.map((action, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleQuickAction(action.prompt)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl border border-neutral-800 bg-neutral-900/50 hover:bg-neutral-800/80 hover:border-neutral-700 text-left transition group"
+                    >
+                      <action.icon className="w-4 h-4 text-neutral-500 group-hover:text-blue-400 transition flex-shrink-0" />
+                      <span className="text-xs text-neutral-400 group-hover:text-neutral-200 transition">{action.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-[10px] text-neutral-600 max-w-xs mx-auto">
+                  Não cite nomes, CPFs, REDS ou dados pessoais. O foco é em problemas estruturais e processuais.
+                </p>
+              </div>
             </div>
           ) : (
-            <p className="text-xs text-slate-400">Carregando...</p>
-          )}
-        </div>
-      )}
-
-      <main className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center space-y-4 text-slate-400">
-            <ShieldAlert className="w-12 h-12 text-slate-600" />
-            <p className="max-w-xs">
-              Bem-vindo ao canal seguro do 852 Inteligência. Tudo relatado aqui é <strong>anônimo</strong>. Por favor, <strong>não cite nomes de pessoas, nem CPFs, nem números de processos ou inquéritos</strong>. Nosso objetivo é coletar problemas estruturais e processuais para levarmos ao comando.
-            </p>
-          </div>
-        )}
-        
-        {messages.map((m: any) => (
-          <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] rounded-2xl p-4 ${
-              m.role === 'user' 
-                ? 'bg-blue-600 text-white rounded-br-none' 
-                : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700'
-            }`}>
-              {m.role !== 'user' && (
-                <div className="flex items-center gap-2 mb-2">
-                  <Bot className="w-4 h-4 text-blue-400" />
-                  <span className="text-xs font-semibold text-blue-400">Agente 852</span>
+            /* Messages */
+            <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+              {messages.map((m: any) => {
+                const text = getMessageText(m);
+                const isUser = m.role === 'user';
+                return (
+                  <div key={m.id} className="group">
+                    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
+                      {/* Avatar */}
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                        isUser ? 'bg-blue-600' : 'bg-neutral-800 border border-neutral-700'
+                      }`}>
+                        {isUser ? (
+                          <span className="text-[10px] font-bold text-white">P</span>
+                        ) : (
+                          <Bot className="w-3.5 h-3.5 text-blue-400" />
+                        )}
+                      </div>
+                      {/* Content */}
+                      <div className={`flex-1 min-w-0 ${isUser ? 'text-right' : ''}`}>
+                        <div className={`inline-block text-left max-w-full ${
+                          isUser
+                            ? 'bg-blue-600 text-white rounded-2xl rounded-tr-md px-4 py-3'
+                            : 'text-neutral-200'
+                        }`}>
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">{text}</div>
+                        </div>
+                        {/* Action buttons (assistant only) */}
+                        {!isUser && (
+                          <div className="flex items-center gap-1 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => copyMessage(text, m.id)}
+                              className="p-1 rounded text-neutral-500 hover:text-white hover:bg-neutral-800 transition"
+                              title="Copiar"
+                            >
+                              {copiedId === m.id ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {isLoading && (
+                <div className="flex gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-neutral-800 border border-neutral-700 flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-3.5 h-3.5 text-blue-400" />
+                  </div>
+                  <div className="flex items-center gap-1 py-3">
+                    <span className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
                 </div>
               )}
-              <div className="whitespace-pre-wrap text-sm">{getMessageText(m)}</div>
+              {error && (
+                <div className="flex gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+                  </div>
+                  <p className="text-sm text-red-400 py-2">Erro ao processar. Tente novamente.</p>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-slate-800 text-slate-400 border border-slate-700 rounded-2xl rounded-bl-none p-4 text-sm flex items-center gap-2">
-              <span className="animate-pulse">●</span>
-              <span className="animate-pulse delay-75">●</span>
-              <span className="animate-pulse delay-150">●</span>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </main>
+          )}
+        </main>
 
-      <footer className="p-4 bg-slate-900 border-t border-slate-800 pb-safe">
-        {messages.length > 0 && (
-          <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar">
-            <button onClick={exportPDF} className="text-xs flex items-center gap-1 bg-slate-800 px-3 py-1.5 rounded-full text-slate-300 whitespace-nowrap">
-              <Download className="w-3 h-3" /> PDF
-            </button>
-            <button onClick={exportDocx} className="text-xs flex items-center gap-1 bg-slate-800 px-3 py-1.5 rounded-full text-slate-300 whitespace-nowrap">
-              <Download className="w-3 h-3" /> DOCX
-            </button>
-            <button onClick={exportMD} className="text-xs flex items-center gap-1 bg-slate-800 px-3 py-1.5 rounded-full text-slate-300 whitespace-nowrap">
-              <Download className="w-3 h-3" /> MarkDown
-            </button>
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="flex gap-2 items-end">
-          <textarea
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Relate o fluxo ou problema (não cite nomes)..."
-            className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none max-h-32 min-h-[50px]"
-            rows={1}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e as any);
-              }
-            }}
-          />
-          <button 
-            type="submit" 
-            disabled={isLoading || !input.trim()}
-            className="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition flex-shrink-0"
-          >
-            <Send className="w-5 h-5" />
-          </button>
-        </form>
-      </footer>
+        {/* Input Area */}
+        <div className="border-t border-neutral-800/50 bg-neutral-950 p-4">
+          <form onSubmit={handleFormSubmit} className="max-w-3xl mx-auto">
+            <div className="relative flex items-end bg-neutral-900 border border-neutral-800 rounded-2xl focus-within:border-neutral-600 transition">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={handleInputChange}
+                placeholder="Relate o problema ou faça uma pergunta..."
+                className="flex-1 bg-transparent px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none resize-none max-h-40 min-h-[44px]"
+                rows={1}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleFormSubmit(e);
+                  }
+                }}
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="m-1.5 p-2 bg-white text-black rounded-xl hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition flex-shrink-0"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-[10px] text-neutral-600 text-center mt-2">
+              852 Inteligência • Canal anônimo • Suas conversas ficam apenas neste navegador
+            </p>
+          </form>
+        </div>
+      </div>
+
+      {/* FAQ Modal */}
+      {showFAQ && <FAQModal onClose={() => setShowFAQ(false)} />}
     </div>
   );
 }
