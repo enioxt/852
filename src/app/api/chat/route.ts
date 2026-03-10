@@ -1,14 +1,63 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { agentPrompt } from '@/lib/prompt';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const maxDuration = 60;
+
+const CHAT_LIMIT = {
+  limit: 12,
+  windowMs: 5 * 60 * 1000,
+};
 
 const PRICING: Record<string, { input: number; output: number; free?: boolean }> = {
   'qwen-plus': { input: 0.0008, output: 0.002 },
   'google/gemini-2.0-flash-001': { input: 0, output: 0, free: false },
   'gpt-4o-mini': { input: 0.00015, output: 0.0006 },
 };
+
+type IncomingMessage = {
+  role: 'user' | 'assistant' | 'system';
+  content?: string;
+  parts?: Array<{ type?: string; text?: string }>;
+};
+
+function hasAvailableProvider() {
+  return Boolean(
+    (process.env.DASHSCOPE_API_KEY && process.env.DASHSCOPE_API_KEY !== 'your_dashscope_api_key_here') ||
+    process.env.OPENROUTER_API_KEY ||
+    process.env.OPENAI_API_KEY
+  );
+}
+
+function getMessageText(message: IncomingMessage) {
+  if (typeof message.content === 'string' && message.content.trim()) return message.content.trim();
+  if (Array.isArray(message.parts)) {
+    return message.parts
+      .filter(part => part.type === 'text' && typeof part.text === 'string')
+      .map(part => part.text?.trim() || '')
+      .join('')
+      .trim();
+  }
+  return '';
+}
+
+function sanitizeMessages(messages: unknown) {
+  if (!Array.isArray(messages)) return [];
+
+  return messages
+    .slice(-12)
+    .filter((message): message is IncomingMessage => {
+      if (!message || typeof message !== 'object') return false;
+      const role = (message as IncomingMessage).role;
+      return role === 'user' || role === 'assistant' || role === 'system';
+    })
+    .map(message => ({
+      role: message.role,
+      content: getMessageText(message).slice(0, 4000),
+    }))
+    .filter(message => message.content.length > 0);
+}
 
 function getProvider() {
   const key = process.env.DASHSCOPE_API_KEY;
@@ -42,7 +91,44 @@ function getProviderLabel() {
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    if (!hasAvailableProvider()) {
+      return new Response(JSON.stringify({ error: 'Nenhum provedor de IA está configurado no servidor.' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const ip = getClientIp(req.headers);
+    const rate = checkRateLimit(`chat:${ip}`, CHAT_LIMIT.limit, CHAT_LIMIT.windowMs);
+
+    if (!rate.allowed) {
+      return new Response(JSON.stringify({
+        error: 'Muitas mensagens em pouco tempo. Aguarde alguns minutos antes de tentar novamente.',
+        resetAt: rate.resetAt,
+      }), {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RateLimit-Remaining': String(rate.remaining),
+          'X-RateLimit-Reset': String(rate.resetAt),
+        },
+      });
+    }
+
+    const body = await req.json();
+    const messages = sanitizeMessages(body?.messages);
+
+    if (messages.length === 0) {
+      return new Response(JSON.stringify({ error: 'Nenhuma mensagem válida foi enviada.' }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RateLimit-Remaining': String(rate.remaining),
+          'X-RateLimit-Reset': String(rate.resetAt),
+        },
+      });
+    }
+
     const provider = getProvider();
     const modelId = getModelId();
     const providerLabel = getProviderLabel();
@@ -66,11 +152,14 @@ export async function POST(req: Request) {
         'X-Model-Id': modelId,
         'X-Provider': providerLabel,
         'X-Model-Free': pricing.free ? 'true' : 'false',
+        'X-RateLimit-Remaining': String(rate.remaining),
+        'X-RateLimit-Reset': String(rate.resetAt),
       },
     });
-  } catch (error: any) {
-    console.error('Chat API Error:', error?.message || error);
-    return new Response(JSON.stringify({ error: 'Falha ao processar a mensagem.', detail: error?.message }), {
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Chat API Error:', detail);
+    return new Response(JSON.stringify({ error: 'Falha ao processar a mensagem.', detail }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

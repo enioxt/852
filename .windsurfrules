@@ -29,6 +29,7 @@ architecture: "MCP-FIRST + NEXUS-ZERO + INTELINK + RHO"
 
 - **MCPs:** `.guarani/MCP_ORCHESTRATION_GUIDE.md`
 - **Código:** `.guarani/PREFERENCES.md`
+- **Shared EGOS:** `.egos/guarani/PREFERENCES_SHARED.md`
 - **Design Standards:** `.guarani/DESIGN_STANDARDS.md`
 - **Orquestração:** `.guarani/orchestration/PIPELINE.md`
 
@@ -37,7 +38,7 @@ architecture: "MCP-FIRST + NEXUS-ZERO + INTELINK + RHO"
 - **App:** Next.js 16 + Turbopack + TailwindCSS
 - **Database:** Supabase PostgreSQL
 - **AI/LLM:** Alibaba qwen-plus via DashScope / Gemini via OpenRouter
-- **Deploy:** Vercel
+- **Deploy:** Contabo VPS + Docker Compose + Caddy (`852.egos.ia.br`)
 
 ## 🎨 DESIGN CONSTITUTION (ENTERPRISE)
 

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Shield, Clock } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
+import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock } from 'lucide-react';
 import { listConversations, deleteConversation, type Conversation } from '@/lib/chat-store';
 
 interface SidebarProps {
@@ -26,17 +27,15 @@ function timeAgo(ts: number): string {
 }
 
 export default function Sidebar({ isOpen, onToggle, activeConversationId, onSelectConversation, onNewConversation, onShowFAQ }: SidebarProps) {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [, forceRefresh] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  useEffect(() => {
-    setConversations(listConversations());
-  }, [activeConversationId]);
+  const conversations: Conversation[] = listConversations();
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     deleteConversation(id);
-    setConversations(listConversations());
+    forceRefresh(current => current + 1);
     if (id === activeConversationId) {
       onNewConversation();
     }
@@ -52,9 +51,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
       <div className={`flex items-center ${isOpen ? 'justify-between' : 'justify-center'} p-3 h-14`}>
         {isOpen && (
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
+            <Image src="/brand/logo-852.png" alt="852" width={28} height={28} className="w-7 h-7 rounded-lg object-cover flex-shrink-0" />
             <span className="text-sm font-semibold text-white truncate">852</span>
           </div>
         )}

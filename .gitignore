@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local governance mesh (do not publish machine-specific symlinks)
+.egos
+.agent/
+.windsurf/workflows/
+.windsurf/skills/
+.guarani/orchestration/
+.guarani/philosophy/
+.guarani/prompts/
+.guarani/refinery/

@@ -1,16 +1,22 @@
+import Image from 'next/image';
 import Link from 'next/link';
-import { Shield, ArrowRight, Lock, MessageSquare, FileDown } from 'lucide-react';
+import { ArrowRight, Lock, MessageSquare, FileDown } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col font-[family-name:var(--font-geist-sans)]">
+    <div
+      className="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col font-[family-name:var(--font-geist-sans)]"
+      style={{
+        backgroundImage: "linear-gradient(to bottom, rgba(10,10,10,0.92), rgba(10,10,10,0.98)), url('/brand/bg-pattern.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
       {/* Hero — full screen centered */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
         <div className="max-w-2xl mx-auto space-y-8">
           {/* Logo */}
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center mx-auto shadow-lg shadow-blue-900/20">
-            <Shield className="w-10 h-10 text-white" />
-          </div>
+          <Image src="/brand/logo-852.png" alt="852 Inteligência" width={96} height={96} className="w-24 h-24 rounded-2xl object-cover mx-auto shadow-lg shadow-blue-900/20" />
 
           {/* Headline */}
           <div className="space-y-4">

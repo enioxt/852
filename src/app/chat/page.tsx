@@ -1,9 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import { useChat } from '@ai-sdk/react';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import {
-  Send, Download, Share2, Shield, Bot, Copy, Check,
+  Send, Download, Share2, Copy, Check,
   FileText, MessageCircle, AlertTriangle, Zap, ChevronDown, Menu
 } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -13,7 +14,7 @@ import Sidebar from '@/components/chat/Sidebar';
 import FAQModal from '@/components/chat/FAQModal';
 import MarkdownMessage from '@/components/chat/MarkdownMessage';
 import {
-  listConversations, getConversation, createConversation,
+  getConversation, createConversation,
   updateConversation, generateTitle, type StoredMessage
 } from '@/lib/chat-store';
 
@@ -24,14 +25,16 @@ const quickActions = [
   { icon: Zap, label: 'Problema com sistema/tecnologia', prompt: 'Estou enfrentando problemas com sistemas ou tecnologia utilizados no serviço.' },
 ];
 
+function getMessageText(message: { content?: string; parts?: Array<{ type?: string; text?: string }> }): string {
+  if (typeof message.content === 'string' && message.content) return message.content;
+  if (Array.isArray(message.parts)) {
+    return message.parts.filter((part) => part.type === 'text').map((part) => part.text ?? '').join('');
+  }
+  return '';
+}
+
 export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setHydrated(true);
-    setSidebarOpen(window.innerWidth > 768);
-  }, []);
   const [showFAQ, setShowFAQ] = useState(false);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -74,14 +77,6 @@ export default function ChatPage() {
     const title = stored.length > 0 ? generateTitle(stored[0].content) : 'Nova conversa';
     updateConversation(activeConvId, stored, title);
   }, [messages, activeConvId]);
-
-  const getMessageText = (m: any): string => {
-    if (typeof m.content === 'string' && m.content) return m.content;
-    if (Array.isArray(m.parts)) {
-      return m.parts.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('');
-    }
-    return '';
-  };
 
   const handleNewConversation = useCallback(() => {
     const conv = createConversation();
@@ -175,7 +170,14 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-screen bg-neutral-950 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
+    <div
+      className="flex h-screen bg-neutral-950 text-neutral-200 font-[family-name:var(--font-geist-sans)]"
+      style={{
+        backgroundImage: "linear-gradient(to bottom, rgba(10,10,10,0.95), rgba(10,10,10,0.98)), url('/brand/bg-pattern.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -250,9 +252,7 @@ export default function ChatPage() {
             <div className="flex flex-col items-center justify-center h-full px-4">
               <div className="max-w-2xl w-full text-center space-y-8">
                 <div className="space-y-3">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center mx-auto shadow-lg shadow-blue-900/30">
-                    <Shield className="w-8 h-8 text-white" />
-                  </div>
+                  <Image src="/brand/logo-852.png" alt="852 Inteligência" width={64} height={64} className="w-16 h-16 rounded-2xl object-cover mx-auto shadow-lg shadow-blue-900/30" />
                   <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                     Como posso ajudar?
                   </h2>
@@ -296,7 +296,7 @@ export default function ChatPage() {
                         {isUser ? (
                           <span className="text-[10px] font-bold text-white">P</span>
                         ) : (
-                          <Bot className="w-3.5 h-3.5 text-blue-400" />
+                          <Image src="/brand/agent-avatar.png" alt="Agente 852" width={28} height={28} className="w-7 h-7 rounded-lg object-cover" />
                         )}
                       </div>
                       {/* Content */}
@@ -333,9 +333,7 @@ export default function ChatPage() {
               })}
               {isLoading && (
                 <div className="flex gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-neutral-800 border border-neutral-700 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-3.5 h-3.5 text-blue-400" />
-                  </div>
+                  <Image src="/brand/agent-avatar.png" alt="Agente 852" width={28} height={28} className="w-7 h-7 rounded-lg object-cover flex-shrink-0" />
                   <div className="flex items-center gap-1 py-3">
                     <span className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />

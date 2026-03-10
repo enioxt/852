@@ -10,8 +10,9 @@
 - [x] Deploy v1 no VPS Contabo via Docker (porta 3001, Caddy reverse proxy)
 - [x] UI/UX overhaul: sidebar colapsável, histórico, persistência localStorage, FAQ, quick actions
 - [x] Landing page redesenhada (tema escuro neutro)
-- [ ] **DNS:** Configurar A record `852.egos.ia.br → 217.216.95.126` (Registro.br)
-- [ ] Assets visuais: logo, favicon, OG image (Google Stitch)
+- [x] **DNS:** `852.egos.ia.br` online com HTTPS via Caddy
+- [x] Assets visuais integrados: logo, avatar IA, background pattern, OG image
+- [x] Governança EGOS sincronizada via `egos-gov sync` (`.egos`, workflows, skills, AGENTS.md)
 
 ## 🏃 P1 - Polimento
 
@@ -20,9 +21,10 @@
 - [x] Exportação PDF/DOCX/Markdown (dropdown)
 - [x] Compartilhamento WhatsApp dinâmico
 - [x] README/.env.example/License para repo público
-- [ ] Markdown rendering nas respostas da IA (bold, listas, código)
-- [ ] Mobile responsive sidebar (drawer no mobile)
-- [ ] Favicon e meta tags OG
+- [x] Markdown rendering nas respostas da IA (bold, listas, código)
+- [x] Mobile responsive sidebar (drawer no mobile)
+- [x] Favicon e meta tags OG
+- [x] Hardening inicial da API: rate limit + validação de payload + headers de quota
 
 ## ⏭️ Backlog
 
@@ -31,4 +33,5 @@
 - [ ] Dashboard com métricas
 - [ ] ETHIK/Gamificação
 - [ ] Relatórios HTML avançados
+- [ ] Refinar OG image para proporção 1200x630 real
 - [ ] Sync repo público GitHub com últimas mudanças

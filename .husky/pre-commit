@@ -24,3 +24,6 @@ if git diff --cached --name-only | grep -q "^\.env$"; then
 fi
 
 echo "✅ Pre-commit passed."
+
+# EGOS Governance Check
+[ -x "$HOME/.egos/bin/egos-gov" ] && "$HOME/.egos/bin/egos-gov" check --quiet || { echo "⚠️  Governance drift detected. Run: egos-gov sync"; }
