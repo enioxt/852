@@ -13,6 +13,7 @@
     "smoke:local": "bash scripts/smoke_852.sh local",
     "smoke:vps": "bash scripts/smoke_852.sh vps",
     "smoke:public": "bash scripts/smoke_852.sh public",
+    "smoke:rate-limit": "python3 scripts/verify_rate_limit.py http://127.0.0.1:3100",
     "release:prod": "bash scripts/release_contabo.sh"
   },
   "dependencies": {

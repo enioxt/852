@@ -113,6 +113,7 @@ Symptoms:
 Fix now implemented:
 
 - `npm run release:prod`
+- local production boot + smoke + rate-limit verification before VPS deploy
 
 ### Gap 2 — No reusable Stitch import path
 
@@ -178,6 +179,8 @@ Fix now implemented:
   - `npm run brand:import -- /path/to/stitch.zip`
 - **Local smoke**
   - `npm run smoke:local`
+- **Local rate-limit verification**
+  - `npm run smoke:rate-limit`
 - **Public smoke**
   - `npm run smoke:public`
 - **Full release**
@@ -193,9 +196,10 @@ Fix now implemented:
 6. Run `npm run lint`
 7. Run `npm run build`
 8. Run `npm run smoke:local`
-9. Run `npm run release:prod`
-10. Run `/disseminate`
-11. Run `/end`
+9. Run `npm run smoke:rate-limit`
+10. Run `npm run release:prod`
+11. Run `/disseminate`
+12. Run `/end`
 
 ## Preventive Heuristics From This Conversation
 
