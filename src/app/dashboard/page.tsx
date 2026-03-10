@@ -1,10 +1,10 @@
 'use client';
 
-import { ShieldAlert, Bot, ArrowLeft, BarChart3, Users, AlertTriangle, TrendingUp, Search } from 'lucide-react';
+import { Bot, ArrowLeft, BarChart3, Users, AlertTriangle, TrendingUp, Search } from 'lucide-react';
 import Link from 'next/link';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, Legend
+  PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
 
 // Mock data based on the Sindpol WhatsApp conversation analysis
