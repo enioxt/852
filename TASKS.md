@@ -31,19 +31,27 @@
 - [x] Configurar Microsoft Clarity: projeto vtsny72z0w ativado, NEXT_PUBLIC_CLARITY_ID no .env local e VPS
 - [x] Camada de Verdade ATRiAN: reescrita completa do system prompt (remover Sindpol, epistemic humility, sem siglas inventadas)
 - [x] Módulo ATRiAN (`src/lib/atrian.ts`): validação ética de output com telemetria integrada
+- [x] Report Sharing System: PII scanner + AI review + report store + ReportReview modal
+- [x] PII Scanner (`src/lib/pii-scanner.ts`): CPF, RG, MASP, phone, email, REDS, plates, names
+- [x] AI Review API (`/api/review`): conversation completeness analysis, topic suggestions, blind spots
+- [x] Report Store (`src/lib/report-store.ts`): localStorage persistence, share/delete controls
+- [x] /reports page refactored: shared reports tab + AI report generator tab
+- [x] Landing page: 4-feature grid + reports CTA link
 
 ## ⏭️ Backlog
 
 - [ ] Ativar Supabase para 852: criar tabela telemetry_852 (migration pronta), adicionar env vars
-- [ ] Supabase real + RLS para persistência server-side de conversas
+- [ ] Supabase real + RLS para persistência server-side de conversas e relatórios
+- [ ] Migrar report-store de localStorage para Supabase (reports_852 table)
 - [ ] Memória persistente + tools
 - [ ] Dashboard com métricas reais (substituir mock data)
 - [ ] ETHIK/Gamificação com dados reais
 - [ ] Relatórios HTML avançados
 - [ ] Refinar OG image para proporção 1200x630 real
-- [ ] Decompose `chat/page.tsx` (395 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
+- [ ] Decompose `chat/page.tsx` (~420 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [ ] CI/CD pipeline (lint + build + smoke on push/PR)
 - [ ] Consolidar package manager (remover vestígios de bun, manter npm)
 - [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
 - [ ] ATRiAN dashboard: visualizar violations no /admin/telemetry
 - [ ] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
+- [ ] Admin view para relatórios compartilhados (autenticado)

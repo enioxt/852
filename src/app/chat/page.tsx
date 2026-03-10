@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 import Sidebar from '@/components/chat/Sidebar';
 import FAQModal from '@/components/chat/FAQModal';
 import MarkdownMessage from '@/components/chat/MarkdownMessage';
+import ReportReview from '@/components/chat/ReportReview';
 import {
   getConversation, createConversation,
   updateConversation, generateTitle, type StoredMessage
@@ -39,6 +40,7 @@ export default function ChatPage() {
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
+  const [showReportReview, setShowReportReview] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -243,6 +245,15 @@ export default function ChatPage() {
                 )}
               </div>
             )}
+            {messages.length >= 2 && (
+              <button
+                onClick={() => setShowReportReview(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-green-400 hover:text-green-300 hover:bg-green-900/20 transition border border-green-800/30"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Enviar Relatório</span>
+              </button>
+            )}
             <button onClick={shareWhatsApp} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition" title="Compartilhar">
               <Share2 className="w-4 h-4" />
             </button>
@@ -393,6 +404,20 @@ export default function ChatPage() {
 
       {/* FAQ Modal */}
       {showFAQ && <FAQModal onClose={() => setShowFAQ(false)} />}
+
+      {/* Report Review Modal */}
+      {showReportReview && activeConvId && (
+        <ReportReview
+          messages={messages.map(m => ({ role: m.role, content: getMessageText(m) }))}
+          conversationId={activeConvId}
+          onClose={() => setShowReportReview(false)}
+          onSuggestionClick={(suggestion) => {
+            setShowReportReview(false);
+            setInput(suggestion);
+            inputRef.current?.focus();
+          }}
+        />
+      )}
     </div>
   );
 }

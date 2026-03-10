@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Lock, MessageSquare, FileDown } from 'lucide-react';
+import { ArrowRight, Lock, MessageSquare, FileDown, Users } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -41,7 +41,7 @@ export default function Home() {
           </Link>
 
           {/* Features — minimal */}
-          <div className="grid grid-cols-3 gap-8 mt-16 w-full max-w-sm">
+          <div className="grid grid-cols-4 gap-6 mt-16 w-full max-w-md">
             <div className="flex flex-col items-center gap-2.5">
               <div className="w-12 h-12 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center">
                 <Lock className="w-5 h-5 text-green-400" />
@@ -60,7 +60,23 @@ export default function Home() {
               </div>
               <p className="text-xs text-neutral-500">Exportar relato</p>
             </div>
+            <div className="flex flex-col items-center gap-2.5">
+              <div className="w-12 h-12 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center">
+                <Users className="w-5 h-5 text-amber-400" />
+              </div>
+              <p className="text-xs text-neutral-500">Colaboração</p>
+            </div>
           </div>
+
+          {/* Secondary CTA — Reports */}
+          <Link
+            href="/reports"
+            className="mt-6 flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition"
+          >
+            <Users className="w-4 h-4" />
+            Ver relatórios compartilhados
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </main>
 
