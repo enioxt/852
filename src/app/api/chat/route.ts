@@ -1,7 +1,7 @@
-import { createOpenAI } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { agentPrompt } from '@/lib/prompt';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { getProvider, getModelId, getProviderLabel, hasAvailableProvider, PRICING } from '@/lib/ai-provider';
 
 export const maxDuration = 60;
 
@@ -10,25 +10,11 @@ const CHAT_LIMIT = {
   windowMs: 5 * 60 * 1000,
 };
 
-const PRICING: Record<string, { input: number; output: number; free?: boolean }> = {
-  'qwen-plus': { input: 0.0008, output: 0.002 },
-  'google/gemini-2.0-flash-001': { input: 0, output: 0, free: false },
-  'gpt-4o-mini': { input: 0.00015, output: 0.0006 },
-};
-
 type IncomingMessage = {
   role: 'user' | 'assistant' | 'system';
   content?: string;
   parts?: Array<{ type?: string; text?: string }>;
 };
-
-function hasAvailableProvider() {
-  return Boolean(
-    (process.env.DASHSCOPE_API_KEY && process.env.DASHSCOPE_API_KEY !== 'your_dashscope_api_key_here') ||
-    process.env.OPENROUTER_API_KEY ||
-    process.env.OPENAI_API_KEY
-  );
-}
 
 function getMessageText(message: IncomingMessage) {
   if (typeof message.content === 'string' && message.content.trim()) return message.content.trim();
@@ -57,36 +43,6 @@ function sanitizeMessages(messages: unknown) {
       content: getMessageText(message).slice(0, 4000),
     }))
     .filter(message => message.content.length > 0);
-}
-
-function getProvider() {
-  const key = process.env.DASHSCOPE_API_KEY;
-  if (key && key !== 'your_dashscope_api_key_here') {
-    return createOpenAI({
-      apiKey: key,
-      baseURL: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
-    });
-  }
-  const orKey = process.env.OPENROUTER_API_KEY;
-  if (orKey) {
-    return createOpenAI({
-      apiKey: orKey,
-      baseURL: 'https://openrouter.ai/api/v1',
-    });
-  }
-  return createOpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
-}
-
-function getModelId() {
-  if (process.env.DASHSCOPE_API_KEY && process.env.DASHSCOPE_API_KEY !== 'your_dashscope_api_key_here') return 'qwen-plus';
-  if (process.env.OPENROUTER_API_KEY) return 'google/gemini-2.0-flash-001';
-  return 'gpt-4o-mini';
-}
-
-function getProviderLabel() {
-  if (process.env.DASHSCOPE_API_KEY && process.env.DASHSCOPE_API_KEY !== 'your_dashscope_api_key_here') return 'Alibaba DashScope';
-  if (process.env.OPENROUTER_API_KEY) return 'OpenRouter (paid)';
-  return 'OpenAI';
 }
 
 export async function POST(req: Request) {

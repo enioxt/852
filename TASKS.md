@@ -30,8 +30,11 @@
 
 - [ ] Supabase real + RLS para persistência server-side
 - [ ] Memória persistente + tools
-- [ ] Dashboard com métricas
-- [ ] ETHIK/Gamificação
+- [ ] Dashboard com métricas reais (substituir mock data)
+- [ ] ETHIK/Gamificação com dados reais
 - [ ] Relatórios HTML avançados
 - [ ] Refinar OG image para proporção 1200x630 real
 - [ ] Sync repo público GitHub com últimas mudanças
+- [ ] Decompose `chat/page.tsx` (395 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
+- [ ] CI/CD pipeline (lint + build + smoke on push/PR)
+- [ ] Consolidar package manager (remover vestígios de bun, manter npm)

@@ -1,31 +1,13 @@
-import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
+import { getProvider, getModelId, hasAvailableProvider } from '@/lib/ai-provider';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const maxDuration = 60;
 
-function getProvider() {
-  const key = process.env.DASHSCOPE_API_KEY;
-  if (key && key !== 'your_dashscope_api_key_here') {
-    return createOpenAI({
-      apiKey: key,
-      baseURL: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
-    });
-  }
-  const orKey = process.env.OPENROUTER_API_KEY;
-  if (orKey) {
-    return createOpenAI({
-      apiKey: orKey,
-      baseURL: 'https://openrouter.ai/api/v1',
-    });
-  }
-  return createOpenAI({ apiKey: process.env.OPENAI_API_KEY || '' });
-}
-
-function getModelId() {
-  if (process.env.DASHSCOPE_API_KEY && process.env.DASHSCOPE_API_KEY !== 'your_dashscope_api_key_here') return 'qwen-plus';
-  if (process.env.OPENROUTER_API_KEY) return 'google/gemini-2.0-flash-001';
-  return 'gpt-4o-mini';
-}
+const REPORT_LIMIT = {
+  limit: 6,
+  windowMs: 10 * 60 * 1000,
+};
 
 const REPORT_SYSTEM_PROMPT = `Você é um gerador de relatórios HTML para a plataforma 852 Inteligência.
 Ao receber um prompt do usuário, gere um relatório HTML COMPLETO e profissional.
@@ -48,6 +30,30 @@ ESTILO VISUAL:
 
 export async function POST(req: Request) {
   try {
+    if (!hasAvailableProvider()) {
+      return new Response(JSON.stringify({ error: 'Nenhum provedor de IA está configurado no servidor.' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const ip = getClientIp(req.headers);
+    const rate = checkRateLimit(`report:${ip}`, REPORT_LIMIT.limit, REPORT_LIMIT.windowMs);
+
+    if (!rate.allowed) {
+      return new Response(JSON.stringify({
+        error: 'Muitos relatórios em pouco tempo. Aguarde alguns minutos.',
+        resetAt: rate.resetAt,
+      }), {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RateLimit-Remaining': String(rate.remaining),
+          'X-RateLimit-Reset': String(rate.resetAt),
+        },
+      });
+    }
+
     const { prompt } = await req.json();
 
     if (!prompt || typeof prompt !== 'string') {
@@ -84,9 +90,10 @@ export async function POST(req: Request) {
         'X-Model-Id': modelId,
       },
     });
-  } catch (error: any) {
-    console.error('Report API Error:', error?.message || error);
-    return new Response(JSON.stringify({ error: 'Falha ao gerar relatório', detail: error?.message }), {
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Report API Error:', detail);
+    return new Response(JSON.stringify({ error: 'Falha ao gerar relatório', detail }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
