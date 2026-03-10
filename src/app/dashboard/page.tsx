@@ -7,7 +7,7 @@ import {
   PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
 
-// Mock data based on the Sindpol WhatsApp conversation analysis
+// Mock data based on institutional intelligence analysis
 const issuesData = [
   { name: 'Infraestrutura', count: 45 },
   { name: 'Efetivo', count: 82 },

@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sindpol Inteligência",
-  description: "Canal de coleta de dados de inteligência Sindpol-MG",
+  title: "852 Inteligência",
+  description: "Canal de inteligência institucional para os 852 municípios de Minas Gerais",
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

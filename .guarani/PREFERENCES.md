@@ -1,4 +1,4 @@
-# GUARANI PREFERENCES — EGOS-Sindpol
+# GUARANI PREFERENCES — 852 Inteligência
 
 > **Version:** 2.0.0
 

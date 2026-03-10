@@ -11,7 +11,7 @@ export default function Home() {
             <Bot className="w-8 h-8 text-blue-500" />
           </div>
           <div>
-            <h1 className="font-bold text-2xl leading-tight text-white tracking-tight">Sindpol Inteligência</h1>
+            <h1 className="font-bold text-2xl leading-tight text-white tracking-tight">852 Inteligência</h1>
             <p className="text-sm text-slate-400">Canal Seguro do Policial Civil</p>
           </div>
         </div>
@@ -28,7 +28,7 @@ export default function Home() {
         </h2>
         
         <p className="text-lg text-slate-400 mb-10 leading-relaxed">
-          Este é o canal de Inteligência do Sindpol-MG para mapear problemas estruturais, 
+          Este é o canal de Inteligência 852 para mapear problemas estruturais, 
           gargalos no fluxo de trabalho e sugestões de melhoria nas delegacias. 
           Sem exposição, sem nomes, focado em soluções institucionais.
         </p>
