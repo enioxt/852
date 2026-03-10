@@ -1,0 +1,62 @@
+# .windsurfrules — EGOSv3 Production Workspace
+# VERSION 5.4.0
+# MAX_LINES: 150 (HARD LIMIT)
+
+---
+sacred_code: "000.111.369.963.1618"
+version: "5.4.0"
+project: "EGOS-Sindpol-Chat"
+architecture: "MCP-FIRST + NEXUS-ZERO + INTELINK + RHO"
+---
+
+## ⚡ PRIME DIRECTIVE
+
+> **NEVER write manual logic if a Tool (MCP) exists.**
+> **ALWAYS read the appropriate guide before complex actions.**
+> **CHALLENGE before EXECUTE. Process before code.**
+
+## 🎯 MANDAMENTOS (ABSOLUTOS)
+
+1. **START** → Execute `/start` antes de qualquer trabalho
+2. **READ** → "Já Concluído" = NÃO REIMPLEMENTAR
+3. **SSOT** → Tasks APENAS em `TASKS.md` (root)
+4. **THINK** → Sequential Thinking (P0=7, P1=5, P2=3 thoughts)
+5. **COMMIT** → Convencional (feat:/fix:/chore:) cada 30-60min
+6. **END** → Execute `/end` ao finalizar
+7. **ONE THING** → Cada agente faz UMA coisa.
+
+## 📂 GUIAS
+
+- **MCPs:** `.guarani/MCP_ORCHESTRATION_GUIDE.md`
+- **Código:** `.guarani/PREFERENCES.md`
+- **Design Standards:** `.guarani/DESIGN_STANDARDS.md`
+- **Orquestração:** `.guarani/orchestration/PIPELINE.md`
+
+## 🚀 DEPLOY & INFRAESTRUTURA
+
+- **App:** Next.js 16 + Turbopack + TailwindCSS
+- **Database:** Supabase PostgreSQL
+- **AI/LLM:** Alibaba qwen-plus via DashScope / Gemini via OpenRouter
+- **Deploy:** Vercel
+
+## 🎨 DESIGN CONSTITUTION (ENTERPRISE)
+
+1. **Identity:** "Police Intelligence" (Palantir/Linear style). Dark Mode Only.
+2. **Spacing:** Tailwind 4pt grid (`gap-4`, `p-6`). NO magic numbers.
+3. **Fitts's Law:** Hit-area min 40x40px. Padding INSIDE links.
+4. **Symmetry:** Inputs/Buttons share height (`h-10` or `h-12`).
+5. **Colors:** 🔴Danger 🟠Warn 🟢Safe 🔵Action ⚪Text ⚫Structure.
+
+## 🚨 REGRAS CRÍTICAS
+
+### Privacy & PII
+Agents MUST mask CPF/email, specific names, and process numbers in all output.
+
+### SSOT Tasks
+```
+TASKS.md (root)     ← ÚNICO local para tasks
+├── P0 = Blockers (máx 3)
+├── P1 = Sprint (máx 5)
+├── P2 = Backlog
+└── MÁX 500 linhas
+```
