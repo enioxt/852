@@ -25,16 +25,20 @@
 - [x] Mobile responsive sidebar (drawer no mobile)
 - [x] Favicon e meta tags OG
 - [x] Hardening inicial da API: rate limit + validação de payload + headers de quota
+- [x] Fix: stream protocol mismatch (toTextStreamResponse + streamProtocol:'text')
+- [x] DRY refactor: ai-provider.ts shared module (eliminates 3x duplication)
+- [x] Telemetria: Clarity + Supabase + structured JSON logs + admin dashboard (/admin/telemetry)
 
 ## ⏭️ Backlog
 
-- [ ] Supabase real + RLS para persistência server-side
+- [ ] Ativar Supabase para 852: criar tabela telemetry_852 (migration pronta), adicionar env vars
+- [ ] Configurar Microsoft Clarity: criar projeto, adicionar NEXT_PUBLIC_CLARITY_ID ao .env
+- [ ] Supabase real + RLS para persistência server-side de conversas
 - [ ] Memória persistente + tools
 - [ ] Dashboard com métricas reais (substituir mock data)
 - [ ] ETHIK/Gamificação com dados reais
 - [ ] Relatórios HTML avançados
 - [ ] Refinar OG image para proporção 1200x630 real
-- [ ] Sync repo público GitHub com últimas mudanças
 - [ ] Decompose `chat/page.tsx` (395 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [ ] CI/CD pipeline (lint + build + smoke on push/PR)
 - [ ] Consolidar package manager (remover vestígios de bun, manter npm)
