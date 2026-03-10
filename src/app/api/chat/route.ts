@@ -2,6 +2,7 @@ import { streamText } from 'ai';
 import { agentPrompt } from '@/lib/prompt';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { getProvider, getModelId, getProviderLabel, hasAvailableProvider, PRICING } from '@/lib/ai-provider';
+import { recordChatCompletion, recordRateLimitHit, recordChatError, recordEvent } from '@/lib/telemetry';
 
 export const maxDuration = 60;
 
@@ -48,6 +49,7 @@ function sanitizeMessages(messages: unknown) {
 export async function POST(req: Request) {
   try {
     if (!hasAvailableProvider()) {
+      recordEvent({ event_type: 'provider_unavailable', status_code: 503 });
       return new Response(JSON.stringify({ error: 'Nenhum provedor de IA está configurado no servidor.' }), {
         status: 503,
         headers: { 'Content-Type': 'application/json' },
@@ -58,6 +60,7 @@ export async function POST(req: Request) {
     const rate = checkRateLimit(`chat:${ip}`, CHAT_LIMIT.limit, CHAT_LIMIT.windowMs);
 
     if (!rate.allowed) {
+      recordRateLimitHit(ip, '/api/chat');
       return new Response(JSON.stringify({
         error: 'Muitas mensagens em pouco tempo. Aguarde alguns minutos antes de tentar novamente.',
         resetAt: rate.resetAt,
@@ -99,7 +102,11 @@ export async function POST(req: Request) {
         const inputTokens = usage?.inputTokens || 0;
         const outputTokens = usage?.outputTokens || 0;
         const cost = pricing.free ? 0 : (inputTokens / 1000) * pricing.input + (outputTokens / 1000) * pricing.output;
-        console.log(`[852] model=${modelId} provider=${providerLabel} in=${inputTokens} out=${outputTokens} cost=$${cost.toFixed(6)}`);
+        recordChatCompletion({
+          modelId, provider: providerLabel,
+          tokensIn: inputTokens, tokensOut: outputTokens,
+          costUsd: cost, clientIp: ip,
+        });
       },
     });
 
@@ -114,7 +121,7 @@ export async function POST(req: Request) {
     });
   } catch (error: unknown) {
     const detail = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Chat API Error:', detail);
+    recordChatError(detail, getClientIp(req.headers));
     return new Response(JSON.stringify({ error: 'Falha ao processar a mensagem.', detail }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
