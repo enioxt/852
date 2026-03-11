@@ -30,6 +30,8 @@ export type TelemetryEventType =
   | 'notification_error'
   | 'user_registered'
   | 'user_login'
+  | 'email_verification_sent'
+  | 'email_verified'
   | 'rate_limited';
 
 export interface TelemetryEvent {

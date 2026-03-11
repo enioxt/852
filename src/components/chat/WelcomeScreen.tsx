@@ -24,7 +24,7 @@ export default function WelcomeScreen({ onQuickAction }: WelcomeScreenProps) {
             Fala, parceiro. Aqui é o Tira-Voz.
           </h2>
           <p className="text-base text-neutral-400 max-w-md mx-auto leading-relaxed">
-            Canal seguro e anônimo. Relate problemas, sugira melhorias — sem identificação. Sua voz já existe, aqui ela chega onde precisa.
+            Canal seguro e anônimo. Relate problemas, sugira melhorias, sem identificação. Sua voz já existe, aqui ela chega onde precisa.
           </p>
         </div>
 

@@ -92,32 +92,36 @@
 - [x] Diagnóstico multi-repo consolidado em `/home/enio/.egos/hooks/HOOK_MIGRATION_STATUS.md`
 - [x] Bootstrap de governança no repo privado `policia`: `AGENTS.md`, `TASKS.md`, `docs/SYSTEM_MAP.md`, `.windsurf/workflows/ovm.md`
 
-## 🏃 P1 - Sprint v5 (Security + Report Flow)
+## 🏃 P1 - Sprint v5 (Anonymous Identity + Gamification)
 
-- [ ] **Email verification flow**: enviar token de confirmação por email (Resend/Supabase Edge) antes de ativar conta
-- [ ] **Espiral de Escuta**: relatórios com <85% aprovação (5+ votos) reabrem rodada de discussão; comentários dos revisores viram prompt para nova análise IA; ciclo se repete até consenso
-- [ ] **Report flow multi-camada**: usuário itera → envia → IA analisa com regras claras → usuário acolhe sugestões → envia para revisão humana obrigatória → votação maioria simples
-- [ ] **Free-text report mode**: caixa de texto livre na landing + upload (doc/docx/pdf/md/audio) com mesma pipeline de análise do chatbot
-- [ ] **Audio transcription**: integrar Web Speech API / Whisper para transcrever áudio enviado pelo usuário na submissão de relatos
-- [ ] **Lotação auto-detect via chatbot**: se usuário mencionar lotação, confirmar e vincular ao perfil (sem expor em relatórios)
-- [ ] **Suggest external LLMs**: ao finalizar relatório, sugerir que usuário copie prompt final e passe por Claude/Gemini/GPT para aprimorar
-- [ ] **LGPD consent banner**: aviso explícito de consentimento no cadastro com referência à Lei 13.709/2018
-- [ ] **User self-service data access**: usuário pode ver/exportar/deletar seus próprios dados (LGPD Art. 18)
+- [x] **Email verification flow**: token de confirmação por email (Resend) antes de ativar conta
+- [x] **Sistema de identidade anônima**: nickname generator (codinomes policiais) + validação AI de nomes reais (Gemini Flash via OpenRouter)
+- [x] **Redesign do registro**: codinome auto-gerado, modo personalizar com validação AI, MASP/lotação opcionais e nunca públicos
+- [x] **Gamificação**: sistema de pontos (report=10, issue=5, comment=3, vote=1), ranks policiais (Recruta a Comissário), leaderboard anônimo
+- [x] **Mobile bottom nav**: navegação fixa no rodapé para mobile (Home, Chat, Fórum, Relatos, Painel)
+- [x] **Copy rules**: remoção de travessões (em-dashes) de todo o copy público
+- [ ] **Supabase migrations**: aplicar migration_v4 + v5 + v6 no banco (lotação, email verification, gamification)
+- [ ] **Espiral de Escuta**: relatórios com <85% aprovação reabrem rodada de discussão
+- [ ] **Report flow multi-camada**: usuário itera, IA analisa, revisão humana, votação maioria
+- [ ] **Free-text report mode**: caixa de texto livre na landing + upload com mesma pipeline
+- [ ] **Audio transcription**: Web Speech API / Whisper para transcrever áudio
+- [ ] **LGPD consent banner**: consentimento explícito no cadastro (Lei 13.709/2018)
+- [ ] **User self-service data access**: ver/exportar/deletar dados (LGPD Art. 18)
 
 ## ⏭️ Backlog
 
 - [x] Dashboard UI com métricas reais Recharts (substituir mock data no /dashboard)
 - [x] Migrar report-store de localStorage para Supabase (dual write: local + server)
 - [x] Session hashing: cada interação gera um hash único rastreável
-- [x] Memória persistente do agente entre sessões (conversation summaries → system prompt)
-- [x] Sincronizar `/reports` ↔ `ai_reports_852` ↔ `/issues` com links bidirecionais e filtro por relatório
+- [x] Memória persistente do agente entre sessões (conversation summaries, system prompt)
+- [x] Sincronizar `/reports`, `ai_reports_852`, `/issues` com links bidirecionais e filtro por relatório
 - [x] Corrigir drift de schema das issues (`ai_report_id`) e deduplicar recorrência de tópicos gerados por IA
 - [x] Roteamento inteligente de modelos por tarefa (chat/review/html/intelligence/summary)
 - [x] Harden `/start` compartilhado: System Map, module roots, workflows e deploy surface como ativação mandatória
 - [x] Eliminar warnings SSR do Recharts no build do /dashboard
 - [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
 - [ ] Refinar OG image para proporção 1200x630 real
-- [x] Decompose `chat/page.tsx` (~450 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
+- [x] Decompose `chat/page.tsx` (~450 lines), extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [x] CI/CD pipeline (lint + build + smoke on push/PR)
 - [x] Consolidar package manager (remover vestígios de bun, manter npm)
 - [x] Pipeline real de notificações do 852 (Telegram/Discord/webhook/admin alerts) acoplado a eventos críticos
@@ -129,3 +133,8 @@
 - [ ] Voice input (speech-to-text via Browser API)
 - [ ] Proactive collaboration suggestions (agent sugere temas durante a conversa)
 - [x] User-linked conversation persistence (load from Supabase when logged in)
+- [ ] BYOK: usuários plugam próprias API keys, grupos com chave compartilhada
+- [ ] Fórum: notificações, follow-up mode, integração cross-page
+- [ ] AI Reports v2: auto-análise a cada 5 relatos, HTML output, padrões cross-report
+- [ ] Lotação auto-detect via chatbot: mencionar lotação, confirmar e vincular ao perfil
+- [ ] Suggest external LLMs: sugerir que usuário passe prompt por Claude/Gemini/GPT

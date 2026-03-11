@@ -24,12 +24,12 @@ export async function POST(req: Request) {
     }
 
     const result = await registerUser(email, password, displayName, masp, lotacao);
-    if (result.error) {
+    if ('error' in result) {
       return Response.json({ error: result.error }, { status: 400 });
     }
 
     recordEvent({ event_type: 'user_registered', metadata: { userId: result.user?.id } });
-    return Response.json({ user: result.user });
+    return Response.json(result, { status: result.verificationEmailSent ? 200 : 202 });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Erro interno';
     return Response.json({ error: msg }, { status: 500 });

@@ -50,6 +50,9 @@
 ├── src/app/
 │   ├── api/chat/route.ts             # POST /api/chat — AI streaming + ATRiAN validation
 │   ├── api/chat/info/route.ts        # GET  /api/chat/info — model/provider metadata
+│   ├── api/auth/generate-nickname/   # GET  /api/auth/generate-nickname — random codenames
+│   ├── api/auth/validate-name/       # POST /api/auth/validate-name — AI real-name blocker
+│   ├── api/leaderboard/route.ts      # GET  /api/leaderboard — anonymous reputation board
 │   ├── api/review/route.ts           # POST /api/review — AI conversation analysis
 │   ├── api/report/route.ts           # POST /api/report — AI HTML report generation
 │   ├── api/telemetry/route.ts        # GET  /api/telemetry — stats from Supabase
@@ -70,19 +73,24 @@
 │   ├── ChatInputArea.tsx             # Chat input form
 │   └── ExportMenu.tsx                # PDF/DOCX/MD export + WhatsApp share
 │
+├── src/components/
+│   ├── MobileNav.tsx                 # Mobile bottom navigation (5 tabs, safe-area)
+│   ├── ClarityAnalytics.tsx          # Microsoft Clarity tracking component
+│   └── ui/                           # Shared UI components
+│
 ├── src/lib/
+│   ├── admin-auth.ts               # Admin authentication
 │   ├── ai-provider.ts               # Shared AI provider config (DRY)
 │   ├── atrian.ts                     # ATRiAN ethical validation (90+ known acronyms)
 │   ├── chat-store.ts                 # localStorage conversation persistence
 │   ├── pii-scanner.ts               # PII detection (CPF, RG, MASP, phone, email, REDS, plates, names)
 │   ├── prompt.ts                     # Agent 852 system prompt + truth layer
+│   ├── nickname-generator.ts         # Police-themed anonymous nickname generator
+│   ├── name-validator.ts             # AI name validation (Gemini Flash via OpenRouter)
+│   ├── gamification.ts               # Points, ranks (Recruta-Comissário), leaderboard
 │   ├── rate-limit.ts                 # In-memory rate limiting
 │   ├── report-store.ts              # localStorage report persistence (Supabase-ready)
 │   ├── telemetry.ts                  # Dual telemetry: Supabase + structured JSON logs
-│
-├── src/components/
-│   ├── ClarityAnalytics.tsx          # Microsoft Clarity tracking component
-│   └── ui/                           # Shared UI components
 │
 ├── sql/
 │   ├── schema.sql                    # Supabase schema (chats, messages, insights + RLS)
@@ -125,6 +133,13 @@
 | 26 | Notificações operacionais por webhook/Telegram para `/issues` | `notifications.ts` | Active |
 | 27 | ATRiAN violations dashboard (score, categories, severity) | `admin/telemetry/page.tsx` | Active |
 | 28 | Componentized chat UI (WelcomeScreen, MessageList, InputArea, ExportMenu) | `components/chat/*` | Active |
+| 29 | Anonymous Identity System (police-themed nickname generator) | `nickname-generator.ts` | Active |
+| 30 | AI Name Validator (blocks real names via Gemini Flash / OpenRouter) | `name-validator.ts` | Active |
+| 31 | Email Verification Flow (Resend API + token hashing) | `user-auth.ts` | Active |
+| 32 | Gamification (points, police ranks Recruta-Comissário, leaderboard) | `gamification.ts` | Active |
+| 33 | Mobile Bottom Navigation (5-tab fixed bar, safe-area) | `MobileNav.tsx` | Active |
+| 34 | Leaderboard API (anonymous, ranked by reputation points) | `api/leaderboard/route.ts` | Active |
+| 35 | Copy rules enforcement (no em-dashes in public copy) | Global | Active |
 
 ## Agent 852 — Roadmap
 
@@ -132,17 +147,19 @@
 
 | # | Feature | Notes |
 |---|---------|-------|
-| 1 | PDF/document upload for police issues | multer or presigned S3 |
+| 1 | Espiral de Escuta (reports <85% approval reopen discussion) | AI re-analysis loop |
+| 2 | PDF/document upload for police issues | multer or presigned S3 |
+| 3 | LGPD consent banner + self-service data access | Lei 13.709/2018 |
 
 ### P2 (Backlog)
 
 | # | Feature | Notes |
 |---|---------|-------|
-| 1 | ATRiAN v2 — NeMo Guardrails or stream-level filtering | Python sidecar |
+| 1 | ATRiAN v2: NeMo Guardrails or stream-level filtering | Python sidecar |
 | 2 | Cross-conversation insight aggregation (themes, patterns, regions) | Supabase aggregation |
 | 3 | Tool use: web search for institutional data (AI SDK tools) | DashScope function calling |
 | 4 | Voice input (speech-to-text via Browser API) | Web Speech API |
-| 5 | Proactive collaboration suggestions (agent suggests topics mid-chat) | Prompt engineering |
+| 5 | BYOK: users plug own API keys, shared key groups | Model transparency |
 | 6 | Automated PDF report from aggregated discussion data | puppeteer/weasyprint |
 
 ## User Flow

@@ -99,7 +99,7 @@ export default function IssuesPage() {
   useEffect(() => { loadIssues(); }, [loadIssues]);
 
   const handleVote = async (issueId: string) => {
-    if (!currentUser?.masp) {
+    if (!currentUser?.masp || currentUser.validation_status !== 'approved') {
       setShowLoginNotice(true);
       return;
     }
@@ -110,6 +110,10 @@ export default function IssuesPage() {
       body: JSON.stringify({ action: 'vote', issueId, sessionHash }),
     });
     const data = await res.json();
+    if (!res.ok && data?.needsValidatedOfficer) {
+      setShowLoginNotice(true);
+      return;
+    }
     if (data.voted) {
       setIssues(prev => prev.map(i => i.id === issueId ? { ...i, votes: i.votes + 1 } : i));
     }
@@ -129,11 +133,20 @@ export default function IssuesPage() {
 
   const handleComment = async (issueId: string) => {
     if (!commentText.trim()) return;
-    await fetch('/api/issues', {
+    if (!currentUser?.masp || currentUser.validation_status !== 'approved') {
+      setShowLoginNotice(true);
+      return;
+    }
+    const res = await fetch('/api/issues', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'comment', issueId, commentBody: commentText }),
     });
+    const data = await res.json();
+    if (!res.ok && data?.needsValidatedOfficer) {
+      setShowLoginNotice(true);
+      return;
+    }
     setCommentText('');
     // Reload comments
     handleExpand(issueId);
@@ -163,14 +176,14 @@ export default function IssuesPage() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 max-w-sm w-full space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-white">Login necessário para votar</h2>
+              <h2 className="text-base font-semibold text-white">Validação necessária</h2>
               <button onClick={() => setShowLoginNotice(false)} className="text-neutral-500 hover:text-white"><X className="w-4 h-4" /></button>
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed">
-              Para votar nas pautas, você precisa estar cadastrado como <strong className="text-white">Policial Civil de MG</strong> com MASP válido.
+              Para votar e fazer follow-up nas pautas, você precisa estar cadastrado como <strong className="text-white">Policial Civil de MG</strong> com MASP validado.
             </p>
             <p className="text-xs text-neutral-500 leading-relaxed">
-              Isso garante que cada pauta seja votada apenas uma vez por servidor — evitando duplicidade e dando legitimidade ao processo.
+              Anônimos podem abrir conversas e gerar relatos. A governança dos tópicos públicos exige validação para evitar duplicidade, abuso e dar legitimidade ao processo.
             </p>
             <div className="space-y-2">
               <p className="text-[10px] text-neutral-600 font-semibold uppercase tracking-wider">Transparência de dados</p>
@@ -206,7 +219,7 @@ export default function IssuesPage() {
           </Link>
           <AlertCircle className="w-5 h-5 text-green-400" />
           <h1 className="text-lg font-semibold text-white">Tópicos em Discussão</h1>
-          <span className="text-xs text-neutral-500 hidden sm:inline">Anônimo — como issues do GitHub</span>
+          <span className="text-xs text-neutral-500 hidden sm:inline">Leitura aberta. Voto e follow-up só com MASP validado.</span>
         </div>
         <button
           onClick={() => setShowCreate(true)}
@@ -303,6 +316,7 @@ export default function IssuesPage() {
               </button>
             </div>
             <p className="text-[10px] text-neutral-600">Seu tópico é 100% anônimo. Sem rastreamento de identidade.</p>
+            <p className="text-[10px] text-neutral-600">Tópicos também podem ser gerados automaticamente a partir de relatos compartilhados e relatórios de inteligência.</p>
           </div>
         )}
 
@@ -411,7 +425,7 @@ export default function IssuesPage() {
                       <input
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Adicionar comentário anônimo..."
+                        placeholder="Adicionar follow-up (somente MASP validado)..."
                         className="flex-1 h-9 px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-green-700 transition"
                         onKeyDown={(e) => e.key === 'Enter' && handleComment(issue.id)}
                       />

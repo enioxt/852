@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { listSharedReports, deleteReport, type Report, loadAllPublicReports, deleteReportFromServer } from '@/lib/report-store';
 import { getOrCreateSessionHash } from '@/lib/session';
+import MarkdownMessage from '@/components/chat/MarkdownMessage';
 
 type Tab = 'shared' | 'intelligence' | 'generator';
 
@@ -286,7 +287,7 @@ export default function ReportsPage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-white">
-                            Relato — {report.sanitizedMessages.filter(m => m.role === 'user').length} mensagem(ns)
+                            {report.title || `Relato — ${report.sanitizedMessages.filter(m => m.role === 'user').length} mensagem(ns)`}
                           </p>
                           <div className="flex items-center gap-3 mt-0.5">
                             <span className="flex items-center gap-1 text-[10px] text-neutral-500">
@@ -306,17 +307,43 @@ export default function ReportsPage() {
                     {/* Report Content (expanded) */}
                     {expandedReport === report.id && (
                       <div className="border-t border-neutral-800 p-4 space-y-3">
-                        <div className="space-y-2 max-h-64 overflow-y-auto">
-                          {report.sanitizedMessages.map((m, i) => (
-                            <div key={i} className={`flex gap-2 ${m.role === 'user' ? '' : 'opacity-60'}`}>
-                              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
-                                m.role === 'user' ? 'bg-blue-900/30 text-blue-400' : 'bg-neutral-800 text-neutral-500'
-                              }`}>
-                                {m.role === 'user' ? 'Policial' : '852-IA'}
-                              </span>
-                              <p className="text-xs text-neutral-400 leading-relaxed flex-1">{m.content}</p>
+                        {(report.reporterTypeLabel || report.tags?.length || report.summary) && (
+                          <div className="space-y-2 rounded-xl border border-neutral-800 bg-neutral-950/60 p-4">
+                            {report.reporterTypeLabel && (
+                              <p className="text-[11px] text-neutral-500">{report.reporterTypeLabel}</p>
+                            )}
+                            {report.tags && report.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5">
+                                {report.tags.map((tag) => (
+                                  <span key={tag} className="text-[10px] px-2 py-1 rounded-lg bg-blue-900/20 text-blue-400 border border-blue-800/30">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {report.summary && (
+                              <p className="text-xs text-neutral-400 leading-relaxed">{report.summary}</p>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="space-y-2 max-h-80 overflow-y-auto">
+                          {report.formattedMarkdown ? (
+                            <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-4 text-sm text-neutral-300 leading-relaxed">
+                              <MarkdownMessage content={report.formattedMarkdown} />
                             </div>
-                          ))}
+                          ) : (
+                            report.sanitizedMessages.map((m, i) => (
+                              <div key={i} className={`flex gap-2 ${m.role === 'user' ? '' : 'opacity-60'}`}>
+                                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                                  m.role === 'user' ? 'bg-blue-900/30 text-blue-400' : 'bg-neutral-800 text-neutral-500'
+                                }`}>
+                                  {m.role === 'user' ? 'Policial' : '852-IA'}
+                                </span>
+                                <p className="text-xs text-neutral-400 leading-relaxed flex-1">{m.content}</p>
+                              </div>
+                            ))
+                          )}
                         </div>
                         <div className="flex items-center justify-between pt-2 border-t border-neutral-800">
                           <p className="text-[10px] text-neutral-600">

@@ -6,6 +6,7 @@
  */
 
 import { getMetadataValue } from '@/lib/session';
+import type { ReviewData } from '@/lib/report-format';
 
 export interface ReportMessage {
   role: 'user' | 'assistant';
@@ -23,6 +24,13 @@ export interface Report {
   status: ReportStatus;
   piiRemoved: number;
   aiSuggestions?: string[];
+  reviewData?: ReviewData | null;
+  title?: string;
+  summary?: string;
+  tags?: string[];
+  formattedMarkdown?: string;
+  shareText?: string;
+  reporterTypeLabel?: string;
   createdAt: number;
   updatedAt: number;
   sharedAt?: number;
@@ -71,6 +79,15 @@ export function createReport(
   sanitizedMessages: ReportMessage[],
   piiRemoved: number,
   aiSuggestions?: string[],
+  options?: {
+    reviewData?: ReviewData | null;
+    title?: string;
+    summary?: string;
+    tags?: string[];
+    formattedMarkdown?: string;
+    shareText?: string;
+    reporterTypeLabel?: string;
+  },
 ): Report {
   const report: Report = {
     id: crypto.randomUUID(),
@@ -80,6 +97,13 @@ export function createReport(
     status: 'reviewed',
     piiRemoved,
     aiSuggestions,
+    reviewData: options?.reviewData || null,
+    title: options?.title,
+    summary: options?.summary,
+    tags: options?.tags || [],
+    formattedMarkdown: options?.formattedMarkdown,
+    shareText: options?.shareText,
+    reporterTypeLabel: options?.reporterTypeLabel,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -138,6 +162,12 @@ function normalizeServerReport(report: ServerReportPayload): Report {
   const localReportId = getMetadataValue<string>(report.metadata, 'localReportId') || report.id;
   const clientConversationId = getMetadataValue<string>(report.metadata, 'clientConversationId') || report.conversation_id;
   const aiSuggestions = getMetadataValue<string[]>(report.metadata, 'aiSuggestions') || [];
+  const title = getMetadataValue<string>(report.metadata, 'title') || undefined;
+  const summary = getMetadataValue<string>(report.metadata, 'summary') || undefined;
+  const tags = getMetadataValue<string[]>(report.metadata, 'tags') || [];
+  const formattedMarkdown = getMetadataValue<string>(report.metadata, 'formattedMarkdown') || undefined;
+  const shareText = getMetadataValue<string>(report.metadata, 'shareText') || undefined;
+  const reporterTypeLabel = getMetadataValue<string>(report.metadata, 'reporterTypeLabel') || undefined;
   const sharedAt = new Date(report.created_at).getTime();
 
   return {
@@ -149,6 +179,13 @@ function normalizeServerReport(report: ServerReportPayload): Report {
     status: 'shared',
     piiRemoved,
     aiSuggestions,
+    reviewData: (report.review_data as ReviewData | null) || null,
+    title,
+    summary,
+    tags,
+    formattedMarkdown,
+    shareText,
+    reporterTypeLabel,
     createdAt: sharedAt,
     updatedAt: sharedAt,
     sharedAt,
@@ -175,6 +212,7 @@ export async function syncReportToServer(payload: {
   piiRemoved: number;
   aiSuggestions?: string[];
   reviewData?: Record<string, unknown> | null;
+  metadata?: Record<string, unknown> | null;
   sessionHash: string;
 }): Promise<string | null> {
   const res = await fetch('/api/reports/server', {
@@ -191,6 +229,7 @@ export async function syncReportToServer(payload: {
         sanitizedMessages: payload.sanitizedMessages,
         piiRemoved: payload.piiRemoved,
         aiSuggestions: payload.aiSuggestions || [],
+        ...(payload.metadata || {}),
       },
     }),
   });

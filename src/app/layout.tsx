@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClarityAnalytics from "@/components/ClarityAnalytics";
+import MobileNav from "@/components/MobileNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,8 +17,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://852.egos.ia.br"),
   applicationName: "Tira-Voz",
-  title: "Tira-Voz — o radar da base",
-  description: "Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe — aqui ela chega onde precisa chegar.",
+  title: "Tira-Voz: o radar da base",
+  description: "Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe, e aqui ela chega onde precisa chegar.",
   alternates: {
     canonical: "/",
   },
@@ -27,8 +28,8 @@ export const metadata: Metadata = {
     apple: "/brand/logo-852.png",
   },
   openGraph: {
-    title: "Tira-Voz — o radar da base",
-    description: "Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe — aqui ela chega onde precisa chegar.",
+    title: "Tira-Voz: o radar da base",
+    description: "Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe, e aqui ela chega onde precisa chegar.",
     url: "https://852.egos.ia.br",
     siteName: "Tira-Voz",
     images: [
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
         url: "/brand/og-banner.png",
         width: 512,
         height: 512,
-        alt: "Tira-Voz — o radar da base",
+        alt: "Tira-Voz: o radar da base",
       },
     ],
     locale: "pt_BR",
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tira-Voz — o radar da base",
+    title: "Tira-Voz: o radar da base",
     description: "Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe.",
     images: ["/brand/og-banner.png"],
   },
@@ -62,6 +63,7 @@ export default function RootLayout({
       >
         <ClarityAnalytics />
         {children}
+        <MobileNav />
       </body>
     </html>
   );

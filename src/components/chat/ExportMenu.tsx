@@ -1,10 +1,12 @@
 'use client';
 
-import { Download, FileText, ChevronDown, Share2 } from 'lucide-react';
+import { useState } from 'react';
+import { Download, FileText, ChevronDown, Share2, Copy, Check } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 import { getMessageText } from '@/components/chat/MessageList';
+import { buildFormattedReport } from '@/lib/report-format';
 
 interface ExportMenuProps {
   messages: Array<{ role: string; content?: string; parts?: Array<{ type?: string; text?: string }> }>;
@@ -27,14 +29,22 @@ export function ShareWhatsAppButton() {
 }
 
 export default function ExportMenu({ messages, showExport, onToggleExport }: ExportMenuProps) {
+  const [copied, setCopied] = useState(false);
+  const formattedReport = buildFormattedReport({
+    messages: messages.map((message) => ({
+      role: message.role === 'assistant' ? 'assistant' : 'user',
+      content: getMessageText(message),
+    })),
+    reporterTypeLabel: 'Relator protegido',
+  });
+
   const generateMarkdown = () => {
-    return messages.map((m) => `**${m.role === 'user' ? 'Policial' : '852-IA'}**:\n${getMessageText(m)}\n`).join('\n---\n');
+    return formattedReport.markdown;
   };
 
   const exportPDF = () => {
     const doc = new jsPDF();
-    const text = messages.map((m) => `${m.role === 'user' ? 'Policial' : '852-IA'}: ${getMessageText(m)}`).join('\n\n');
-    const splitText = doc.splitTextToSize(text, 180);
+    const splitText = doc.splitTextToSize(formattedReport.plainText, 180);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.text(splitText, 15, 15);
@@ -45,11 +55,10 @@ export default function ExportMenu({ messages, showExport, onToggleExport }: Exp
     const doc = new Document({
       sections: [{
         properties: {},
-        children: messages.map((m) =>
+        children: formattedReport.plainText.split('\n').filter(Boolean).map((line) =>
           new Paragraph({
             children: [
-              new TextRun({ text: `${m.role === 'user' ? 'Policial' : '852-IA'}: `, bold: true }),
-              new TextRun({ text: getMessageText(m) })
+              new TextRun({ text: line })
             ]
           })
         )
@@ -62,6 +71,24 @@ export default function ExportMenu({ messages, showExport, onToggleExport }: Exp
   const exportMD = () => {
     const blob = new Blob([generateMarkdown()], { type: 'text/markdown;charset=utf-8' });
     saveAs(blob, 'relato-852.md');
+  };
+
+  const copyText = async () => {
+    await navigator.clipboard.writeText(formattedReport.plainText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareText = async () => {
+    if (navigator.share) {
+      await navigator.share({
+        title: formattedReport.title,
+        text: formattedReport.plainText,
+      });
+      return;
+    }
+
+    await copyText();
   };
 
   return (
@@ -84,6 +111,12 @@ export default function ExportMenu({ messages, showExport, onToggleExport }: Exp
           </button>
           <button onClick={() => { exportMD(); onToggleExport(); }} className="w-full px-3 py-2 text-xs text-left text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2">
             <FileText className="w-3.5 h-3.5" /> Markdown
+          </button>
+          <button onClick={() => { void copyText(); onToggleExport(); }} className="w-full px-3 py-2 text-xs text-left text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2">
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />} {copied ? 'Copiado' : 'Copiar texto'}
+          </button>
+          <button onClick={() => { void shareText(); onToggleExport(); }} className="w-full px-3 py-2 text-xs text-left text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2">
+            <Share2 className="w-3.5 h-3.5" /> Compartilhar texto
           </button>
         </div>
       )}

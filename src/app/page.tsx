@@ -152,7 +152,7 @@ export default function Home() {
               o radar da base
             </p>
             <p className="mt-4 text-lg sm:text-xl text-neutral-300 max-w-lg text-center leading-relaxed">
-              Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe — aqui ela chega onde precisa chegar.
+              Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe, e aqui ela chega onde precisa chegar.
             </p>
           </div>
 
@@ -165,7 +165,7 @@ export default function Home() {
             className="mt-5 flex items-center gap-3 px-5 py-3 rounded-full bg-green-900/30 text-green-400 border border-green-800/40 text-base font-medium hover:bg-green-900/50 transition touch-target cursor-pointer active:scale-95"
           >
             <Lock className="w-5 h-5" />
-            🔒 100% Anônimo — Toque para entender
+            🔒 100% Anônimo: toque para entender
           </button>
 
           {/* ═══════════ CTA PRINCIPAL ═══════════ */}
@@ -187,7 +187,7 @@ export default function Home() {
             <ExpandableCard
               icon={Shield}
               title="O que é o Tira-Voz?"
-              description="É um canal seguro onde você, policial civil — investigador, escrivão, delegado — pode relatar problemas estruturais, sugerir melhorias e ajudar a construir pautas reais para a categoria. Sem nome, sem CPF, sem MASP. O que importa é o que você tem a dizer."
+              description="É um canal seguro onde você, policial civil (investigador, escrivão, delegado), pode relatar problemas estruturais, sugerir melhorias e ajudar a construir pautas reais para a categoria. Sem nome, sem CPF, sem MASP. O que importa é o que você tem a dizer."
               defaultOpen
             />
             <ExpandableCard
@@ -382,7 +382,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-6 text-center text-sm text-neutral-600">
-        EGOS • Tira-Voz — o radar da base
+        EGOS · Tira-Voz: o radar da base
       </footer>
     </div>
   );

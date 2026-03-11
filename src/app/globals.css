@@ -49,3 +49,18 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Safe area for mobile bottom nav */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Pages with mobile bottom nav need bottom spacing */
+.pb-mobile-nav {
+  padding-bottom: 3.5rem;
+}
+@media (min-width: 768px) {
+  .pb-mobile-nav {
+    padding-bottom: 0;
+  }
+}

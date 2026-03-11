@@ -12,7 +12,8 @@ export type ModelTask =
   | 'review'
   | 'html_report'
   | 'intelligence_report'
-  | 'conversation_summary';
+  | 'conversation_summary'
+  | 'name_validation';
 
 export interface ModelConfig {
   modelId: string;
@@ -83,6 +84,30 @@ export function getModelConfig(task: ModelTask = 'chat'): ModelConfig {
         providerLabel: 'OpenRouter (paid)',
         pricing: PRICING[modelId] || { input: 0, output: 0 },
         routingReason: 'Fallback de relatório de inteligência via OpenRouter por indisponibilidade da DashScope.',
+      };
+    }
+  }
+
+  if (task === 'name_validation') {
+    if (hasOpenRouter()) {
+      const modelId = 'google/gemini-2.0-flash-001';
+      return {
+        modelId,
+        provider: createOpenRouterProvider(),
+        providerLabel: 'OpenRouter (paid)',
+        pricing: PRICING[modelId] || { input: 0, output: 0 },
+        routingReason: 'Validação de nome anônimo via Gemini Flash (OpenRouter).',
+      };
+    }
+
+    if (hasDashScope()) {
+      const modelId = process.env.DASHSCOPE_CHAT_MODEL || 'qwen-plus';
+      return {
+        modelId,
+        provider: createDashScopeProvider(),
+        providerLabel: 'Alibaba DashScope',
+        pricing: PRICING[modelId] || PRICING['qwen-plus'],
+        routingReason: 'Validação de nome via DashScope (fallback).',
       };
     }
   }

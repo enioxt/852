@@ -22,8 +22,8 @@ export async function POST(req: Request) {
     }
 
     const result = await loginUser(email, password);
-    if (result.error) {
-      return Response.json({ error: result.error }, { status: 401 });
+    if ('error' in result) {
+      return Response.json(result, { status: result.status ?? 401 });
     }
 
     recordEvent({ event_type: 'user_login', metadata: { userId: result.user?.id } });

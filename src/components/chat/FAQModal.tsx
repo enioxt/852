@@ -10,7 +10,7 @@ const faqs = [
   {
     icon: Shield,
     q: 'Este canal é realmente anônimo?',
-    a: 'Sim. Não coletamos nomes, CPFs, IPs, nem identificamos quem está usando. Suas conversas não são armazenadas em servidores — ficam apenas no seu navegador.',
+    a: 'Sim. Não coletamos nomes, CPFs, IPs, nem identificamos quem está usando. Suas conversas não são armazenadas em servidores, ficam apenas no seu navegador.',
   },
   {
     icon: Lock,
@@ -25,7 +25,7 @@ const faqs = [
   {
     icon: MessageSquare,
     q: 'Que tipo de relato posso fazer?',
-    a: 'Problemas de fluxo, gargalos operacionais, falta de equipamento, demandas repetitivas, sugestões de melhoria, dificuldades com sistemas — tudo que impacta o dia a dia da Polícia Civil.',
+    a: 'Problemas de fluxo, gargalos operacionais, falta de equipamento, demandas repetitivas, sugestões de melhoria, dificuldades com sistemas, tudo que impacta o dia a dia da Polícia Civil.',
   },
   {
     icon: FileText,
@@ -69,7 +69,7 @@ export default function FAQModal({ onClose }: FAQModalProps) {
         </div>
         <div className="p-4 border-t border-neutral-800 bg-neutral-900/80">
           <p className="text-[10px] text-neutral-500 text-center">
-            Tira-Voz — o radar da base • Canal de inteligência institucional para os 852 municípios de MG
+            Tira-Voz: o radar da base · Canal de inteligência institucional para os 852 municípios de MG
           </p>
         </div>
       </div>

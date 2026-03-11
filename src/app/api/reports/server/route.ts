@@ -1,7 +1,19 @@
-import { saveReport, getReports, deleteReportServer } from '@/lib/supabase';
+import { saveReport, getReports, deleteReportServer, createIssue } from '@/lib/supabase';
 import { recordEvent } from '@/lib/telemetry';
 import { getCurrentUser } from '@/lib/user-auth';
 import { createInteractionHash, getIdentityKey } from '@/lib/session';
+
+function normalizeTag(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function toTitleCase(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 export async function POST(req: Request) {
   try {
@@ -13,9 +25,10 @@ export async function POST(req: Request) {
     const user = await getCurrentUser();
     const identityKey = getIdentityKey(sessionHash, user?.id);
     const interactionHash = createInteractionHash();
+    const metadataPayload = metadata && typeof metadata === 'object' ? metadata as Record<string, unknown> : {};
 
     const id = await saveReport(conversationId, messages, reviewData, identityKey || undefined, {
-      ...(metadata && typeof metadata === 'object' ? metadata : {}),
+      ...metadataPayload,
       interactionHash,
       userEmail: user?.email || null,
       userDisplayName: user?.display_name || null,
@@ -23,7 +36,22 @@ export async function POST(req: Request) {
     });
     if (!id) return Response.json({ error: 'Supabase não configurado' }, { status: 503 });
 
-    recordEvent({ event_type: 'report_shared', metadata: { reportId: id, conversationId, identityKey, interactionHash } });
+    const tags = Array.isArray(metadataPayload.tags)
+      ? metadataPayload.tags.filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0)
+      : [];
+    const primaryTag = tags.length > 0 ? normalizeTag(tags[0]) : null;
+    const summary = typeof metadataPayload.summary === 'string' ? metadataPayload.summary.trim() : '';
+
+    if (primaryTag) {
+      await createIssue(
+        `Tema recorrente: ${toTitleCase(primaryTag)}`,
+        summary || `Relato compartilhado apontou recorrência em ${primaryTag}.`,
+        primaryTag,
+        'ai_suggestion',
+      );
+    }
+
+    recordEvent({ event_type: 'report_shared', metadata: { reportId: id, conversationId, identityKey, interactionHash, primaryTag } });
     return Response.json({ id, identityKey, interactionHash });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Erro interno';

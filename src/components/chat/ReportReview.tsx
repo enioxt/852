@@ -12,15 +12,8 @@ import {
   syncReportToServer, deleteReportFromServer,
   type ReportMessage
 } from '@/lib/report-store';
-
-interface ReviewData {
-  completude: number;
-  resumo: string;
-  temas: string[];
-  pontosCegos: string[];
-  sugestoes: string[];
-  impacto: string;
-}
+import { buildFormattedReport, type ReviewData } from '@/lib/report-format';
+import MarkdownMessage from '@/components/chat/MarkdownMessage';
 
 interface Props {
   messages: Array<{ role: string; content: string }>;
@@ -63,8 +56,16 @@ export default function ReportReview({ messages, conversationId, serverConversat
   const [hasReviewed, setHasReviewed] = useState(false);
   const [reportId, setReportId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [showOriginal, setShowOriginal] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(true);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['pii', 'ai']));
+  const [currentUser, setCurrentUser] = useState<{ masp?: string; validation_status?: string } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((response) => response.json())
+      .then((data) => setCurrentUser(data.user || null))
+      .catch(() => setCurrentUser(null));
+  }, []);
 
   // Step 1: Scan for PII on mount
   useEffect(() => {
@@ -146,12 +147,32 @@ export default function ReportReview({ messages, conversationId, serverConversat
 
   const handleShare = async () => {
     const sanitized = getSanitizedMessages();
+    const reporterTypeLabel = currentUser?.masp && currentUser.validation_status === 'approved'
+      ? 'Policial validado'
+      : currentUser
+        ? 'Conta vinculada'
+        : 'Relator anônimo';
+    const formattedReport = buildFormattedReport({
+      messages: sanitized,
+      reviewData,
+      piiRemoved: acceptedRemovals.size,
+      reporterTypeLabel,
+    });
     const report = createReport(
       conversationId,
       messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
       sanitized,
       acceptedRemovals.size,
       reviewData?.sugestoes,
+      {
+        reviewData,
+        title: formattedReport.title,
+        summary: formattedReport.summary,
+        tags: formattedReport.tags,
+        formattedMarkdown: formattedReport.markdown,
+        shareText: formattedReport.shareText,
+        reporterTypeLabel,
+      },
     );
 
     const serverReportId = sessionHash
@@ -165,6 +186,14 @@ export default function ReportReview({ messages, conversationId, serverConversat
           aiSuggestions: reviewData?.sugestoes,
           reviewData: reviewData ? { ...reviewData } : null,
           sessionHash,
+          metadata: {
+            title: formattedReport.title,
+            summary: formattedReport.summary,
+            tags: formattedReport.tags,
+            formattedMarkdown: formattedReport.markdown,
+            shareText: formattedReport.shareText,
+            reporterTypeLabel,
+          },
         })
       : null;
 
@@ -193,14 +222,36 @@ export default function ReportReview({ messages, conversationId, serverConversat
   };
 
   const shareWhatsApp = () => {
-    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/chat` : '';
+    const shareUrl = reportId ? getShareUrl(reportId) : (typeof window !== 'undefined' ? `${window.location.origin}/chat` : '');
+    const reporterTypeLabel = currentUser?.masp && currentUser.validation_status === 'approved'
+      ? 'Policial validado'
+      : currentUser
+        ? 'Conta vinculada'
+        : 'Relator anônimo';
+    const formattedReport = buildFormattedReport({
+      messages: getSanitizedMessages(),
+      reviewData,
+      piiRemoved: acceptedRemovals.size,
+      reporterTypeLabel,
+    });
     const text = encodeURIComponent(
-      `Colega, relatei problemas da nossa delegacia pelo Tira-Voz. É anônimo e seguro. Acessa e relata também: ${shareUrl}`
+      `${formattedReport.shareText}\n\nVeja o relatório completo: ${shareUrl}`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
   const userMessageCount = messages.filter(m => m.role === 'user').length;
+  const reporterTypeLabel = currentUser?.masp && currentUser.validation_status === 'approved'
+    ? 'Policial validado'
+    : currentUser
+      ? 'Conta vinculada'
+      : 'Relator anônimo';
+  const formattedReport = buildFormattedReport({
+    messages: getSanitizedMessages(),
+    reviewData,
+    piiRemoved: acceptedRemovals.size,
+    reporterTypeLabel,
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
@@ -217,7 +268,7 @@ export default function ReportReview({ messages, conversationId, serverConversat
                 {step === 'scanning' && 'Analisando dados sensíveis...'}
                 {step === 'pii_review' && `${piiFindings.length} dado(s) sensível(is) encontrado(s)`}
                 {step === 'ai_review' && 'Analisando completude do relato...'}
-                {step === 'ready' && 'Relatório pronto para compartilhar'}
+                {step === 'ready' && 'Relatório pronto. Só será compartilhado após seu clique final.'}
                 {step === 'shared' && 'Relatório compartilhado com sucesso'}
               </p>
             </div>
@@ -436,16 +487,25 @@ export default function ReportReview({ messages, conversationId, serverConversat
                 className="flex items-center gap-2 text-xs text-neutral-500 hover:text-white transition"
               >
                 {showOriginal ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                {showOriginal ? 'Ocultar prévia' : 'Ver prévia do relatório'}
+                {showOriginal ? 'Ocultar prévia completa' : 'Ver prévia completa do relatório'}
               </button>
 
+              <p className="text-[11px] text-neutral-500">
+                Este conteúdo ainda não foi enviado. O compartilhamento só acontece quando você clicar em <span className="text-white">Compartilhar relatório</span>.
+              </p>
+
               {showOriginal && (
-                <div className="max-h-48 overflow-y-auto rounded-xl bg-neutral-800/30 border border-neutral-800 p-3 space-y-2">
-                  {getSanitizedMessages()
-                    .filter(m => m.role === 'user')
-                    .map((m, i) => (
-                      <p key={i} className="text-xs text-neutral-400 leading-relaxed">{m.content}</p>
+                <div className="max-h-72 overflow-y-auto rounded-xl bg-neutral-800/30 border border-neutral-800 p-4 space-y-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {formattedReport.tags.map((tag) => (
+                      <span key={tag} className="text-[10px] px-2 py-1 rounded-lg bg-blue-900/20 text-blue-400 border border-blue-800/30">
+                        {tag}
+                      </span>
                     ))}
+                  </div>
+                  <div className="text-sm text-neutral-300 leading-relaxed">
+                    <MarkdownMessage content={formattedReport.markdown} />
+                  </div>
                 </div>
               )}
             </div>
@@ -481,8 +541,15 @@ export default function ReportReview({ messages, conversationId, serverConversat
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-neutral-800 flex items-center justify-between">
-          <div className="text-[10px] text-neutral-600">
-            {userMessageCount} mensagem(ns) do policial
+          <div className="space-y-1">
+            <div className="text-[10px] text-neutral-600">
+              {userMessageCount} mensagem(ns) do policial
+            </div>
+            {(step === 'ready' || step === 'shared') && (
+              <div className="text-[10px] text-neutral-500">
+                Classificação atual do relator: {reporterTypeLabel}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {step === 'pii_review' && (

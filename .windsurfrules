@@ -27,12 +27,12 @@ architecture: "MCP-FIRST + NEXUS-ZERO + INTELINK + RHO"
 
 ## 📂 GUIAS
 
-- **MCPs:** `.guarani/MCP_ORCHESTRATION_GUIDE.md`
+- **MCPs:** `/home/enio/egos-lab/.guarani/MCP_ORCHESTRATION_GUIDE.md`
 - **Código:** `.guarani/PREFERENCES.md`
 - **Shared EGOS:** `.egos/guarani/PREFERENCES_SHARED.md`
-- **System Map:** `SYSTEM_MAP.md` ou `docs/SYSTEM_MAP.md` (ler primeiro se existir)
-- **Design Standards:** `.guarani/DESIGN_STANDARDS.md`
-- **Orquestração:** `.guarani/orchestration/PIPELINE.md`
+- **System Map:** `.egos/SYSTEM_MAP.md`, `SYSTEM_MAP.md` ou `docs/SYSTEM_MAP.md` (ler primeiro se existir)
+- **Design Standards:** `/home/enio/egos-lab/.guarani/DESIGN_STANDARDS.md`
+- **Orquestração:** `.egos/guarani/orchestration/PIPELINE.md`
 
 ## 🚀 DEPLOY & INFRAESTRUTURA
 
