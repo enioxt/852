@@ -102,8 +102,8 @@
 - [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
 - [ ] Refinar OG image para proporção 1200x630 real
 - [ ] Decompose `chat/page.tsx` (~450 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
-- [ ] CI/CD pipeline (lint + build + smoke on push/PR)
-- [ ] Consolidar package manager (remover vestígios de bun, manter npm)
+- [x] CI/CD pipeline (lint + build + smoke on push/PR)
+- [x] Consolidar package manager (remover vestígios de bun, manter npm)
 - [ ] Pipeline real de notificações do 852 (Telegram/Discord/webhook/admin alerts) acoplado a eventos críticos
 - [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
 - [ ] ATRiAN dashboard: visualizar violations no /admin/telemetry

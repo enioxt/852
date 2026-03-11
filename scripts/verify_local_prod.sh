@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOCAL_BASE_URL="${LOCAL_BASE_URL:-http://127.0.0.1:3100}"
 LOCAL_PORT="${LOCAL_PORT:-3100}"
+VERIFY_RATE_LIMIT="${VERIFY_RATE_LIMIT:-1}"
 
 cleanup() {
   if [[ -n "${LOCAL_SERVER_PID:-}" ]] && kill -0 "$LOCAL_SERVER_PID" 2>/dev/null; then
@@ -29,5 +30,9 @@ if ! curl -s -o /dev/null "$LOCAL_BASE_URL/"; then
   exit 1
 fi
 
-BASE_URL="$LOCAL_BASE_URL" bash "$SCRIPT_DIR/smoke_852.sh" local
-python3 "$SCRIPT_DIR/verify_rate_limit.py" "$LOCAL_BASE_URL"
+if [[ "$VERIFY_RATE_LIMIT" == "1" ]]; then
+  BASE_URL="$LOCAL_BASE_URL" bash "$SCRIPT_DIR/smoke_852.sh" local
+  python3 "$SCRIPT_DIR/verify_rate_limit.py" "$LOCAL_BASE_URL"
+else
+  BASE_URL="$LOCAL_BASE_URL" bash "$SCRIPT_DIR/smoke_852.sh" ci
+fi

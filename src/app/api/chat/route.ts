@@ -52,14 +52,6 @@ function sanitizeMessages(messages: unknown) {
 
 export async function POST(req: Request) {
   try {
-    if (!hasAvailableProvider()) {
-      recordEvent({ event_type: 'provider_unavailable', status_code: 503 });
-      return new Response(JSON.stringify({ error: 'Nenhum provedor de IA está configurado no servidor.' }), {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
     const ip = getClientIp(req.headers);
     const rate = checkRateLimit(`chat:${ip}`, CHAT_LIMIT.limit, CHAT_LIMIT.windowMs);
 
@@ -93,6 +85,14 @@ export async function POST(req: Request) {
           'X-RateLimit-Remaining': String(rate.remaining),
           'X-RateLimit-Reset': String(rate.resetAt),
         },
+      });
+    }
+
+    if (!hasAvailableProvider()) {
+      recordEvent({ event_type: 'provider_unavailable', status_code: 503 });
+      return new Response(JSON.stringify({ error: 'Nenhum provedor de IA está configurado no servidor.' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 

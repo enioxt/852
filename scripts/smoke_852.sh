@@ -13,8 +13,11 @@ case "$MODE" in
   public)
     BASE_URL="${BASE_URL:-https://852.egos.ia.br}"
     ;;
+  ci)
+    BASE_URL="${BASE_URL:-http://127.0.0.1:3100}"
+    ;;
   *)
-    echo "Usage: bash scripts/smoke_852.sh [local|vps|public]" >&2
+    echo "Usage: bash scripts/smoke_852.sh [local|vps|public|ci]" >&2
     exit 1
     ;;
 esac
@@ -23,16 +26,27 @@ echo "Smoke target: $BASE_URL"
 
 landing_status=$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/")
 chat_status=$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/chat")
-api_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE_URL/api/chat" \
-  -H 'Content-Type: application/json' \
-  -d '{"messages":[{"role":"user","content":"oi"}]}')
+info_status=$(curl -s -o /dev/null -w '%{http_code}' "$BASE_URL/api/chat/info")
 invalid_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE_URL/api/chat" \
   -H 'Content-Type: application/json' \
   -d '{"messages":[]}')
 
-echo "landing:$landing_status chat:$chat_status api:$api_status invalid:$invalid_status"
+if [[ "$MODE" == "ci" ]]; then
+  api_status="skipped"
+else
+  api_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE_URL/api/chat" \
+    -H 'Content-Type: application/json' \
+    -d '{"messages":[{"role":"user","content":"oi"}]}')
+fi
 
-if [[ "$landing_status" != "200" || "$chat_status" != "200" || "$api_status" != "200" || "$invalid_status" != "400" ]]; then
+echo "landing:$landing_status chat:$chat_status info:$info_status api:$api_status invalid:$invalid_status"
+
+if [[ "$landing_status" != "200" || "$chat_status" != "200" || "$info_status" != "200" || "$invalid_status" != "400" ]]; then
+  echo "Smoke test failed for $BASE_URL" >&2
+  exit 1
+fi
+
+if [[ "$MODE" != "ci" && "$api_status" != "200" ]]; then
   echo "Smoke test failed for $BASE_URL" >&2
   exit 1
 fi

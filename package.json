@@ -2,6 +2,7 @@
   "name": "852-inteligencia",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@10.9.3",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,6 +14,7 @@
     "smoke:local": "bash scripts/smoke_852.sh local",
     "smoke:vps": "bash scripts/smoke_852.sh vps",
     "smoke:public": "bash scripts/smoke_852.sh public",
+    "smoke:ci": "bash scripts/smoke_852.sh ci",
     "verify:local-prod": "bash scripts/verify_local_prod.sh",
     "smoke:rate-limit": "python3 scripts/verify_rate_limit.py http://127.0.0.1:3100",
     "release:prod": "bash scripts/release_contabo.sh"
@@ -51,13 +53,5 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
-  },
-  "ignoreScripts": [
-    "sharp",
-    "unrs-resolver"
-  ],
-  "trustedDependencies": [
-    "sharp",
-    "unrs-resolver"
-  ]
+  }
 }

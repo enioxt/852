@@ -116,6 +116,7 @@
 | 21 | Dashboard live feed (30s polling, real Recharts metrics) | `dashboard/page.tsx` | Active |
 | 22 | Reports ↔ Issues ↔ AI Reports SSOT (bidirectional links) | `supabase.ts` | Active |
 | 23 | Seeded police issues (Helios, Olho Vivo, PF integration, etc.) | `sql/seed_issues_v4.sql` | Active |
+| 24 | CI pipeline (lint + build + local smoke on push/PR) | `.github/workflows/ci.yml` | Active |
 
 ## Agent 852 — Roadmap
 
@@ -137,12 +138,11 @@
 | 2 | ATRiAN violations dashboard in /admin/telemetry | Admin auth ready |
 | 3 | Decompose `chat/page.tsx` into WelcomeScreen + MessageList + InputArea + ExportMenu | ~450 lines |
 | 4 | Cross-conversation insight aggregation (themes, patterns, regions) | Supabase aggregation |
-| 5 | CI/CD pipeline (lint + build + smoke on push) | GitHub Actions |
-| 6 | Tool use: web search for institutional data (AI SDK tools) | DashScope function calling |
-| 7 | Voice input (speech-to-text via Browser API) | Web Speech API |
-| 8 | Proactive collaboration suggestions (agent suggests topics mid-chat) | Prompt engineering |
-| 9 | Automated PDF report from aggregated discussion data | puppeteer/weasyprint |
-| 10 | Expand KNOWN_ACRONYMS in atrian.ts with delegacia-specific terms | PII/ATRiAN hardening |
+| 5 | Tool use: web search for institutional data (AI SDK tools) | DashScope function calling |
+| 6 | Voice input (speech-to-text via Browser API) | Web Speech API |
+| 7 | Proactive collaboration suggestions (agent suggests topics mid-chat) | Prompt engineering |
+| 8 | Automated PDF report from aggregated discussion data | puppeteer/weasyprint |
+| 9 | Expand KNOWN_ACRONYMS in atrian.ts with delegacia-specific terms | PII/ATRiAN hardening |
 
 ## User Flow
 
