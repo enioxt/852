@@ -1,4 +1,4 @@
-# TASKS — 852 Inteligência
+# TASKS — Tira-Voz (852)
 
 ## 🚨 P0 - Go Live
 
@@ -91,6 +91,18 @@
 - [x] Hook Mesh EGOS: `852`, `carteira-livre`, `forja`, `egos-self`, `policia` com symlink SSOT; `br-acc` e `egos-lab` com wrapper SSOT + hook legado
 - [x] Diagnóstico multi-repo consolidado em `/home/enio/.egos/hooks/HOOK_MIGRATION_STATUS.md`
 - [x] Bootstrap de governança no repo privado `policia`: `AGENTS.md`, `TASKS.md`, `docs/SYSTEM_MAP.md`, `.windsurf/workflows/ovm.md`
+
+## 🏃 P1 - Sprint v5 (Security + Report Flow)
+
+- [ ] **Email verification flow**: enviar token de confirmação por email (Resend/Supabase Edge) antes de ativar conta
+- [ ] **Espiral de Escuta**: relatórios com <85% aprovação (5+ votos) reabrem rodada de discussão; comentários dos revisores viram prompt para nova análise IA; ciclo se repete até consenso
+- [ ] **Report flow multi-camada**: usuário itera → envia → IA analisa com regras claras → usuário acolhe sugestões → envia para revisão humana obrigatória → votação maioria simples
+- [ ] **Free-text report mode**: caixa de texto livre na landing + upload (doc/docx/pdf/md/audio) com mesma pipeline de análise do chatbot
+- [ ] **Audio transcription**: integrar Web Speech API / Whisper para transcrever áudio enviado pelo usuário na submissão de relatos
+- [ ] **Lotação auto-detect via chatbot**: se usuário mencionar lotação, confirmar e vincular ao perfil (sem expor em relatórios)
+- [ ] **Suggest external LLMs**: ao finalizar relatório, sugerir que usuário copie prompt final e passe por Claude/Gemini/GPT para aprimorar
+- [ ] **LGPD consent banner**: aviso explícito de consentimento no cadastro com referência à Lei 13.709/2018
+- [ ] **User self-service data access**: usuário pode ver/exportar/deletar seus próprios dados (LGPD Art. 18)
 
 ## ⏭️ Backlog
 

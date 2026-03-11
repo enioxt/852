@@ -195,7 +195,7 @@ export default function ReportReview({ messages, conversationId, serverConversat
   const shareWhatsApp = () => {
     const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/chat` : '';
     const text = encodeURIComponent(
-      `Colega, relatei problemas da nossa delegacia pelo 852 Inteligência. É anônimo e seguro. Acessa e relata também: ${shareUrl}`
+      `Colega, relatei problemas da nossa delegacia pelo Tira-Voz. É anônimo e seguro. Acessa e relata também: ${shareUrl}`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };

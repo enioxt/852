@@ -43,7 +43,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
   const [currentUser, setCurrentUser] = useState<{ id: string; email: string; display_name?: string; masp?: string; lotacao?: string; validation_status?: string } | null>(null);
 
   useEffect(() => {
-    fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setCurrentUser(d.user); }).catch(() => {});
+    fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setCurrentUser(d.user); }).catch(() => { });
   }, []);
 
   const handleAuth = async () => {
@@ -93,16 +93,15 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
 
   return (
     <aside
-      className={`flex flex-col h-full bg-neutral-900 border-r border-neutral-800 transition-all duration-300 ease-in-out ${
-        isOpen ? 'w-[280px] min-w-[280px]' : 'w-[60px] min-w-[60px]'
-      }`}
+      className={`flex flex-col h-full bg-neutral-900 border-r border-neutral-800 transition-all duration-300 ease-in-out ${isOpen ? 'w-[280px] min-w-[280px]' : 'w-[60px] min-w-[60px]'
+        }`}
     >
       {/* Header */}
       <div className={`flex items-center ${isOpen ? 'justify-between' : 'justify-center'} p-3 h-14`}>
         {isOpen && (
           <div className="flex items-center gap-2 min-w-0">
-            <Image src="/brand/logo-852.png" alt="852" width={28} height={28} className="w-7 h-7 rounded-lg object-cover flex-shrink-0" />
-            <span className="text-sm font-semibold text-white truncate">852</span>
+            <Image src="/brand/logo-852.png" alt="Tira-Voz" width={28} height={28} className="w-7 h-7 rounded-lg object-cover flex-shrink-0" />
+            <span className="text-sm font-semibold text-white truncate">Tira-Voz</span>
           </div>
         )}
         <button

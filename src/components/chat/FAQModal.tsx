@@ -69,7 +69,7 @@ export default function FAQModal({ onClose }: FAQModalProps) {
         </div>
         <div className="p-4 border-t border-neutral-800 bg-neutral-900/80">
           <p className="text-[10px] text-neutral-500 text-center">
-            852 Inteligência — Canal de Inteligência Institucional para os 852 municípios de MG
+            Tira-Voz — o radar da base • Canal de inteligência institucional para os 852 municípios de MG
           </p>
         </div>
       </div>

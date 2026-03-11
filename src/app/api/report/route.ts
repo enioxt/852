@@ -9,7 +9,7 @@ const REPORT_LIMIT = {
   windowMs: 10 * 60 * 1000,
 };
 
-const REPORT_SYSTEM_PROMPT = `Você é um gerador de relatórios HTML para a plataforma 852 Inteligência.
+const REPORT_SYSTEM_PROMPT = `Você é um gerador de relatórios HTML para a plataforma Tira-Voz.
 Ao receber um prompt do usuário, gere um relatório HTML COMPLETO e profissional.
 
 REGRAS:
@@ -19,7 +19,7 @@ REGRAS:
 4. Inclua: título, data/hora, seções com ícones Unicode, gráficos em texto/ASCII se necessário
 5. O HTML deve ser auto-contido e renderizável standalone
 6. NUNCA inclua dados reais de PII — use dados fictícios se necessário
-7. Rodapé: "Relatório gerado por 852 Inteligência — EGOS Ecosystem"
+7. Rodapé: "Relatório gerado por Tira-Voz — EGOS Ecosystem"
 8. Responsivo (mobile-friendly)
 
 ESTILO VISUAL:

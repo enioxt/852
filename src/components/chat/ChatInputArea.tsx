@@ -38,7 +38,7 @@ export default function ChatInputArea({ input, onInputChange, onSubmit, isLoadin
           </button>
         </div>
         <p className="text-[10px] text-neutral-600 text-center mt-2">
-          852 Inteligência • Canal anônimo • Entre com sua conta se quiser sincronizar conversas entre dispositivos
+          Tira-Voz • Canal anônimo • Entre com sua conta se quiser sincronizar conversas entre dispositivos
         </p>
       </form>
     </div>

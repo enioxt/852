@@ -321,7 +321,7 @@ export default function ChatPage() {
             <Link href="/" className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition" title="Página inicial">
               <Home className="w-4 h-4" />
             </Link>
-            <h1 className="text-sm font-semibold text-white">852 Inteligência</h1>
+            <h1 className="text-sm font-semibold text-white">Tira-Voz</h1>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-900/40 text-green-400 font-medium">Anônimo</span>
           </div>
           <div className="flex items-center gap-1">

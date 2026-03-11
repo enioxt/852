@@ -15,7 +15,7 @@ interface ExportMenuProps {
 export function ShareWhatsAppButton() {
   const shareWhatsApp = () => {
     const shareUrl = `${window.location.origin}/chat`;
-    const text = encodeURIComponent(`Colega, relatei nossos problemas de forma anônima pelo 852 Inteligência. Acessa aí e relata também: ${shareUrl}`);
+    const text = encodeURIComponent(`Colega, relatei nossos problemas de forma anônima pelo Tira-Voz. Acessa aí e relata também: ${shareUrl}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 

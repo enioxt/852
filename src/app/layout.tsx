@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://852.egos.ia.br"),
-  applicationName: "852 Inteligência",
-  title: "852 Inteligência",
-  description: "Canal de inteligência institucional para os 852 municípios de Minas Gerais",
+  applicationName: "Tira-Voz",
+  title: "Tira-Voz — o radar da base",
+  description: "Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe — aqui ela chega onde precisa chegar.",
   alternates: {
     canonical: "/",
   },
@@ -27,16 +27,16 @@ export const metadata: Metadata = {
     apple: "/brand/logo-852.png",
   },
   openGraph: {
-    title: "852 Inteligência",
-    description: "Canal seguro e anônimo para mapear problemas estruturais nas delegacias de Minas Gerais.",
+    title: "Tira-Voz — o radar da base",
+    description: "Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe — aqui ela chega onde precisa chegar.",
     url: "https://852.egos.ia.br",
-    siteName: "852 Inteligência",
+    siteName: "Tira-Voz",
     images: [
       {
         url: "/brand/og-banner.png",
         width: 512,
         height: 512,
-        alt: "852 Inteligência",
+        alt: "Tira-Voz — o radar da base",
       },
     ],
     locale: "pt_BR",
@@ -44,8 +44,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "852 Inteligência",
-    description: "Canal seguro e anônimo para inteligência institucional da Polícia Civil.",
+    title: "Tira-Voz — o radar da base",
+    description: "Canal seguro e anônimo para policiais civis de Minas Gerais. Sua voz já existe.",
     images: ["/brand/og-banner.png"],
   },
 };

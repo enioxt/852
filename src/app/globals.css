@@ -3,6 +3,10 @@
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand-amber: #f59e0b;
+  --color-brand-amber-dark: #b45309;
+  --color-brand-blue: #1e3a5f;
+  --color-brand-blue-light: #3b82f6;
 }
 
 :root {
@@ -14,6 +18,12 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Touch-friendly targets — min 48px (WCAG) */
+.touch-target {
+  min-height: 56px;
+  min-width: 56px;
 }
 
 /* Custom scrollbar */

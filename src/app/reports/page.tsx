@@ -37,7 +37,7 @@ const EXAMPLE_PROMPTS = [
   'Relatório semanal de problemas estruturais nas delegacias do interior de MG',
   'Análise de tendências: falta de efetivo vs. sobrecarga de trabalho por região',
   'Dashboard executivo: top 10 problemas mais relatados pelos policiais civis',
-  'Relatório de engajamento da plataforma 852 Inteligência - métricas do mês',
+  'Relatório de engajamento da plataforma Tira-Voz - métricas do mês',
 ];
 
 export default function ReportsPage() {
@@ -534,7 +534,7 @@ export default function ReportsPage() {
       </main>
 
       <footer className="p-4 text-center border-t border-neutral-800 text-xs text-neutral-500">
-        852 Inteligência — Relatórios gerados por IA
+        Tira-Voz — Relatórios gerados por IA
       </footer>
     </div>
   );

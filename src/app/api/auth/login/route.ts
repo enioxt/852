@@ -1,8 +1,21 @@
 import { loginUser } from '@/lib/user-auth';
 import { recordEvent } from '@/lib/telemetry';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+
+const LOGIN_LIMIT = { limit: 5, windowMs: 15 * 60 * 1000 };
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req.headers);
+    const rl = checkRateLimit(`login:${ip}`, LOGIN_LIMIT.limit, LOGIN_LIMIT.windowMs);
+    if (!rl.allowed) {
+      recordEvent({ event_type: 'rate_limited', metadata: { endpoint: '/api/auth/login', ip } });
+      return Response.json(
+        { error: 'Muitas tentativas. Aguarde 15 minutos.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
+      );
+    }
+
     const { email, password } = await req.json();
     if (!email || !password) {
       return Response.json({ error: 'Email e senha obrigatórios' }, { status: 400 });
