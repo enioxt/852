@@ -84,6 +84,9 @@
 - [x] Sidebar: form de cadastro com campos MASP, lotação e aviso de plataforma exclusiva PC-MG
 - [x] MASP badge no sidebar (pendente/aprovado) para usuários autenticados
 - [x] Pre-commit SSOT: `/home/enio/.egos/hooks/pre-commit` — hook universal para todos os repos EGOS
+- [x] Hook Mesh EGOS: `852`, `carteira-livre`, `forja`, `egos-self`, `policia` com symlink SSOT; `br-acc` e `egos-lab` com wrapper SSOT + hook legado
+- [x] Diagnóstico multi-repo consolidado em `/home/enio/.egos/hooks/HOOK_MIGRATION_STATUS.md`
+- [x] Bootstrap de governança no repo privado `policia`: `AGENTS.md`, `TASKS.md`, `docs/SYSTEM_MAP.md`, `.windsurf/workflows/ovm.md`
 
 ## ⏭️ Backlog
 
