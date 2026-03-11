@@ -89,41 +89,60 @@
 └── .windsurfrules                    # Active Windsurf repo rules
 ```
 
-## Agent 852 — Current Capabilities
+## Agent 852 — Current Capabilities (v4, 2026-03-13)
 
 | # | Capability | Module | Status |
 |---|-----------|--------|--------|
-| 1 | AI Chat Streaming | `api/chat/route.ts` | Active |
+| 1 | AI Chat Streaming (Qwen-plus primary) | `api/chat/route.ts` | Active |
 | 2 | Multi-provider fallback (Qwen → Gemini → GPT) | `ai-provider.ts` | Active |
-| 3 | ATRiAN Truth Layer (prompt rules) | `prompt.ts` | Active |
-| 4 | ATRiAN Output Validation | `atrian.ts` | Active |
-| 5 | PII Auto-Detection | `pii-scanner.ts` | Active |
-| 6 | AI Conversation Review | `api/review/route.ts` | Active |
-| 7 | Report Sharing (localStorage) | `report-store.ts` | Active |
-| 8 | Conversation Persistence (localStorage) | `chat-store.ts` | Active |
-| 9 | Export (PDF/DOCX/Markdown) | `chat/page.tsx` | Active |
-| 10 | WhatsApp Sharing | `chat/page.tsx` | Active |
-| 11 | Telemetry (Clarity + JSON logs) | `telemetry.ts` | Active |
-| 12 | Rate Limiting | `rate-limit.ts` | Active |
-| 13 | Markdown Rendering (GFM) | `MarkdownMessage.tsx` | Active |
+| 3 | Task-based model routing (chat/review/summary/intelligence) | `ai-provider.ts` | Active |
+| 4 | ATRiAN Truth Layer (prompt rules, 7 axioms) | `prompt.ts` | Active |
+| 5 | ATRiAN Output Validation (post-stream) | `atrian.ts` | Active |
+| 6 | PII Auto-Detection (CPF, RG, MASP, plates, etc.) | `pii-scanner.ts` | Active |
+| 7 | AI Conversation Review (completeness score) | `api/review/route.ts` | Active |
+| 8 | Report Sharing — cross-device (Supabase + localStorage) | `report-store.ts` | Active |
+| 9 | Conversation Persistence (localStorage + Supabase) | `chat-store.ts` | Active |
+| 10 | Export (PDF/DOCX/Markdown) | `chat/page.tsx` | Active |
+| 11 | WhatsApp Sharing | `chat/page.tsx` | Active |
+| 12 | Telemetry (Clarity + Supabase + JSON logs) | `telemetry.ts` | Active |
+| 13 | Rate Limiting (per-IP) | `rate-limit.ts` | Active |
+| 14 | Markdown Rendering (GFM) | `MarkdownMessage.tsx` | Active |
+| 15 | Agent Cross-Session Memory (conversation summaries) | `conversation-memory.ts` | Active |
+| 16 | AI Intelligence Reports (qwen-max, auto every 5 convos) | `api/ai-reports/generate/route.ts` | Active |
+| 17 | Issues / Discussion Board (GitHub-style voting) | `api/issues/route.ts` | Active |
+| 18 | Upvote/Downvote with MASP login requirement | `issues/page.tsx` | Active |
+| 19 | User Auth (PBKDF2 + Supabase sessions, 30d) | `user-auth.ts` | Active |
+| 20 | MASP + Lotação registration (manual validation flow) | `api/auth/register/route.ts` | Active |
+| 21 | Dashboard live feed (30s polling, real Recharts metrics) | `dashboard/page.tsx` | Active |
+| 22 | Reports ↔ Issues ↔ AI Reports SSOT (bidirectional links) | `supabase.ts` | Active |
+| 23 | Seeded police issues (Helios, Olho Vivo, PF integration, etc.) | `sql/seed_issues_v4.sql` | Active |
 
-## Agent 852 — Planned Capabilities (Roadmap)
+## Agent 852 — Roadmap
 
-| # | Capability | Priority | Dependency |
-|---|-----------|----------|------------|
-| 1 | Supabase persistence (conversations + reports server-side) | P1 | Supabase env vars |
-| 2 | Cross-conversation insight aggregation | P1 | Supabase |
-| 3 | Session hashing (each interaction tracked with unique hash) | P2 | Supabase |
-| 4 | Agent memory across sessions (user context) | P2 | Supabase |
-| 5 | ATRiAN v2: NeMo Guardrails or stream-level filtering | P2 | Python sidecar |
-| 6 | ATRiAN violations dashboard | P2 | Admin auth |
-| 7 | Real-time collaboration suggestions (proactive) | P2 | Prompt engineering |
-| 8 | Tool use: web search for institutional data | P3 | AI SDK tools |
-| 9 | Voice input (speech-to-text) | P3 | Browser API |
-| 10 | Observability and insight enrichment with real data | P2 | Supabase |
-| 11 | Dashboard with real metrics | P1 | Supabase |
-| 12 | Admin auth for telemetry/reports | P1 | NextAuth or Supabase Auth |
-| 13 | Automated PDF report generation from aggregated data | P2 | Multiple reports |
+### P1 (Next Sprint)
+
+| # | Feature | Notes |
+|---|---------|-------|
+| 1 | Admin validation dashboard for MASP registrations | pending_validations_852 view ready |
+| 2 | Issue vote dedup by user_id (not just session_hash) | migration_v4.sql adds user_id FK |
+| 3 | PDF/document upload for police issues | multer or presigned S3 |
+| 4 | Real notification pipeline (Telegram/webhook on new issue/vote) | fire-and-forget fetch |
+| 5 | User-linked conversation persistence (load from Supabase when logged in) | cross-device chat |
+
+### P2 (Backlog)
+
+| # | Feature | Notes |
+|---|---------|-------|
+| 1 | ATRiAN v2 — NeMo Guardrails or stream-level filtering | Python sidecar |
+| 2 | ATRiAN violations dashboard in /admin/telemetry | Admin auth ready |
+| 3 | Decompose `chat/page.tsx` into WelcomeScreen + MessageList + InputArea + ExportMenu | ~450 lines |
+| 4 | Cross-conversation insight aggregation (themes, patterns, regions) | Supabase aggregation |
+| 5 | CI/CD pipeline (lint + build + smoke on push) | GitHub Actions |
+| 6 | Tool use: web search for institutional data (AI SDK tools) | DashScope function calling |
+| 7 | Voice input (speech-to-text via Browser API) | Web Speech API |
+| 8 | Proactive collaboration suggestions (agent suggests topics mid-chat) | Prompt engineering |
+| 9 | Automated PDF report from aggregated discussion data | puppeteer/weasyprint |
+| 10 | Expand KNOWN_ACRONYMS in atrian.ts with delegacia-specific terms | PII/ATRiAN hardening |
 
 ## User Flow
 
