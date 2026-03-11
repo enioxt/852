@@ -1,5 +1,6 @@
 import { createIssue, getIssues, voteIssue, addIssueComment, getIssueComments } from '@/lib/supabase';
 import { recordEvent } from '@/lib/telemetry';
+import { getCurrentUser } from '@/lib/user-auth';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -19,8 +20,11 @@ export async function POST(req: Request) {
 
     if (action === 'vote') {
       const { issueId, sessionHash } = body;
-      if (!issueId || !sessionHash) return Response.json({ error: 'issueId e sessionHash obrigatórios' }, { status: 400 });
-      const ok = await voteIssue(issueId, sessionHash);
+      const user = await getCurrentUser();
+      if (!issueId || (!sessionHash && !user?.id)) {
+        return Response.json({ error: 'issueId e identidade do votante obrigatórios' }, { status: 400 });
+      }
+      const ok = await voteIssue(issueId, sessionHash || '', user?.id);
       return Response.json({ voted: ok });
     }
 

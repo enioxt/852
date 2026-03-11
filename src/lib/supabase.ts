@@ -267,14 +267,61 @@ export async function getIssues(
   return data || [];
 }
 
-export async function voteIssue(issueId: string, sessionHash: string): Promise<boolean> {
+export async function voteIssue(issueId: string, sessionHash: string, userId?: string): Promise<boolean> {
   const sb = getSupabase();
   if (!sb) return false;
+
+  const normalizedSessionHash = sessionHash.trim();
+  const identitySessionHash = userId ? `user:${userId}` : normalizedSessionHash;
+  if (!identitySessionHash) return false;
+
+  if (userId) {
+    const { data: existingByUser } = await sb
+      .from('issue_votes_852')
+      .select('id')
+      .eq('issue_id', issueId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existingByUser?.id) return false;
+
+    const { data: existingByIdentityHash } = await sb
+      .from('issue_votes_852')
+      .select('id')
+      .eq('issue_id', issueId)
+      .eq('session_hash', identitySessionHash)
+      .maybeSingle();
+
+    if (existingByIdentityHash?.id) return false;
+
+    if (normalizedSessionHash) {
+      const { data: existingBySession } = await sb
+        .from('issue_votes_852')
+        .select('id, user_id')
+        .eq('issue_id', issueId)
+        .eq('session_hash', normalizedSessionHash)
+        .maybeSingle();
+
+      if (existingBySession?.id) {
+        if (!existingBySession.user_id) {
+          await sb
+            .from('issue_votes_852')
+            .update({ user_id: userId, session_hash: identitySessionHash })
+            .eq('id', existingBySession.id);
+        }
+        return false;
+      }
+    }
+  }
 
   // Try to insert vote (unique constraint prevents double votes)
   const { error } = await sb
     .from('issue_votes_852')
-    .insert({ issue_id: issueId, session_hash: sessionHash });
+    .insert({
+      issue_id: issueId,
+      session_hash: identitySessionHash,
+      user_id: userId || null,
+    });
 
   if (error) return false; // Already voted or other error
 

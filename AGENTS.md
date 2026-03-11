@@ -110,7 +110,7 @@
 | 15 | Agent Cross-Session Memory (conversation summaries) | `conversation-memory.ts` | Active |
 | 16 | AI Intelligence Reports (qwen-max, auto every 5 convos) | `api/ai-reports/generate/route.ts` | Active |
 | 17 | Issues / Discussion Board (GitHub-style voting) | `api/issues/route.ts` | Active |
-| 18 | Upvote/Downvote with MASP login requirement | `issues/page.tsx` | Active |
+| 18 | Upvote/Downvote with MASP login + dedup por `user_id` | `issues/page.tsx` | Active |
 | 19 | User Auth (PBKDF2 + Supabase sessions, 30d) | `user-auth.ts` | Active |
 | 20 | MASP + Lotação registration (manual validation flow) | `api/auth/register/route.ts` | Active |
 | 21 | Dashboard live feed (30s polling, real Recharts metrics) | `dashboard/page.tsx` | Active |
@@ -125,10 +125,9 @@
 
 | # | Feature | Notes |
 |---|---------|-------|
-| 1 | Issue vote dedup by user_id (not just session_hash) | migration_v4.sql adds user_id FK |
-| 2 | PDF/document upload for police issues | multer or presigned S3 |
-| 3 | Real notification pipeline (Telegram/webhook on new issue/vote) | fire-and-forget fetch |
-| 4 | User-linked conversation persistence (load from Supabase when logged in) | cross-device chat |
+| 1 | PDF/document upload for police issues | multer or presigned S3 |
+| 2 | Real notification pipeline (Telegram/webhook on new issue/vote) | fire-and-forget fetch |
+| 3 | User-linked conversation persistence (load from Supabase when logged in) | cross-device chat |
 
 ### P2 (Backlog)
 
