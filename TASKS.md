@@ -61,16 +61,23 @@
 
 - [x] Supabase v2: 6 novas tabelas (issues_852, ai_reports_852, user_accounts_852, user_sessions_852, issue_votes_852, issue_comments_852)
 - [x] Public Stats API (`/api/stats`) com dados reais agregados
-- [x] Auto-report generation: qwen-max gera relatório a cada 5 conversas (`/api/ai-reports/generate`)
+- [x] Auto-report generation: qwen-max gera relatório de inteligência a cada 5 relatos compartilhados (`/api/ai-reports/generate`)
 - [x] Issues system: GitHub-like anonymous topics com voting e comments (`/issues` + `/api/issues`)
 - [x] Landing page overhaul: live stats, animated counters, AI report showcase, progress bar, pending topics
-- [x] Auto-report trigger wired into conversation save flow (fire-and-forget)
+- [x] Auto-report trigger wired into report share flow (fire-and-forget)
 - [x] qwen-max pricing added to ai-provider.ts
 - [x] Optional user auth: email/password login for cross-device chat persistence
 - [x] User auth API routes: `/api/auth/login`, `/api/auth/register`, `/api/auth/logout`, `/api/auth/me`
 - [x] User auth UI: login/register modal in sidebar + user status display + logout
 - [x] Issues link added to sidebar navigation
 - [x] Telemetry events: ai_report_generated, issue_created, user_registered, user_login
+
+## ✅ P1 - Sprint v5.1 (Completed 2026-03-11)
+
+- [x] Landing stats semantics corrigidas: relatórios revisados pela IA separados de relatórios de inteligência agregados
+- [x] Progress bar da landing corrigida para contar relatos compartilhados desde o último relatório de inteligência
+- [x] Backfill inicial de tópico automático a partir de relato compartilhado já salvo
+- [x] Repo `852` adicionado ao mesh compartilhado do `~/.egos/sync.sh` com workflows e skills sincronizados
 
 ## ✅ P1 - Sprint v4 (Completed 2026-03-13)
 

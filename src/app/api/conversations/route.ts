@@ -1,9 +1,7 @@
-import { saveConversation, getConversations, getConversationCountSinceLastReport } from '@/lib/supabase';
+import { saveConversation, getConversations } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/user-auth';
 import { summarizeConversation, saveConversationSummary } from '@/lib/conversation-memory';
 import { createInteractionHash, getIdentityKey } from '@/lib/session';
-
-const AI_REPORT_TRIGGER = 5;
 
 export async function POST(req: Request) {
   try {
@@ -36,22 +34,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Auto-report trigger: check every new conversation (not updates)
-    let reportTriggered = false;
-    if (!existingId) {
-      const count = await getConversationCountSinceLastReport();
-      if (count >= AI_REPORT_TRIGGER) {
-        // Fire-and-forget: generate AI report in background
-        const baseUrl = req.headers.get('origin') || req.headers.get('host') || '';
-        const protocol = baseUrl.startsWith('http') ? '' : 'http://';
-        fetch(`${protocol}${baseUrl}/api/ai-reports/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ force: false }),
-        }).catch(err => console.error('[852] auto-report trigger failed:', err.message));
-        reportTriggered = true;
-      }
-    }
+    const reportTriggered = false;
 
     return Response.json({ id, reportTriggered, identityKey, interactionHash });
   } catch (error) {

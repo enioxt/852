@@ -13,8 +13,10 @@ import {
 interface Stats {
   totalConversations: number;
   totalReportsShared: number;
+  totalReportsReviewedByAI: number;
   totalIssuesOpen: number;
   totalAIReports: number;
+  sharedReportsSinceLastAIReport: number;
   latestAIReport: {
     id: string;
     created_at: string;
@@ -122,7 +124,7 @@ export default function Home() {
       .finally(() => setLoadingStats(false));
   }, []);
 
-  const nextReportIn = stats ? Math.max(0, 5 - (stats.totalConversations % 5)) : 5;
+  const sharedReportsProgress = stats ? Math.min(stats.sharedReportsSinceLastAIReport, 5) : 0;
 
   return (
     <div
@@ -222,23 +224,27 @@ export default function Home() {
                   <AnimatedCounter value={stats.totalConversations} label="Conversas realizadas" />
                   <AnimatedCounter value={stats.totalReportsShared} label="Relatórios compartilhados" />
                   <AnimatedCounter value={stats.totalIssuesOpen} label="Tópicos em discussão" />
-                  <AnimatedCounter value={stats.totalAIReports} label="Relatórios de IA" />
+                  <AnimatedCounter value={stats.totalReportsReviewedByAI} label="Relatórios revisados pela IA" />
                 </div>
+
+                <p className="mt-4 text-sm text-neutral-500 text-center">
+                  Relatórios de inteligência completos já gerados: <span className="text-neutral-300 font-medium">{stats.totalAIReports}</span>
+                </p>
 
                 {/* Progress to next AI report */}
                 <div className="mt-6 pt-5 border-t border-neutral-800/30">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-neutral-400">Próximo relatório de IA</span>
-                    <span className="text-sm text-neutral-300 font-medium">{5 - nextReportIn}/5 relatos</span>
+                    <span className="text-sm text-neutral-400">Próximo relatório de inteligência</span>
+                    <span className="text-sm text-neutral-300 font-medium">{sharedReportsProgress}/5 relatos</span>
                   </div>
                   <div className="w-full h-3 rounded-full bg-neutral-800">
                     <div
                       className="h-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000"
-                      style={{ width: `${((5 - nextReportIn) / 5) * 100}%` }}
+                      style={{ width: `${(sharedReportsProgress / 5) * 100}%` }}
                     />
                   </div>
                   <p className="text-sm text-neutral-500 mt-2">
-                    A cada 5 relatos, um relatório completo é gerado automaticamente por IA
+                    A cada 5 relatos compartilhados, um relatório completo de inteligência é gerado automaticamente por IA
                   </p>
                 </div>
               </div>

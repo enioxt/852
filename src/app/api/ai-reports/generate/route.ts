@@ -5,7 +5,7 @@ import {
   getSupabase,
   saveAIReport,
   createIssue,
-  getConversationCountSinceLastReport,
+  getSharedReportCountSinceLastAIReport,
 } from '@/lib/supabase';
 
 const AI_REPORT_TRIGGER_COUNT = 5;
@@ -46,14 +46,14 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const forceGenerate = body.force === true;
 
-    // Check if we should generate (every 5 conversations)
+    // Check if we should generate (every 5 shared reports)
     if (!forceGenerate) {
-      const count = await getConversationCountSinceLastReport();
+      const count = await getSharedReportCountSinceLastAIReport();
       if (count < AI_REPORT_TRIGGER_COUNT) {
         return Response.json({
           generated: false,
-          reason: `Apenas ${count}/${AI_REPORT_TRIGGER_COUNT} conversas desde o último relatório`,
-          conversationsSinceLastReport: count,
+          reason: `Apenas ${count}/${AI_REPORT_TRIGGER_COUNT} relatórios compartilhados desde o último relatório de inteligência`,
+          reportsSinceLastAIReport: count,
         });
       }
     }

@@ -8,8 +8,10 @@ export async function GET() {
     return Response.json({
       totalConversations: 0,
       totalReportsShared: 0,
+      totalReportsReviewedByAI: 0,
       totalIssuesOpen: 0,
       totalAIReports: 0,
+      sharedReportsSinceLastAIReport: 0,
       latestAIReport: null,
       recentIssues: [],
       recentReports: [],

@@ -480,8 +480,10 @@ export async function getLatestAIReport(): Promise<AIReportRecord | null> {
 export interface PublicStats {
   totalConversations: number;
   totalReportsShared: number;
+  totalReportsReviewedByAI: number;
   totalIssuesOpen: number;
   totalAIReports: number;
+  sharedReportsSinceLastAIReport: number;
   latestAIReport: AIReportRecord | null;
   recentIssues: IssueRecord[];
   recentReports: Array<{ id: string; created_at: string; conversation_id: string; status: string }>;
@@ -492,21 +494,25 @@ export async function getPublicStats(): Promise<PublicStats | null> {
   if (!sb) return null;
 
   try {
-    const [convos, reports, issues, aiReports, latestAI, recentIssues, recentReportsData] = await Promise.all([
+    const [convos, reports, reviewedReports, issues, aiReports, latestAI, recentIssues, recentReportsData, sharedReportsSinceLastAIReport] = await Promise.all([
       sb.from('conversations_852').select('id', { count: 'exact', head: true }),
       sb.from('reports_852').select('id', { count: 'exact', head: true }).neq('status', 'deleted'),
+      sb.from('reports_852').select('id', { count: 'exact', head: true }).neq('status', 'deleted').not('review_data', 'is', null),
       sb.from('issues_852').select('id', { count: 'exact', head: true }).eq('status', 'open'),
       sb.from('ai_reports_852').select('id', { count: 'exact', head: true }),
       sb.from('ai_reports_852').select('*').order('created_at', { ascending: false }).limit(1).maybeSingle(),
       sb.from('issues_852').select('*').in('status', ['open', 'in_discussion']).order('votes', { ascending: false }).limit(5),
       sb.from('reports_852').select('id, created_at, conversation_id, status').neq('status', 'deleted').order('created_at', { ascending: false }).limit(5),
+      getSharedReportCountSinceLastAIReport(),
     ]);
 
     return {
       totalConversations: convos.count || 0,
       totalReportsShared: reports.count || 0,
+      totalReportsReviewedByAI: reviewedReports.count || 0,
       totalIssuesOpen: issues.count || 0,
       totalAIReports: aiReports.count || 0,
+      sharedReportsSinceLastAIReport,
       latestAIReport: latestAI.data || null,
       recentIssues: recentIssues.data || [],
       recentReports: recentReportsData.data || [],
@@ -517,7 +523,7 @@ export async function getPublicStats(): Promise<PublicStats | null> {
   }
 }
 
-// ── Conversation Count for Auto-Report Trigger ───────────
+// ── AI Report Trigger Counts ─────────────────────────────
 
 export async function getConversationCountSinceLastReport(): Promise<number> {
   const sb = getSupabase();
@@ -532,6 +538,30 @@ export async function getConversationCountSinceLastReport(): Promise<number> {
     .maybeSingle();
 
   let query = sb.from('conversations_852').select('id', { count: 'exact', head: true });
+  if (lastReport?.created_at) {
+    query = query.gte('created_at', lastReport.created_at);
+  }
+
+  const { count } = await query;
+  return count || 0;
+}
+
+export async function getSharedReportCountSinceLastAIReport(): Promise<number> {
+  const sb = getSupabase();
+  if (!sb) return 0;
+
+  const { data: lastReport } = await sb
+    .from('ai_reports_852')
+    .select('created_at')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let query = sb
+    .from('reports_852')
+    .select('id', { count: 'exact', head: true })
+    .neq('status', 'deleted');
+
   if (lastReport?.created_at) {
     query = query.gte('created_at', lastReport.created_at);
   }

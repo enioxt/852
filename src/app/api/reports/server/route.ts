@@ -1,7 +1,9 @@
-import { saveReport, getReports, deleteReportServer, createIssue } from '@/lib/supabase';
+import { saveReport, getReports, deleteReportServer, createIssue, getSharedReportCountSinceLastAIReport } from '@/lib/supabase';
 import { recordEvent } from '@/lib/telemetry';
 import { getCurrentUser } from '@/lib/user-auth';
 import { createInteractionHash, getIdentityKey } from '@/lib/session';
+
+const AI_REPORT_TRIGGER_COUNT = 5;
 
 function normalizeTag(value: string) {
   return value
@@ -51,7 +53,18 @@ export async function POST(req: Request) {
       );
     }
 
-    recordEvent({ event_type: 'report_shared', metadata: { reportId: id, conversationId, identityKey, interactionHash, primaryTag } });
+    const sharedReportsSinceLastAIReport = await getSharedReportCountSinceLastAIReport();
+    if (sharedReportsSinceLastAIReport >= AI_REPORT_TRIGGER_COUNT) {
+      const baseUrl = req.headers.get('origin') || req.headers.get('host') || '';
+      const protocol = baseUrl.startsWith('http') ? '' : 'http://';
+      fetch(`${protocol}${baseUrl}/api/ai-reports/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ force: false }),
+      }).catch((err) => console.error('[852] auto ai-report trigger from shared report failed:', err.message));
+    }
+
+    recordEvent({ event_type: 'report_shared', metadata: { reportId: id, conversationId, identityKey, interactionHash, primaryTag, sharedReportsSinceLastAIReport } });
     return Response.json({ id, identityKey, interactionHash });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Erro interno';
