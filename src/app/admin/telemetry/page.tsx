@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   BarChart3, Activity, MessageSquare, AlertTriangle,
   RefreshCw, Loader2, DollarSign, Zap, ShieldAlert,
-  ArrowLeft, Clock,
+  ArrowLeft, Clock, LogOut,
 } from 'lucide-react';
 
 interface TelemetryStats {
@@ -29,6 +30,7 @@ interface ApiResponse {
 }
 
 export default function TelemetryDashboard() {
+  const router = useRouter();
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(7);
@@ -37,6 +39,10 @@ export default function TelemetryDashboard() {
     setLoading(true);
     try {
       const res = await fetch(`/api/telemetry?days=${days}`);
+      if (res.status === 401) {
+        router.push('/admin/login');
+        return;
+      }
       const json = await res.json();
       setData(json);
     } catch {
@@ -44,7 +50,12 @@ export default function TelemetryDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [days]);
+  }, [days, router]);
+
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    router.push('/admin/login');
+  };
 
   useEffect(() => { load(); }, [load]);
 
@@ -75,6 +86,13 @@ export default function TelemetryDashboard() {
             className="p-2 rounded-lg hover:bg-neutral-800 transition text-neutral-400 hover:text-white disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-lg hover:bg-neutral-800 transition text-neutral-400 hover:text-red-400"
+            title="Sair"
+          >
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </header>

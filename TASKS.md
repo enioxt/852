@@ -43,20 +43,31 @@
 - [x] AGENTS.md v2.0: system map completo, capabilities, roadmap, user flow
 - [x] README.md v2.0: features, stack, system map, deploy, roadmap
 
+## ✅ P1 - Sprint (Completed 2026-03-11)
+
+- [x] Fix JSON parse error in AI review (robust parsing + generateText)
+- [x] Fix auto-review: only auto-trigger once, require explicit re-analyze button
+- [x] Supabase ativado: 5 tabelas criadas (telemetry_852, reports_852, conversations_852, admin_users_852, admin_sessions_852)
+- [x] Admin auth system: email/password login, sessions in Supabase, PBKDF2 hashing
+- [x] Admin login page (`/admin/login`) + logout + auth middleware
+- [x] Telemetry API protegida com admin auth
+- [x] Supabase persistence: conversations sync from chat page (background)
+- [x] API routes: `/api/conversations`, `/api/reports/server`, `/api/dashboard`
+- [x] Dashboard API with real aggregated metrics from Supabase
+- [x] Admin user criado em produção (enioxt@gmail.com)
+- [x] Deploy v2 no VPS Contabo com todas as features acima
+
 ## ⏭️ Backlog
 
-- [ ] Ativar Supabase para 852: criar tabela telemetry_852 (migration pronta), adicionar env vars
-- [ ] Supabase real + RLS para persistência server-side de conversas e relatórios
-- [ ] Migrar report-store de localStorage para Supabase (reports_852 table)
+- [ ] Dashboard UI com métricas reais (substituir mock data no /dashboard)
+- [ ] Migrar report-store de localStorage para Supabase (dual write: local + server)
 - [ ] Session hashing: cada interação gera um hash único rastreável
-- [ ] Memória persistente do agente entre sessões (user context)
-- [ ] Dashboard com métricas reais (substituir mock data)
+- [ ] Memória persistente do agente entre sessões (conversation summaries → system prompt)
 - [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
 - [ ] ETHIK/Gamificação com dados reais
-- [ ] Admin auth para telemetry/reports (NextAuth ou Supabase Auth)
 - [ ] Relatórios HTML avançados + PDF automático de dados agregados
 - [ ] Refinar OG image para proporção 1200x630 real
-- [ ] Decompose `chat/page.tsx` (~440 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
+- [ ] Decompose `chat/page.tsx` (~450 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [ ] CI/CD pipeline (lint + build + smoke on push/PR)
 - [ ] Consolidar package manager (remover vestígios de bun, manter npm)
 - [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)

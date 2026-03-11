@@ -73,7 +73,8 @@ export default function ChatPage() {
 
   useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
 
-  // Persist messages to localStorage
+  // Persist messages to localStorage + background Supabase sync
+  const supabaseIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (messages.length === 0 || !activeConvId) return;
     const stored: StoredMessage[] = messages.map(m => ({
@@ -83,6 +84,24 @@ export default function ChatPage() {
     }));
     const title = stored.length > 0 ? generateTitle(stored[0].content) : 'Nova conversa';
     updateConversation(activeConvId, stored, title);
+
+    // Background Supabase sync (fire-and-forget)
+    const syncToSupabase = async () => {
+      try {
+        await fetch('/api/conversations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: stored.map(m => ({ role: m.role, content: m.content })),
+            title,
+            existingId: supabaseIdRef.current,
+          }),
+        }).then(r => r.json()).then(d => {
+          if (d.id && !supabaseIdRef.current) supabaseIdRef.current = d.id;
+        });
+      } catch { /* silent */ }
+    };
+    syncToSupabase();
   }, [messages, activeConvId]);
 
   const handleNewConversation = useCallback(() => {

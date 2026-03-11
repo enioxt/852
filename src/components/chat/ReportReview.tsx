@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   X, Shield, AlertTriangle, CheckCircle, Send, Share2,
   Trash2, Copy, Check, Loader2, ChevronDown, ChevronUp,
-  Eye, EyeOff, MessageCircle, Lightbulb
+  Eye, EyeOff, MessageCircle, Lightbulb, RefreshCw
 } from 'lucide-react';
 import { scanForPII, sanitizeText, getPIISummary, type PIIFinding } from '@/lib/pii-scanner';
 import {
@@ -57,6 +57,7 @@ export default function ReportReview({ messages, conversationId, onClose, onSugg
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
+  const [hasReviewed, setHasReviewed] = useState(false);
   const [reportId, setReportId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showOriginal, setShowOriginal] = useState(false);
@@ -72,9 +73,9 @@ export default function ReportReview({ messages, conversationId, onClose, onSugg
     setStep(findings.length > 0 ? 'pii_review' : 'ai_review');
   }, [messages]);
 
-  // Step 2: Auto-trigger AI review when entering ai_review step
+  // Step 2: Auto-trigger AI review ONLY on first time entering the step
   useEffect(() => {
-    if (step === 'ai_review' && !reviewData && !reviewLoading) {
+    if (step === 'ai_review' && !reviewData && !reviewLoading && !hasReviewed) {
       runAIReview();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,33 +121,19 @@ export default function ReportReview({ messages, conversationId, onClose, onSugg
         body: JSON.stringify({ messages: sanitized }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || `Erro ${res.status}`);
+        throw new Error(data.error || `Erro ${res.status}`);
       }
 
-      // Read streamed response
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error('Sem resposta do servidor');
-
-      let fullText = '';
-      const decoder = new TextDecoder();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        fullText += decoder.decode(value, { stream: true });
-      }
-
-      // Parse JSON from response (may have markdown wrapping)
-      const jsonMatch = fullText.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error('Resposta inválida do agente');
-
-      const data: ReviewData = JSON.parse(jsonMatch[0]);
-      setReviewData(data);
+      setReviewData(data as ReviewData);
+      setHasReviewed(true);
       setStep('ready');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro desconhecido';
       setReviewError(msg);
+      setHasReviewed(true);
       // Still allow sharing even if review fails
       setStep('ready');
     } finally {
@@ -322,6 +309,26 @@ export default function ReportReview({ messages, conversationId, onClose, onSugg
                     </div>
                   )}
 
+                  {!reviewLoading && !reviewData && hasReviewed && !reviewError && (
+                    <button
+                      onClick={runAIReview}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600/20 text-xs text-blue-400 hover:bg-blue-600/30 transition"
+                    >
+                      <Lightbulb className="w-3.5 h-3.5" />
+                      Analisar com IA
+                    </button>
+                  )}
+
+                  {!reviewLoading && !reviewData && !hasReviewed && step === 'ai_review' && (
+                    <button
+                      onClick={runAIReview}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600/20 text-xs text-blue-400 hover:bg-blue-600/30 transition"
+                    >
+                      <Lightbulb className="w-3.5 h-3.5" />
+                      Iniciar análise com IA
+                    </button>
+                  )}
+
                   {reviewError && (
                     <div className="p-3 rounded-xl bg-red-900/20 border border-red-800/30 text-xs text-red-400">
                       {reviewError}
@@ -380,6 +387,17 @@ export default function ReportReview({ messages, conversationId, onClose, onSugg
                           <p className="text-[11px] text-green-400 font-medium mb-1">Impacto do relato</p>
                           <p className="text-xs text-neutral-400 leading-relaxed">{reviewData.impacto}</p>
                         </div>
+                      )}
+
+                      {/* Re-analyze button */}
+                      {!reviewLoading && (
+                        <button
+                          onClick={runAIReview}
+                          className="flex items-center gap-1.5 text-[10px] text-neutral-500 hover:text-blue-400 transition mt-1"
+                        >
+                          <RefreshCw className="w-3 h-3" />
+                          Re-analisar relatório
+                        </button>
                       )}
                     </>
                   )}

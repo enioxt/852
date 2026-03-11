@@ -1,4 +1,4 @@
-import { streamText } from 'ai';
+import { generateText } from 'ai';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { getProvider, getModelId, hasAvailableProvider } from '@/lib/ai-provider';
 import { recordEvent } from '@/lib/telemetry';
@@ -11,29 +11,24 @@ const REVIEW_PROMPT = `Você é um analista de qualidade do Agente 852 — siste
 
 Sua tarefa: analisar uma conversa entre um policial e o Agente 852 e fornecer uma avaliação estruturada.
 
-## REGRAS
+## REGRAS ABSOLUTAS
 1. NUNCA cite nomes, CPFs, REDS, ou dados pessoais — mesmo que apareçam na conversa.
 2. Foque em padrões sistêmicos, não em casos individuais.
 3. Seja objetivo e construtivo.
+4. RESPONDA EXCLUSIVAMENTE com JSON válido. Sem markdown, sem texto antes ou depois, sem comentários.
+5. Todas as strings devem usar aspas duplas. Não use aspas simples.
+6. Não use caracteres de controle ou quebras de linha dentro de strings JSON.
 
-## FORMATO DE RESPOSTA (JSON)
-Responda APENAS com um JSON válido, sem texto adicional:
-{
-  "completude": <número 1-10>,
-  "resumo": "<resumo executivo em 2-3 frases do que foi relatado>",
-  "temas": ["<tema 1>", "<tema 2>"],
-  "pontosCegos": ["<área não explorada 1>", "<área não explorada 2>"],
-  "sugestoes": ["<pergunta sugerida ao policial 1>", "<pergunta sugerida 2>"],
-  "impacto": "<análise breve do impacto potencial deste relato para a inteligência institucional>"
-}
+## FORMATO EXATO (copie esta estrutura):
+{"completude":7,"resumo":"Resumo aqui","temas":["tema1","tema2"],"pontosCegos":["ponto1"],"sugestoes":["pergunta1","pergunta2"],"impacto":"Impacto aqui"}
 
 ## CAMPOS
-- completude: nota de 1 a 10 para quão completo/detalhado está o relato
-- resumo: síntese do que o policial relatou
-- temas: categorias/temas identificados (ex: infraestrutura, efetivo, assédio, tecnologia, processo)
-- pontosCegos: áreas que o policial NÃO explorou mas poderiam enriquecer o relato
-- sugestoes: perguntas concretas que o policial poderia responder para completar o relato
-- impacto: relevância do relato para mapeamento de problemas estruturais`;
+- completude: número inteiro de 1 a 10
+- resumo: síntese em 2-3 frases (sem quebras de linha)
+- temas: array de strings curtas (ex: infraestrutura, efetivo, assédio, tecnologia)
+- pontosCegos: áreas não exploradas que enriqueceriam o relato
+- sugestoes: perguntas concretas para o policial completar o relato
+- impacto: relevância para inteligência institucional (1 frase)`;
 
 export async function POST(req: Request) {
   try {
@@ -75,22 +70,53 @@ export async function POST(req: Request) {
     const provider = getProvider();
     const modelId = getModelId();
 
-    const result = streamText({
+    const result = await generateText({
       model: provider.chat(modelId),
       system: REVIEW_PROMPT,
-      messages: [{ role: 'user', content: `Analise esta conversa:\n\n${conversationText}` }],
-      temperature: 0.3,
-      onFinish: async () => {
-        recordEvent({
-          event_type: 'report_generation',
-          model_id: modelId,
-          status_code: 200,
-          metadata: { type: 'conversation_review', messageCount: messages.length },
-        });
-      },
+      messages: [{ role: 'user', content: `Analise esta conversa e responda APENAS com JSON válido:\n\n${conversationText}` }],
+      temperature: 0.2,
     });
 
-    return result.toTextStreamResponse();
+    recordEvent({
+      event_type: 'report_review',
+      model_id: modelId,
+      status_code: 200,
+      metadata: { type: 'conversation_review', messageCount: messages.length },
+    });
+
+    // Extract and validate JSON from response
+    let jsonText = result.text.trim();
+    // Strip markdown fences if present
+    jsonText = jsonText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+    // Find JSON object
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return new Response(JSON.stringify({ error: 'Resposta inválida do agente. Tente novamente.' }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Sanitize common JSON issues from LLMs
+    let cleaned = jsonMatch[0]
+      .replace(/[\r\n]+/g, ' ')          // Remove newlines inside JSON
+      .replace(/,\s*}/g, '}')             // Trailing commas
+      .replace(/,\s*]/g, ']')             // Trailing commas in arrays
+      .replace(/'/g, '"')                 // Single quotes → double
+      .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":'); // Unquoted keys
+
+    try {
+      const parsed = JSON.parse(cleaned);
+      return new Response(JSON.stringify(parsed), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch {
+      return new Response(JSON.stringify({ error: 'Erro ao processar análise. Tente novamente.' }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
   } catch (error: unknown) {
     const detail = error instanceof Error ? error.message : 'Unknown error';
     recordEvent({ event_type: 'report_error', error_message: detail, status_code: 500 });
