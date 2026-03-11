@@ -1,6 +1,7 @@
 import { createIssue, getIssues, voteIssue, addIssueComment, getIssueComments } from '@/lib/supabase';
 import { recordEvent } from '@/lib/telemetry';
 import { getCurrentUser } from '@/lib/user-auth';
+import { queueIssueNotification } from '@/lib/notifications';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -24,8 +25,16 @@ export async function POST(req: Request) {
       if (!issueId || (!sessionHash && !user?.id)) {
         return Response.json({ error: 'issueId e identidade do votante obrigatórios' }, { status: 400 });
       }
-      const ok = await voteIssue(issueId, sessionHash || '', user?.id);
-      return Response.json({ voted: ok });
+      const result = await voteIssue(issueId, sessionHash || '', user?.id);
+      if (result.voted) {
+        recordEvent({ event_type: 'issue_voted', metadata: { issueId, userId: user?.id || null } });
+        queueIssueNotification('issue_voted', {
+          issueId,
+          title: result.issue?.title,
+          votes: result.issue?.votes,
+        });
+      }
+      return Response.json(result);
     }
 
     if (action === 'comment') {
@@ -50,6 +59,7 @@ export async function POST(req: Request) {
     if (!id) return Response.json({ error: 'Falha ao criar' }, { status: 500 });
 
     recordEvent({ event_type: 'issue_created', metadata: { issueId: id, source: 'user' } });
+    queueIssueNotification('issue_created', { issueId: id, title, category });
     return Response.json({ id });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Erro interno';

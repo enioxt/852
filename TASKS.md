@@ -85,6 +85,7 @@
 - [x] MASP badge no sidebar (pendente/aprovado) para usuários autenticados
 - [x] Admin dashboard para validação manual de registros MASP pendentes (`/admin/validations` + `/api/admin/validations`)
 - [x] Votos de issues deduplicados por `user_id` autenticado com fallback compatível por `session_hash`
+- [x] Pipeline real de notificações (webhook/Telegram) para novas pautas e votos em `/issues`
 - [x] Pre-commit SSOT: `/home/enio/.egos/hooks/pre-commit` — hook universal para todos os repos EGOS
 - [x] Hook Mesh EGOS: `852`, `carteira-livre`, `forja`, `egos-self`, `policia` com symlink SSOT; `br-acc` e `egos-lab` com wrapper SSOT + hook legado
 - [x] Diagnóstico multi-repo consolidado em `/home/enio/.egos/hooks/HOOK_MIGRATION_STATUS.md`

@@ -15,6 +15,7 @@ Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estrutura�
 - **Exportação** — PDF, DOCX, Markdown
 - **Markdown Renderizado** — GFM completo nas respostas da IA
 - **Telemetria** — Microsoft Clarity + structured JSON logs + admin dashboard
+- **Notificações Operacionais** — Webhook/Telegram fire-and-forget para novas pautas e votos
 - **Mobile First & Dark Mode** — Design Palantir/Linear para inteligência policial
 - **API Hardening** — Rate limit, validação de payload, fallback explícito de provider
 
@@ -38,7 +39,7 @@ Landing (/)
   │     ├── Relatos Compartilhados (view/delete)
   │     └── Gerador de Relatórios (AI HTML reports)
   │
-  └── /dashboard, /admin/telemetry
+  └── /dashboard, /admin/telemetry, /admin/validations
 ```
 
 ## Stack
@@ -67,10 +68,12 @@ src/
 │   ├── api/review/route.ts       # POST /api/review — AI conversation review
 │   ├── api/report/route.ts       # POST /api/report — AI HTML report gen
 │   ├── api/telemetry/route.ts    # GET  /api/telemetry — stats
+│   ├── api/issues/route.ts       # GET/POST /api/issues — pautas, votos e comentários
 │   ├── chat/page.tsx             # Chat UI + report review modal
 │   ├── reports/page.tsx          # Shared reports + AI report generator
 │   ├── dashboard/page.tsx        # Insights dashboard
 │   ├── admin/telemetry/page.tsx  # Admin telemetry
+│   ├── admin/validations/page.tsx # Admin validations
 │   ├── layout.tsx                # Root layout (Clarity, fonts, metadata)
 │   └── page.tsx                  # Landing page
 ├── components/chat/
@@ -85,6 +88,7 @@ src/
     ├── pii-scanner.ts            # PII detection (CPF, RG, MASP, etc.)
     ├── prompt.ts                 # System prompt + truth layer
     ├── rate-limit.ts             # In-memory rate limiting
+    ├── notifications.ts          # Webhook/Telegram alerts
     ├── report-store.ts           # localStorage reports (Supabase-ready)
     ├── telemetry.ts              # Dual telemetry (Supabase + JSON logs)
 ```
@@ -105,8 +109,14 @@ DASHSCOPE_API_KEY=sk-xxx              # Alibaba DashScope (primary LLM)
 OPENROUTER_API_KEY=sk-or-xxx          # OpenRouter Gemini 2.0 (fallback)
 NEXT_PUBLIC_CLARITY_ID=xxx            # Microsoft Clarity project ID
 # Optional:
-SUPABASE_URL=https://xxx.supabase.co  # Server-side persistence
-SUPABASE_SERVICE_ROLE_KEY=xxx         # Supabase service key
+SUPABASE_URL=https://xxx.supabase.co          # Server-side persistence
+SUPABASE_SERVICE_ROLE_KEY=xxx                 # Supabase service key
+ADMIN_SETUP_KEY=xxx                           # Bootstrap do primeiro admin
+PUBLIC_BASE_URL=https://852.egos.ia.br       # Base pública usada em links/alertas
+ISSUE_ALERT_WEBHOOK_URL=https://hook.example # Webhook para novas pautas/votos
+ISSUE_ALERT_WEBHOOK_SECRET=xxx               # Segredo opcional do webhook
+TELEGRAM_BOT_TOKEN=xxx                       # Bot Telegram opcional
+TELEGRAM_CHAT_ID=xxx                         # Chat destino opcional
 ```
 
 ## Deploy

@@ -118,6 +118,7 @@
 | 23 | Seeded police issues (Helios, Olho Vivo, PF integration, etc.) | `sql/seed_issues_v4.sql` | Active |
 | 24 | CI pipeline (lint + build + local smoke on push/PR) | `.github/workflows/ci.yml` | Active |
 | 25 | Admin validation dashboard for MASP registrations | `admin/validations/page.tsx` | Active |
+| 26 | Notificações operacionais por webhook/Telegram para `/issues` | `notifications.ts` | Active |
 
 ## Agent 852 — Roadmap
 
@@ -126,8 +127,7 @@
 | # | Feature | Notes |
 |---|---------|-------|
 | 1 | PDF/document upload for police issues | multer or presigned S3 |
-| 2 | Real notification pipeline (Telegram/webhook on new issue/vote) | fire-and-forget fetch |
-| 3 | User-linked conversation persistence (load from Supabase when logged in) | cross-device chat |
+| 2 | User-linked conversation persistence (load from Supabase when logged in) | cross-device chat |
 
 ### P2 (Backlog)
 

@@ -25,6 +25,9 @@ export type TelemetryEventType =
   | 'atrian_violation'
   | 'ai_report_generated'
   | 'issue_created'
+  | 'issue_voted'
+  | 'notification_sent'
+  | 'notification_error'
   | 'user_registered'
   | 'user_login';
 
@@ -212,7 +215,7 @@ export async function getStats(days: number = 7): Promise<TelemetryStats | null>
         if (e.provider) stats.byProvider[e.provider] = (stats.byProvider[e.provider] || 0) + 1;
       }
       if (e.event_type === 'rate_limit_hit') stats.rateLimitHits++;
-      if (e.event_type === 'chat_error' || e.event_type === 'report_error') stats.errors++;
+      if (e.event_type === 'chat_error' || e.event_type === 'report_error' || e.event_type === 'notification_error') stats.errors++;
     }
 
     return stats;

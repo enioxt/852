@@ -230,6 +230,10 @@ function EventBadge({ type }: { type: string }) {
     chat_error: { label: 'ERROR', cls: 'bg-red-900/40 text-red-400 border-red-800/40' },
     rate_limit_hit: { label: 'LIMIT', cls: 'bg-amber-900/40 text-amber-400 border-amber-800/40' },
     report_generation: { label: 'REPORT', cls: 'bg-purple-900/40 text-purple-400 border-purple-800/40' },
+    issue_created: { label: 'ISSUE', cls: 'bg-blue-900/40 text-blue-300 border-blue-800/40' },
+    issue_voted: { label: 'VOTE', cls: 'bg-cyan-900/40 text-cyan-400 border-cyan-800/40' },
+    notification_sent: { label: 'PING', cls: 'bg-emerald-900/40 text-emerald-400 border-emerald-800/40' },
+    notification_error: { label: 'ALERT', cls: 'bg-rose-900/40 text-rose-400 border-rose-800/40' },
     provider_unavailable: { label: 'DOWN', cls: 'bg-red-900/40 text-red-400 border-red-800/40' },
   };
   const c = config[type] || { label: type.toUpperCase(), cls: 'bg-neutral-800 text-neutral-400 border-neutral-700' };

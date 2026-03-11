@@ -267,13 +267,17 @@ export async function getIssues(
   return data || [];
 }
 
-export async function voteIssue(issueId: string, sessionHash: string, userId?: string): Promise<boolean> {
+export async function voteIssue(
+  issueId: string,
+  sessionHash: string,
+  userId?: string
+): Promise<{ voted: boolean; issue?: { id: string; title: string | null; votes: number } }> {
   const sb = getSupabase();
-  if (!sb) return false;
+  if (!sb) return { voted: false };
 
   const normalizedSessionHash = sessionHash.trim();
   const identitySessionHash = userId ? `user:${userId}` : normalizedSessionHash;
-  if (!identitySessionHash) return false;
+  if (!identitySessionHash) return { voted: false };
 
   if (userId) {
     const { data: existingByUser } = await sb
@@ -283,7 +287,7 @@ export async function voteIssue(issueId: string, sessionHash: string, userId?: s
       .eq('user_id', userId)
       .maybeSingle();
 
-    if (existingByUser?.id) return false;
+    if (existingByUser?.id) return { voted: false };
 
     const { data: existingByIdentityHash } = await sb
       .from('issue_votes_852')
@@ -292,7 +296,7 @@ export async function voteIssue(issueId: string, sessionHash: string, userId?: s
       .eq('session_hash', identitySessionHash)
       .maybeSingle();
 
-    if (existingByIdentityHash?.id) return false;
+    if (existingByIdentityHash?.id) return { voted: false };
 
     if (normalizedSessionHash) {
       const { data: existingBySession } = await sb
@@ -309,7 +313,7 @@ export async function voteIssue(issueId: string, sessionHash: string, userId?: s
             .update({ user_id: userId, session_hash: identitySessionHash })
             .eq('id', existingBySession.id);
         }
-        return false;
+        return { voted: false };
       }
     }
   }
@@ -323,15 +327,24 @@ export async function voteIssue(issueId: string, sessionHash: string, userId?: s
       user_id: userId || null,
     });
 
-  if (error) return false; // Already voted or other error
+  if (error) return { voted: false };
 
   // Increment vote count (manual since no RPC function)
-  const { data: issueData } = await sb.from('issues_852').select('votes').eq('id', issueId).single();
+  const { data: issueData } = await sb.from('issues_852').select('title, votes').eq('id', issueId).single();
   if (issueData) {
-    await sb.from('issues_852').update({ votes: (issueData.votes || 0) + 1 }).eq('id', issueId);
+    const updatedVotes = (issueData.votes || 0) + 1;
+    await sb.from('issues_852').update({ votes: updatedVotes }).eq('id', issueId);
+    return {
+      voted: true,
+      issue: {
+        id: issueId,
+        title: issueData.title || null,
+        votes: updatedVotes,
+      },
+    };
   }
 
-  return true;
+  return { voted: true };
 }
 
 export async function addIssueComment(
