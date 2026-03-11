@@ -62,8 +62,8 @@ async function issueEmailVerification(params: { userId: string; email: string; d
   if (updateError) return { error: updateError.message };
 
   const resendApiKey = process.env.RESEND_API_KEY;
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL;
-  if (!resendApiKey || !resendFromEmail) {
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <noreply@intelink.ia.br>';
+  if (!resendApiKey) {
     return {
       sent: false,
       warning: 'Conta criada, mas o envio de email não está configurado neste ambiente.',
