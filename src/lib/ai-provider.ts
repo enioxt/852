@@ -2,6 +2,7 @@ import { createOpenAI } from '@ai-sdk/openai';
 
 export const PRICING: Record<string, { input: number; output: number; free?: boolean }> = {
   'qwen-plus': { input: 0.0008, output: 0.002 },
+  'qwen-max': { input: 0.0016, output: 0.007 },
   'google/gemini-2.0-flash-001': { input: 0, output: 0, free: false },
   'gpt-4o-mini': { input: 0.00015, output: 0.0006 },
 };

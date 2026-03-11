@@ -57,15 +57,29 @@
 - [x] Admin user criado em produção (enioxt@gmail.com)
 - [x] Deploy v2 no VPS Contabo com todas as features acima
 
+## ✅ P1 - Sprint v3 (Completed 2026-03-12)
+
+- [x] Supabase v2: 6 novas tabelas (issues_852, ai_reports_852, user_accounts_852, user_sessions_852, issue_votes_852, issue_comments_852)
+- [x] Public Stats API (`/api/stats`) com dados reais agregados
+- [x] Auto-report generation: qwen-max gera relatório a cada 5 conversas (`/api/ai-reports/generate`)
+- [x] Issues system: GitHub-like anonymous topics com voting e comments (`/issues` + `/api/issues`)
+- [x] Landing page overhaul: live stats, animated counters, AI report showcase, progress bar, pending topics
+- [x] Auto-report trigger wired into conversation save flow (fire-and-forget)
+- [x] qwen-max pricing added to ai-provider.ts
+- [x] Optional user auth: email/password login for cross-device chat persistence
+- [x] User auth API routes: `/api/auth/login`, `/api/auth/register`, `/api/auth/logout`, `/api/auth/me`
+- [x] User auth UI: login/register modal in sidebar + user status display + logout
+- [x] Issues link added to sidebar navigation
+- [x] Telemetry events: ai_report_generated, issue_created, user_registered, user_login
+
 ## ⏭️ Backlog
 
-- [ ] Dashboard UI com métricas reais (substituir mock data no /dashboard)
+- [ ] Dashboard UI com métricas reais Recharts (substituir mock data no /dashboard)
 - [ ] Migrar report-store de localStorage para Supabase (dual write: local + server)
 - [ ] Session hashing: cada interação gera um hash único rastreável
 - [ ] Memória persistente do agente entre sessões (conversation summaries → system prompt)
 - [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
 - [ ] ETHIK/Gamificação com dados reais
-- [ ] Relatórios HTML avançados + PDF automático de dados agregados
 - [ ] Refinar OG image para proporção 1200x630 real
 - [ ] Decompose `chat/page.tsx` (~450 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [ ] CI/CD pipeline (lint + build + smoke on push/PR)
@@ -77,3 +91,4 @@
 - [ ] Tool use: web search para dados institucionais (AI SDK tools)
 - [ ] Voice input (speech-to-text via Browser API)
 - [ ] Proactive collaboration suggestions (agent sugere temas durante a conversa)
+- [ ] User-linked conversation persistence (load from Supabase when logged in)

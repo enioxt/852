@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
-import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock, Home, FileText } from 'lucide-react';
+import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock, Home, FileText, AlertCircle, User, LogOut, Loader2 } from 'lucide-react';
 import { listConversations, deleteConversation, type Conversation } from '@/lib/chat-store';
 
 interface SidebarProps {
@@ -30,6 +30,48 @@ function timeAgo(ts: number): string {
 export default function Sidebar({ isOpen, onToggle, activeConversationId, onSelectConversation, onNewConversation, onShowFAQ }: SidebarProps) {
   const [, forceRefresh] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authName, setAuthName] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id: string; email: string; displayName?: string } | null>(null);
+
+  // Check auth on mount
+  useState(() => {
+    fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setCurrentUser(d.user); }).catch(() => {});
+  });
+
+  const handleAuth = async () => {
+    setAuthError('');
+    setAuthLoading(true);
+    try {
+      const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+      const body = authMode === 'login'
+        ? { email: authEmail, password: authPassword }
+        : { email: authEmail, password: authPassword, displayName: authName };
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.error) { setAuthError(data.error); return; }
+      setCurrentUser(data.user);
+      setShowAuth(false);
+      setAuthEmail('');
+      setAuthPassword('');
+      setAuthName('');
+    } catch { setAuthError('Erro de conexão'); }
+    finally { setAuthLoading(false); }
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setCurrentUser(null);
+  };
 
   const conversations: Conversation[] = listConversations();
 
@@ -125,8 +167,90 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
         ))}
       </div>
 
+      {/* Auth Modal (overlay inside sidebar) */}
+      {showAuth && isOpen && (
+        <div className="px-3 pb-3 border-t border-neutral-800">
+          <div className="bg-neutral-950 rounded-xl p-4 space-y-3 mt-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-semibold text-white">
+                {authMode === 'login' ? 'Entrar' : 'Criar conta'}
+              </h3>
+              <button onClick={() => setShowAuth(false)} className="text-neutral-500 hover:text-white text-xs">✕</button>
+            </div>
+            <p className="text-[10px] text-neutral-500 leading-relaxed">
+              Login opcional para sincronizar conversas entre dispositivos.
+            </p>
+            {authMode === 'register' && (
+              <input
+                value={authName}
+                onChange={e => setAuthName(e.target.value)}
+                placeholder="Nome (opcional)"
+                className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
+              />
+            )}
+            <input
+              value={authEmail}
+              onChange={e => setAuthEmail(e.target.value)}
+              placeholder="Email"
+              type="email"
+              className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
+            />
+            <input
+              value={authPassword}
+              onChange={e => setAuthPassword(e.target.value)}
+              placeholder="Senha"
+              type="password"
+              className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
+              onKeyDown={e => e.key === 'Enter' && handleAuth()}
+            />
+            {authError && <p className="text-[10px] text-red-400">{authError}</p>}
+            <button
+              onClick={handleAuth}
+              disabled={authLoading || !authEmail || !authPassword}
+              className="w-full h-9 bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500 text-white text-xs font-medium rounded-lg transition flex items-center justify-center gap-2"
+            >
+              {authLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+              {authMode === 'login' ? 'Entrar' : 'Criar conta'}
+            </button>
+            <button
+              onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setAuthError(''); }}
+              className="w-full text-[10px] text-neutral-500 hover:text-white transition"
+            >
+              {authMode === 'login' ? 'Não tem conta? Criar uma' : 'Já tem conta? Entrar'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <div className="p-3 border-t border-neutral-800 space-y-1">
+        {/* User status */}
+        {currentUser ? (
+          <div className={`flex items-center gap-2 rounded-lg mb-1 ${isOpen ? 'px-3 py-2' : 'justify-center p-2'}`}>
+            <div className="w-6 h-6 rounded-full bg-blue-900/40 flex items-center justify-center flex-shrink-0">
+              <User className="w-3 h-3 text-blue-400" />
+            </div>
+            {isOpen && (
+              <div className="flex-1 min-w-0 flex items-center justify-between">
+                <span className="text-[10px] text-neutral-300 truncate">{currentUser.displayName || currentUser.email}</span>
+                <button onClick={handleLogout} className="p-1 rounded text-neutral-500 hover:text-red-400 transition" title="Sair">
+                  <LogOut className="w-3 h-3" />
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={() => { setShowAuth(true); setAuthMode('login'); }}
+            className={`flex items-center gap-2 w-full rounded-lg text-neutral-500 hover:text-blue-400 hover:bg-neutral-800 transition
+              ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
+            title="Entrar / Criar conta"
+          >
+            <User className="w-4 h-4 flex-shrink-0" />
+            {isOpen && <span>Entrar (opcional)</span>}
+          </button>
+        )}
+
         <Link
           href="/"
           className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
@@ -144,6 +268,15 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
         >
           <FileText className="w-4 h-4 flex-shrink-0" />
           {isOpen && <span>Relatórios</span>}
+        </Link>
+        <Link
+          href="/issues"
+          className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
+            ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
+          title="Tópicos em discussão"
+        >
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {isOpen && <span>Tópicos</span>}
         </Link>
         <button
           onClick={onShowFAQ}

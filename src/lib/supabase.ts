@@ -150,6 +150,245 @@ export async function deleteReportServer(id: string): Promise<boolean> {
   return !error;
 }
 
+// ── Issues (GitHub-like anonymous) ───────────────────────
+
+export interface IssueRecord {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  body: string | null;
+  status: string;
+  category: string | null;
+  source: string;
+  source_report_id: string | null;
+  votes: number;
+  comment_count: number;
+  metadata: Record<string, unknown> | null;
+}
+
+export async function createIssue(
+  title: string,
+  body?: string,
+  category?: string,
+  source: string = 'user',
+  sourceReportId?: string
+): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data, error } = await sb
+    .from('issues_852')
+    .insert({ title, body: body || null, category: category || null, source, source_report_id: sourceReportId || null })
+    .select('id')
+    .single();
+
+  if (error) { console.error('[852-supabase] create issue error:', error.message); return null; }
+  return data?.id || null;
+}
+
+export async function getIssues(
+  status?: string,
+  limit = 50,
+  sortBy: 'votes' | 'created_at' = 'created_at'
+): Promise<IssueRecord[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  let query = sb.from('issues_852').select('*').limit(limit);
+  if (status) query = query.eq('status', status);
+  query = query.order(sortBy, { ascending: false });
+
+  const { data, error } = await query;
+  if (error) return [];
+  return data || [];
+}
+
+export async function voteIssue(issueId: string, sessionHash: string): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+
+  // Try to insert vote (unique constraint prevents double votes)
+  const { error } = await sb
+    .from('issue_votes_852')
+    .insert({ issue_id: issueId, session_hash: sessionHash });
+
+  if (error) return false; // Already voted or other error
+
+  // Increment vote count (manual since no RPC function)
+  const { data: issueData } = await sb.from('issues_852').select('votes').eq('id', issueId).single();
+  if (issueData) {
+    await sb.from('issues_852').update({ votes: (issueData.votes || 0) + 1 }).eq('id', issueId);
+  }
+
+  return true;
+}
+
+export async function addIssueComment(
+  issueId: string,
+  body: string,
+  isAi: boolean = false
+): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data, error } = await sb
+    .from('issue_comments_852')
+    .insert({ issue_id: issueId, body, is_ai: isAi })
+    .select('id')
+    .single();
+
+  if (error) return null;
+
+  // Increment comment count
+  await sb.from('issues_852').select('comment_count').eq('id', issueId).single().then(({ data: issue }) => {
+    if (issue) sb.from('issues_852').update({ comment_count: (issue.comment_count || 0) + 1, updated_at: new Date().toISOString() }).eq('id', issueId);
+  });
+
+  return data?.id || null;
+}
+
+export async function getIssueComments(issueId: string): Promise<Array<{ id: string; created_at: string; body: string; is_ai: boolean }>> {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  const { data } = await sb
+    .from('issue_comments_852')
+    .select('id, created_at, body, is_ai')
+    .eq('issue_id', issueId)
+    .order('created_at', { ascending: true });
+
+  return data || [];
+}
+
+// ── AI Reports ───────────────────────────────────────────
+
+export interface AIReportRecord {
+  id: string;
+  created_at: string;
+  trigger_type: string;
+  model_id: string;
+  provider: string;
+  tokens_in: number | null;
+  tokens_out: number | null;
+  cost_usd: number | null;
+  duration_ms: number | null;
+  conversation_count: number;
+  report_count: number;
+  content_html: string;
+  content_summary: string | null;
+  insights: Record<string, unknown> | null;
+  pending_topics: Array<{ title: string; category?: string; source_report_id?: string }> | null;
+  metadata: Record<string, unknown> | null;
+}
+
+export async function saveAIReport(report: Omit<AIReportRecord, 'id' | 'created_at'>): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data, error } = await sb
+    .from('ai_reports_852')
+    .insert(report)
+    .select('id')
+    .single();
+
+  if (error) { console.error('[852-supabase] save ai report error:', error.message); return null; }
+  return data?.id || null;
+}
+
+export async function getAIReports(limit = 10): Promise<AIReportRecord[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  const { data, error } = await sb
+    .from('ai_reports_852')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return data || [];
+}
+
+export async function getLatestAIReport(): Promise<AIReportRecord | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data } = await sb
+    .from('ai_reports_852')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  return data || null;
+}
+
+// ── Public Stats ─────────────────────────────────────────
+
+export interface PublicStats {
+  totalConversations: number;
+  totalReportsShared: number;
+  totalIssuesOpen: number;
+  totalAIReports: number;
+  latestAIReport: AIReportRecord | null;
+  recentIssues: IssueRecord[];
+  recentReports: Array<{ id: string; created_at: string; conversation_id: string; status: string }>;
+}
+
+export async function getPublicStats(): Promise<PublicStats | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  try {
+    const [convos, reports, issues, aiReports, latestAI, recentIssues, recentReportsData] = await Promise.all([
+      sb.from('conversations_852').select('id', { count: 'exact', head: true }),
+      sb.from('reports_852').select('id', { count: 'exact', head: true }).neq('status', 'deleted'),
+      sb.from('issues_852').select('id', { count: 'exact', head: true }).eq('status', 'open'),
+      sb.from('ai_reports_852').select('id', { count: 'exact', head: true }),
+      sb.from('ai_reports_852').select('*').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+      sb.from('issues_852').select('*').in('status', ['open', 'in_discussion']).order('votes', { ascending: false }).limit(5),
+      sb.from('reports_852').select('id, created_at, conversation_id, status').neq('status', 'deleted').order('created_at', { ascending: false }).limit(5),
+    ]);
+
+    return {
+      totalConversations: convos.count || 0,
+      totalReportsShared: reports.count || 0,
+      totalIssuesOpen: issues.count || 0,
+      totalAIReports: aiReports.count || 0,
+      latestAIReport: latestAI.data || null,
+      recentIssues: recentIssues.data || [],
+      recentReports: recentReportsData.data || [],
+    };
+  } catch (e) {
+    console.error('[852-supabase] public stats error:', e);
+    return null;
+  }
+}
+
+// ── Conversation Count for Auto-Report Trigger ───────────
+
+export async function getConversationCountSinceLastReport(): Promise<number> {
+  const sb = getSupabase();
+  if (!sb) return 0;
+
+  // Get last AI report timestamp
+  const { data: lastReport } = await sb
+    .from('ai_reports_852')
+    .select('created_at')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let query = sb.from('conversations_852').select('id', { count: 'exact', head: true });
+  if (lastReport?.created_at) {
+    query = query.gte('created_at', lastReport.created_at);
+  }
+
+  const { count } = await query;
+  return count || 0;
+}
+
 // ── Dashboard Stats ──────────────────────────────────────
 
 export interface DashboardStats {

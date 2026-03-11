@@ -22,7 +22,11 @@ export type TelemetryEventType =
   | 'report_deleted'
   | 'report_review'
   | 'provider_unavailable'
-  | 'atrian_violation';
+  | 'atrian_violation'
+  | 'ai_report_generated'
+  | 'issue_created'
+  | 'user_registered'
+  | 'user_login';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
