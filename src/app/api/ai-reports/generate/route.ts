@@ -1,5 +1,5 @@
 import { generateText } from 'ai';
-import { getProvider, PRICING } from '@/lib/ai-provider';
+import { getModelConfig } from '@/lib/ai-provider';
 import { recordEvent } from '@/lib/telemetry';
 import {
   getSupabase,
@@ -8,7 +8,6 @@ import {
   getConversationCountSinceLastReport,
 } from '@/lib/supabase';
 
-const AI_REPORT_MODEL = 'qwen-max';
 const AI_REPORT_TRIGGER_COUNT = 5;
 
 const REPORT_PROMPT = `Você é um analista de inteligência institucional da Polícia Civil de Minas Gerais.
@@ -103,12 +102,11 @@ export async function POST(req: Request) {
 
     const userMessage = `Analise as seguintes ${convoList.length} conversas e ${reportList.length} relatórios:\n\n## CONVERSAS BRUTAS\n${convoText}\n\n## REVISÕES DA IA (sugestões que podem não ter sido seguidas)\n${reviewText || 'Nenhuma revisão disponível'}\n\nGere o relatório completo em JSON.`;
 
-    // Generate with qwen-max (best Alibaba model)
-    const provider = getProvider();
+    const { provider, modelId, providerLabel, pricing } = getModelConfig('intelligence_report');
     const startTime = Date.now();
 
     const result = await generateText({
-      model: provider.chat(AI_REPORT_MODEL),
+      model: provider.chat(modelId),
       system: REPORT_PROMPT,
       messages: [{ role: 'user', content: userMessage }],
       temperature: 0.3,
@@ -133,13 +131,12 @@ export async function POST(req: Request) {
     const usage = result.usage as unknown as Record<string, number>;
     const tokensIn = usage?.promptTokens || usage?.inputTokens || 0;
     const tokensOut = usage?.completionTokens || usage?.outputTokens || 0;
-    const pricing = PRICING[AI_REPORT_MODEL] || PRICING['qwen-plus'];
     const costUsd = (tokensIn / 1000) * pricing.input + (tokensOut / 1000) * pricing.output;
 
     // Build HTML content
     const contentHtml = buildReportHtml(reportJson, {
-      model: AI_REPORT_MODEL,
-      provider: 'Alibaba DashScope',
+      model: modelId,
+      provider: providerLabel,
       costUsd,
       tokensIn,
       tokensOut,
@@ -151,8 +148,8 @@ export async function POST(req: Request) {
     // Save AI report
     const reportId = await saveAIReport({
       trigger_type: forceGenerate ? 'manual' : 'auto_5',
-      model_id: AI_REPORT_MODEL,
-      provider: 'Alibaba DashScope',
+      model_id: modelId,
+      provider: providerLabel,
       tokens_in: tokensIn,
       tokens_out: tokensOut,
       cost_usd: costUsd,
@@ -185,8 +182,8 @@ export async function POST(req: Request) {
     // Record telemetry
     recordEvent({
       event_type: 'ai_report_generated',
-      model_id: AI_REPORT_MODEL,
-      provider: 'Alibaba DashScope',
+      model_id: modelId,
+      provider: providerLabel,
       tokens_in: tokensIn,
       tokens_out: tokensOut,
       cost_usd: costUsd,
@@ -203,8 +200,8 @@ export async function POST(req: Request) {
     return Response.json({
       generated: true,
       reportId,
-      model: AI_REPORT_MODEL,
-      provider: 'Alibaba DashScope',
+      model: modelId,
+      provider: providerLabel,
       cost: { usd: costUsd, tokensIn, tokensOut },
       durationMs,
       issuesCreated: pendingTopics.length,

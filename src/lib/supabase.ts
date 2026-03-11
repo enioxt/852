@@ -18,6 +18,16 @@ export function getSupabase(): SupabaseClient | null {
   return _sb;
 }
 
+function mergeMetadata(
+  current: Record<string, unknown> | null | undefined,
+  incoming: Record<string, unknown> | null | undefined
+) {
+  return {
+    ...(current || {}),
+    ...(incoming || {}),
+  };
+}
+
 // ── Conversations ────────────────────────────────────────
 
 export interface ConversationRecord {
@@ -35,7 +45,8 @@ export async function saveConversation(
   messages: Array<{ role: string; content: string }>,
   title?: string,
   sessionHash?: string,
-  existingId?: string
+  existingId?: string,
+  metadata?: Record<string, unknown>
 ): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
@@ -49,9 +60,18 @@ export async function saveConversation(
   };
 
   if (existingId) {
+    const { data: current } = await sb
+      .from('conversations_852')
+      .select('metadata')
+      .eq('id', existingId)
+      .maybeSingle();
+
     const { error } = await sb
       .from('conversations_852')
-      .update(payload)
+      .update({
+        ...payload,
+        metadata: mergeMetadata(current?.metadata as Record<string, unknown> | null, metadata),
+      })
       .eq('id', existingId);
     if (error) { console.error('[852-supabase] save conv error:', error.message); return null; }
     return existingId;
@@ -59,7 +79,7 @@ export async function saveConversation(
 
   const { data, error } = await sb
     .from('conversations_852')
-    .insert({ ...payload, created_at: new Date().toISOString() })
+    .insert({ ...payload, created_at: new Date().toISOString(), metadata: metadata || null })
     .select('id')
     .single();
 
@@ -67,15 +87,21 @@ export async function saveConversation(
   return data?.id || null;
 }
 
-export async function getConversations(limit = 50): Promise<ConversationRecord[]> {
+export async function getConversations(limit = 50, identityKey?: string): Promise<ConversationRecord[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
-  const { data, error } = await sb
+  let query = sb
     .from('conversations_852')
     .select('*')
     .order('updated_at', { ascending: false })
     .limit(limit);
+
+  if (identityKey) {
+    query = query.eq('session_hash', identityKey);
+  }
+
+  const { data, error } = await query;
 
   if (error) return [];
   return (data || []).map(d => ({ ...d, messages: typeof d.messages === 'string' ? JSON.parse(d.messages) : d.messages }));
@@ -99,7 +125,8 @@ export async function saveReport(
   conversationId: string,
   messages: Array<{ role: string; content: string }>,
   reviewData?: Record<string, unknown>,
-  sessionHash?: string
+  sessionHash?: string,
+  metadata?: Record<string, unknown>
 ): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
@@ -112,6 +139,7 @@ export async function saveReport(
       review_data: reviewData || null,
       status: 'shared',
       session_hash: sessionHash || null,
+      metadata: metadata || null,
     })
     .select('id')
     .single();
@@ -120,16 +148,22 @@ export async function saveReport(
   return data?.id || null;
 }
 
-export async function getReports(limit = 50): Promise<ReportRecord[]> {
+export async function getReports(limit = 50, identityKey?: string): Promise<ReportRecord[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
-  const { data, error } = await sb
+  let query = sb
     .from('reports_852')
     .select('*')
     .neq('status', 'deleted')
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (identityKey) {
+    query = query.eq('session_hash', identityKey);
+  }
+
+  const { data, error } = await query;
 
   if (error) return [];
   return (data || []).map(d => ({
@@ -161,10 +195,9 @@ export interface IssueRecord {
   status: string;
   category: string | null;
   source: string;
-  source_report_id: string | null;
+  ai_report_id: string | null;
   votes: number;
   comment_count: number;
-  metadata: Record<string, unknown> | null;
 }
 
 export async function createIssue(
@@ -172,14 +205,42 @@ export async function createIssue(
   body?: string,
   category?: string,
   source: string = 'user',
-  sourceReportId?: string
+  aiReportId?: string
 ): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
 
+  if (source === 'ai_suggestion') {
+    const { data: existing } = await sb
+      .from('issues_852')
+      .select('id, status, ai_report_id')
+      .eq('source', 'ai_suggestion')
+      .eq('title', title)
+      .in('status', ['open', 'in_discussion', 'resolved'])
+      .limit(1)
+      .maybeSingle();
+
+    if (existing?.id) {
+      await sb
+        .from('issues_852')
+        .update({
+          updated_at: new Date().toISOString(),
+          ai_report_id: aiReportId || existing.ai_report_id || null,
+          status: existing.status === 'closed' ? 'open' : existing.status,
+        })
+        .eq('id', existing.id);
+
+      if (body) {
+        await addIssueComment(existing.id, `Tema recorrente identificado novamente em relatório de inteligência: ${body}`, true);
+      }
+
+      return existing.id;
+    }
+  }
+
   const { data, error } = await sb
     .from('issues_852')
-    .insert({ title, body: body || null, category: category || null, source, source_report_id: sourceReportId || null })
+    .insert({ title, body: body || null, category: category || null, source, ai_report_id: aiReportId || null })
     .select('id')
     .single();
 
@@ -190,13 +251,15 @@ export async function createIssue(
 export async function getIssues(
   status?: string,
   limit = 50,
-  sortBy: 'votes' | 'created_at' = 'created_at'
+  sortBy: 'votes' | 'created_at' = 'created_at',
+  aiReportId?: string
 ): Promise<IssueRecord[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
   let query = sb.from('issues_852').select('*').limit(limit);
   if (status) query = query.eq('status', status);
+  if (aiReportId) query = query.eq('ai_report_id', aiReportId);
   query = query.order(sortBy, { ascending: false });
 
   const { data, error } = await query;
@@ -278,8 +341,13 @@ export interface AIReportRecord {
   content_html: string;
   content_summary: string | null;
   insights: Record<string, unknown> | null;
-  pending_topics: Array<{ title: string; category?: string; source_report_id?: string }> | null;
+  pending_topics: Array<Record<string, unknown>> | null;
   metadata: Record<string, unknown> | null;
+}
+
+export interface AIReportWithIssues extends AIReportRecord {
+  issue_count: number;
+  related_issues: IssueRecord[];
 }
 
 export async function saveAIReport(report: Omit<AIReportRecord, 'id' | 'created_at'>): Promise<string | null> {
@@ -308,6 +376,29 @@ export async function getAIReports(limit = 10): Promise<AIReportRecord[]> {
 
   if (error) return [];
   return data || [];
+}
+
+export async function getAIReportsWithIssues(limit = 10): Promise<AIReportWithIssues[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  const reports = await getAIReports(limit);
+  if (reports.length === 0) return [];
+
+  const reportIds = reports.map((report) => report.id);
+  const { data: issues } = await sb
+    .from('issues_852')
+    .select('*')
+    .in('ai_report_id', reportIds)
+    .order('votes', { ascending: false });
+
+  const relatedIssues = issues || [];
+
+  return reports.map((report) => ({
+    ...report,
+    issue_count: relatedIssues.filter((issue) => issue.ai_report_id === report.id).length,
+    related_issues: relatedIssues.filter((issue) => issue.ai_report_id === report.id),
+  }));
 }
 
 export async function getLatestAIReport(): Promise<AIReportRecord | null> {
@@ -400,6 +491,8 @@ export interface DashboardStats {
   conversationsByDay: Array<{ day: string; count: number }>;
   reportsByDay: Array<{ day: string; count: number }>;
   topThemes: Array<{ theme: string; count: number }>;
+  issuesByCategory: Array<{ category: string; count: number }>;
+  recentReports: Array<{ id: string; created_at: string; snippet: string; themes: string[] }>;
 }
 
 export async function getDashboardStats(days = 30): Promise<DashboardStats | null> {
@@ -418,11 +511,17 @@ export async function getDashboardStats(days = 30): Promise<DashboardStats | nul
     // Reports
     const { data: reports } = await sb
       .from('reports_852')
-      .select('id, created_at, status, review_data')
+      .select('id, created_at, status, review_data, messages')
+      .gte('created_at', since);
+
+    const { data: issues } = await sb
+      .from('issues_852')
+      .select('category, created_at')
       .gte('created_at', since);
 
     const convoList = convos || [];
     const reportList = reports || [];
+    const issueList = issues || [];
 
     // Conversations by day
     const convosByDay = new Map<string, number>();
@@ -448,6 +547,12 @@ export async function getDashboardStats(days = 30): Promise<DashboardStats | nul
       }
     }
 
+    const categoryCounts = new Map<string, number>();
+    for (const issue of issueList) {
+      const category = issue.category || 'outros';
+      categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
+    }
+
     const totalMessages = convoList.reduce((sum, c) => sum + (c.message_count || 0), 0);
 
     return {
@@ -466,6 +571,34 @@ export async function getDashboardStats(days = 30): Promise<DashboardStats | nul
         .map(([theme, count]) => ({ theme, count }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 10),
+      issuesByCategory: Array.from(categoryCounts.entries())
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8),
+      recentReports: reportList
+        .slice()
+        .sort((a, b) => a.created_at.localeCompare(b.created_at) * -1)
+        .slice(0, 6)
+        .map((report) => {
+          const reportMessages = Array.isArray(report.messages)
+            ? report.messages
+            : typeof report.messages === 'string'
+              ? JSON.parse(report.messages)
+              : [];
+          const firstUserMessage = reportMessages.find((message: { role?: string; content?: string }) => message.role === 'user');
+          const themes = report.review_data && Array.isArray(report.review_data.temas)
+            ? report.review_data.temas as string[]
+            : [];
+
+          return {
+            id: report.id,
+            created_at: report.created_at,
+            snippet: typeof firstUserMessage?.content === 'string'
+              ? firstUserMessage.content.slice(0, 160)
+              : 'Relato compartilhado sem resumo disponível.',
+            themes: themes.slice(0, 3),
+          };
+        }),
     };
   } catch (e) {
     console.error('[852-supabase] dashboard stats error:', e);

@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
-import { getModelId, getProviderLabel, PRICING } from '@/lib/ai-provider';
+import { getModelConfig } from '@/lib/ai-provider';
 
 export async function GET() {
-  const modelId = getModelId();
-  const provider = getProviderLabel();
-  const pricing = PRICING[modelId] || { input: 0, output: 0 };
+  const { modelId, providerLabel, pricing, routingReason } = getModelConfig('chat');
 
   return NextResponse.json({
     modelId,
-    provider,
+    provider: providerLabel,
     free: pricing.free || false,
     pricing: { input: pricing.input, output: pricing.output },
+    routingReason,
   });
 }

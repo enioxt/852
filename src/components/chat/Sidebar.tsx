@@ -35,9 +35,11 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authName, setAuthName] = useState('');
+  const [authMasp, setAuthMasp] = useState('');
+  const [authLotacao, setAuthLotacao] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{ id: string; email: string; displayName?: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; email: string; display_name?: string; masp?: string; lotacao?: string; validation_status?: string } | null>(null);
 
   // Check auth on mount
   useState(() => {
@@ -51,7 +53,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
       const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
       const body = authMode === 'login'
         ? { email: authEmail, password: authPassword }
-        : { email: authEmail, password: authPassword, displayName: authName };
+        : { email: authEmail, password: authPassword, displayName: authName, masp: authMasp || undefined, lotacao: authLotacao || undefined };
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,6 +66,8 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
       setAuthEmail('');
       setAuthPassword('');
       setAuthName('');
+      setAuthMasp('');
+      setAuthLotacao('');
     } catch { setAuthError('Erro de conexão'); }
     finally { setAuthLoading(false); }
   };
@@ -181,12 +185,30 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
               Login opcional para sincronizar conversas entre dispositivos.
             </p>
             {authMode === 'register' && (
-              <input
-                value={authName}
-                onChange={e => setAuthName(e.target.value)}
-                placeholder="Nome (opcional)"
-                className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
-              />
+              <>
+                <p className="text-[10px] text-amber-400/80 leading-relaxed bg-amber-900/10 border border-amber-800/30 rounded-lg px-3 py-2">
+                  Plataforma exclusiva para Policiais Civis de MG. Seu MASP e lotação são verificados manualmente.
+                </p>
+                <input
+                  value={authName}
+                  onChange={e => setAuthName(e.target.value)}
+                  placeholder="Nome (não precisa ser completo)"
+                  className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
+                />
+                <input
+                  value={authMasp}
+                  onChange={e => setAuthMasp(e.target.value.replace(/\D/g, ''))}
+                  placeholder="MASP (obrigatório para votar)"
+                  maxLength={9}
+                  className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
+                />
+                <input
+                  value={authLotacao}
+                  onChange={e => setAuthLotacao(e.target.value)}
+                  placeholder="Lotação atual (ex: 1ª DPCAMI BH)"
+                  className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
+                />
+              </>
             )}
             <input
               value={authEmail}
@@ -216,7 +238,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
               onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setAuthError(''); }}
               className="w-full text-[10px] text-neutral-500 hover:text-white transition"
             >
-              {authMode === 'login' ? 'Não tem conta? Criar uma' : 'Já tem conta? Entrar'}
+              {authMode === 'login' ? 'Não tem conta? Cadastrar como policial civil' : 'Já tem conta? Entrar'}
             </button>
           </div>
         </div>
@@ -232,8 +254,15 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
             </div>
             {isOpen && (
               <div className="flex-1 min-w-0 flex items-center justify-between">
-                <span className="text-[10px] text-neutral-300 truncate">{currentUser.displayName || currentUser.email}</span>
-                <button onClick={handleLogout} className="p-1 rounded text-neutral-500 hover:text-red-400 transition" title="Sair">
+                <div className="min-w-0">
+                  <span className="text-[10px] text-neutral-300 truncate block">{currentUser.display_name || currentUser.email}</span>
+                  {currentUser.masp && (
+                    <span className={`text-[9px] px-1 py-0.5 rounded ${currentUser.validation_status === 'approved' ? 'bg-green-900/30 text-green-400' : 'bg-amber-900/30 text-amber-400'}`}>
+                      MASP {currentUser.validation_status === 'approved' ? '✓' : 'pendente'}
+                    </span>
+                  )}
+                </div>
+                <button onClick={handleLogout} className="p-1 rounded text-neutral-500 hover:text-red-400 transition ml-1" title="Sair">
                   <LogOut className="w-3 h-3" />
                 </button>
               </div>

@@ -7,6 +7,7 @@ export interface StoredMessage {
 
 export interface Conversation {
   id: string;
+  serverId?: string;
   title: string;
   messages: StoredMessage[];
   createdAt: number;
@@ -38,17 +39,51 @@ export function getConversation(id: string): Conversation | undefined {
   return getAll().find(c => c.id === id);
 }
 
-export function createConversation(): Conversation {
+export function getConversationServerId(id: string): string | null {
+  return getConversation(id)?.serverId || null;
+}
+
+export function replaceConversations(conversations: Conversation[]) {
+  saveAll(conversations);
+}
+
+export function upsertConversation(conversation: Conversation) {
+  const all = getAll();
+  const idx = all.findIndex(c => c.id === conversation.id);
+  if (idx === -1) {
+    all.push(conversation);
+  } else {
+    all[idx] = {
+      ...all[idx],
+      ...conversation,
+      serverId: conversation.serverId || all[idx].serverId,
+    };
+  }
+  saveAll(all.sort((a, b) => b.updatedAt - a.updatedAt));
+}
+
+export function setConversationServerId(id: string, serverId: string) {
+  const all = getAll();
+  const idx = all.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  all[idx].serverId = serverId;
+  saveAll(all);
+}
+
+export function createConversation(seed?: Partial<Conversation>): Conversation {
   const conv: Conversation = {
-    id: crypto.randomUUID(),
-    title: 'Nova conversa',
-    messages: [],
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
+    id: seed?.id || crypto.randomUUID(),
+    serverId: seed?.serverId,
+    title: seed?.title || 'Nova conversa',
+    messages: seed?.messages || [],
+    createdAt: seed?.createdAt || Date.now(),
+    updatedAt: seed?.updatedAt || Date.now(),
   };
   const all = getAll();
-  all.push(conv);
-  saveAll(all);
+  const idx = all.findIndex(existing => existing.id === conv.id);
+  if (idx === -1) all.push(conv);
+  else all[idx] = conv;
+  saveAll(all.sort((a, b) => b.updatedAt - a.updatedAt));
   return conv;
 }
 

@@ -6,6 +6,7 @@ import {
   ArrowLeft, Plus, MessageCircle, ChevronUp, Tag,
   Loader2, AlertCircle, Clock, Bot, User, Send, X,
 } from 'lucide-react';
+import { getOrCreateSessionHash } from '@/lib/session';
 
 interface Issue {
   id: string;
@@ -15,6 +16,7 @@ interface Issue {
   status: string;
   category: string | null;
   source: string;
+  ai_report_id: string | null;
   votes: number;
   comment_count: number;
 }
@@ -50,17 +52,15 @@ const CATEGORY_COLORS: Record<string, string> = {
   outro: 'bg-neutral-800/50 text-neutral-400',
 };
 
-function getSessionHash(): string {
-  if (typeof window === 'undefined') return 'ssr';
-  let hash = localStorage.getItem('852_session_hash');
-  if (!hash) {
-    hash = Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem('852_session_hash', hash);
-  }
-  return hash;
+interface CurrentUser {
+  id: string;
+  email: string;
+  masp?: string;
+  validation_status?: string;
 }
 
 export default function IssuesPage() {
+  const [aiReportId, setAiReportId] = useState<string | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -73,23 +73,37 @@ export default function IssuesPage() {
   const [newBody, setNewBody] = useState('');
   const [newCategory, setNewCategory] = useState('outro');
   const [creating, setCreating] = useState(false);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [showLoginNotice, setShowLoginNotice] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    setAiReportId(params.get('aiReportId'));
+    fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setCurrentUser(d.user as CurrentUser); }).catch(() => {});
+  }, []);
 
   const loadIssues = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ sort });
       if (filter !== 'all') params.set('status', filter);
+      if (aiReportId) params.set('aiReportId', aiReportId);
       const res = await fetch(`/api/issues?${params}`);
       const data = await res.json();
       setIssues(data.issues || []);
     } catch { setIssues([]); }
     finally { setLoading(false); }
-  }, [filter, sort]);
+  }, [aiReportId, filter, sort]);
 
   useEffect(() => { loadIssues(); }, [loadIssues]);
 
   const handleVote = async (issueId: string) => {
-    const sessionHash = getSessionHash();
+    if (!currentUser?.masp) {
+      setShowLoginNotice(true);
+      return;
+    }
+    const sessionHash = getOrCreateSessionHash();
     const res = await fetch('/api/issues', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -144,6 +158,47 @@ export default function IssuesPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
+      {/* Login required modal */}
+      {showLoginNotice && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 max-w-sm w-full space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold text-white">Login necessário para votar</h2>
+              <button onClick={() => setShowLoginNotice(false)} className="text-neutral-500 hover:text-white"><X className="w-4 h-4" /></button>
+            </div>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              Para votar nas pautas, você precisa estar cadastrado como <strong className="text-white">Policial Civil de MG</strong> com MASP válido.
+            </p>
+            <p className="text-xs text-neutral-500 leading-relaxed">
+              Isso garante que cada pauta seja votada apenas uma vez por servidor — evitando duplicidade e dando legitimidade ao processo.
+            </p>
+            <div className="space-y-2">
+              <p className="text-[10px] text-neutral-600 font-semibold uppercase tracking-wider">Transparência de dados</p>
+              <ul className="text-[11px] text-neutral-500 space-y-1 list-none">
+                <li>🔒 Seu MASP nunca é exibido publicamente</li>
+                <li>🗑️ Você pode apagar sua conta e todos os dados a qualquer momento</li>
+                <li>📡 Dados usados apenas para validação de identidade funcional</li>
+              </ul>
+            </div>
+            <div className="flex gap-2">
+              <Link
+                href="/chat"
+                onClick={() => setShowLoginNotice(false)}
+                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium text-center transition"
+              >
+                Entrar / Cadastrar
+              </Link>
+              <button
+                onClick={() => setShowLoginNotice(false)}
+                className="px-4 py-2.5 rounded-xl border border-neutral-700 text-neutral-400 text-sm hover:border-neutral-600 transition"
+              >
+                Agora não
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="border-b border-neutral-800/50 px-6 py-4 flex items-center justify-between sticky top-0 bg-neutral-950/95 backdrop-blur z-10">
         <div className="flex items-center gap-3">
           <Link href="/" className="p-2 rounded-lg hover:bg-neutral-800 transition">
@@ -163,6 +218,19 @@ export default function IssuesPage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+        {aiReportId && (
+          <div className="mb-4 rounded-xl border border-emerald-800/40 bg-emerald-900/10 p-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-xs text-emerald-300">
+                Exibindo apenas issues vinculadas a um relatório de inteligência específico.
+              </p>
+              <Link href={`/reports?tab=intelligence&reportId=${aiReportId}`} className="text-xs text-emerald-400 hover:text-emerald-300 transition">
+                Voltar para relatórios →
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Filters */}
         <div className="flex items-center gap-2 mb-6 flex-wrap">
           {['all', 'open', 'in_discussion', 'resolved', 'closed'].map(s => (
@@ -283,6 +351,14 @@ export default function IssuesPage() {
                         <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-purple-900/30 text-purple-400">
                           <Bot className="w-2.5 h-2.5 inline mr-0.5" />IA
                         </span>
+                      )}
+                      {issue.ai_report_id && (
+                        <Link
+                          href={`/reports?tab=intelligence&reportId=${issue.ai_report_id}`}
+                          className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-900/30 text-emerald-400 hover:text-emerald-300 transition"
+                        >
+                          relatório vinculado
+                        </Link>
                       )}
                     </div>
                     <button

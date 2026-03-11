@@ -4,10 +4,11 @@ import { recordEvent } from '@/lib/telemetry';
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get('status') || undefined;
+  const aiReportId = searchParams.get('aiReportId') || undefined;
   const sortBy = (searchParams.get('sort') as 'votes' | 'created_at') || 'votes';
   const limit = parseInt(searchParams.get('limit') || '50', 10);
 
-  const issues = await getIssues(status, limit, sortBy);
+  const issues = await getIssues(status, limit, sortBy, aiReportId);
   return Response.json({ issues });
 }
 

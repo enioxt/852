@@ -54,7 +54,7 @@
 - [x] Supabase persistence: conversations sync from chat page (background)
 - [x] API routes: `/api/conversations`, `/api/reports/server`, `/api/dashboard`
 - [x] Dashboard API with real aggregated metrics from Supabase
-- [x] Admin user criado em produção (enioxt@gmail.com)
+- [x] Admin user criado em produção (`enioxt@gmail.com`)
 - [x] Deploy v2 no VPS Contabo com todas as features acima
 
 ## ✅ P1 - Sprint v3 (Completed 2026-03-12)
@@ -72,18 +72,36 @@
 - [x] Issues link added to sidebar navigation
 - [x] Telemetry events: ai_report_generated, issue_created, user_registered, user_login
 
+## ✅ P1 - Sprint v4 (Completed 2026-03-13)
+
+- [x] Cross-device report sync: `loadAllPublicReports()` fetches all public reports (not filtered by session) — visível em qualquer dispositivo
+- [x] Delete button visível apenas para `isOwn` reports (relatório pertence à sessão atual)
+- [x] Dashboard live polling: atualização automática a cada 30s conforme conversas acontecem
+- [x] Upvote/downvote agora requer login com MASP — modal de aviso com transparência de dados
+- [x] Registro de MASP + lotação no cadastro (user_accounts_852) com validação manual
+- [x] SQL migration_v4.sql: campos masp/lotacao/validation_status/nome_partial na tabela de usuários
+- [x] SQL seed_issues_v4.sql: 10 pautas iniciais reais de policiais civis MG (Helios, Olho Vivo, PF, etc.)
+- [x] Sidebar: form de cadastro com campos MASP, lotação e aviso de plataforma exclusiva PC-MG
+- [x] MASP badge no sidebar (pendente/aprovado) para usuários autenticados
+- [x] Pre-commit SSOT: `/home/enio/.egos/hooks/pre-commit` — hook universal para todos os repos EGOS
+
 ## ⏭️ Backlog
 
-- [ ] Dashboard UI com métricas reais Recharts (substituir mock data no /dashboard)
-- [ ] Migrar report-store de localStorage para Supabase (dual write: local + server)
-- [ ] Session hashing: cada interação gera um hash único rastreável
-- [ ] Memória persistente do agente entre sessões (conversation summaries → system prompt)
+- [x] Dashboard UI com métricas reais Recharts (substituir mock data no /dashboard)
+- [x] Migrar report-store de localStorage para Supabase (dual write: local + server)
+- [x] Session hashing: cada interação gera um hash único rastreável
+- [x] Memória persistente do agente entre sessões (conversation summaries → system prompt)
+- [x] Sincronizar `/reports` ↔ `ai_reports_852` ↔ `/issues` com links bidirecionais e filtro por relatório
+- [x] Corrigir drift de schema das issues (`ai_report_id`) e deduplicar recorrência de tópicos gerados por IA
+- [x] Roteamento inteligente de modelos por tarefa (chat/review/html/intelligence/summary)
+- [x] Harden `/start` compartilhado: System Map, module roots, workflows e deploy surface como ativação mandatória
+- [x] Eliminar warnings SSR do Recharts no build do /dashboard
 - [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
-- [ ] ETHIK/Gamificação com dados reais
 - [ ] Refinar OG image para proporção 1200x630 real
 - [ ] Decompose `chat/page.tsx` (~450 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [ ] CI/CD pipeline (lint + build + smoke on push/PR)
 - [ ] Consolidar package manager (remover vestígios de bun, manter npm)
+- [ ] Pipeline real de notificações do 852 (Telegram/Discord/webhook/admin alerts) acoplado a eventos críticos
 - [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
 - [ ] ATRiAN dashboard: visualizar violations no /admin/telemetry
 - [ ] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor

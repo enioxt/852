@@ -5,6 +5,8 @@
  * Reports are anonymized conversation snapshots that users chose to share.
  */
 
+import { getMetadataValue } from '@/lib/session';
+
 export interface ReportMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -14,6 +16,7 @@ export type ReportStatus = 'draft' | 'reviewed' | 'shared' | 'deleted';
 
 export interface Report {
   id: string;
+  serverId?: string;
   conversationId: string;
   messages: ReportMessage[];
   sanitizedMessages: ReportMessage[];
@@ -24,6 +27,7 @@ export interface Report {
   updatedAt: number;
   sharedAt?: number;
   deletedAt?: number;
+  isOwn?: boolean;
 }
 
 const STORAGE_KEY = '852-reports';
@@ -85,11 +89,12 @@ export function createReport(
   return report;
 }
 
-export function shareReport(id: string): Report | undefined {
+export function shareReport(id: string, serverId?: string): Report | undefined {
   const all = getAll();
   const idx = all.findIndex(r => r.id === id);
   if (idx === -1) return undefined;
   all[idx].status = 'shared';
+  if (serverId) all[idx].serverId = serverId;
   all[idx].sharedAt = Date.now();
   all[idx].updatedAt = Date.now();
   saveAll(all);
@@ -116,4 +121,110 @@ export function getReportCount(): number {
 export function getShareUrl(reportId: string): string {
   if (typeof window === 'undefined') return '';
   return `${window.location.origin}/reports?id=${reportId}`;
+}
+
+type ServerReportPayload = {
+  id: string;
+  conversation_id: string;
+  created_at: string;
+  messages: ReportMessage[];
+  review_data?: Record<string, unknown> | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+function normalizeServerReport(report: ServerReportPayload): Report {
+  const sanitizedMessages = getMetadataValue<ReportMessage[]>(report.metadata, 'sanitizedMessages') || report.messages;
+  const piiRemoved = getMetadataValue<number>(report.metadata, 'piiRemoved') || 0;
+  const localReportId = getMetadataValue<string>(report.metadata, 'localReportId') || report.id;
+  const clientConversationId = getMetadataValue<string>(report.metadata, 'clientConversationId') || report.conversation_id;
+  const aiSuggestions = getMetadataValue<string[]>(report.metadata, 'aiSuggestions') || [];
+  const sharedAt = new Date(report.created_at).getTime();
+
+  return {
+    id: localReportId,
+    serverId: report.id,
+    conversationId: clientConversationId,
+    messages: report.messages,
+    sanitizedMessages,
+    status: 'shared',
+    piiRemoved,
+    aiSuggestions,
+    createdAt: sharedAt,
+    updatedAt: sharedAt,
+    sharedAt,
+  };
+}
+
+export async function loadSharedReportsFromServer(sessionHash: string): Promise<Report[]> {
+  const res = await fetch(`/api/reports/server?ownOnly=true&sessionHash=${encodeURIComponent(sessionHash)}`);
+  if (!res.ok) return [];
+  const data = await res.json();
+  const reports = Array.isArray(data.reports) ? data.reports.map(normalizeServerReport) : [];
+  if (reports.length > 0) {
+    saveAll(reports);
+  }
+  return reports;
+}
+
+export async function syncReportToServer(payload: {
+  localReportId: string;
+  conversationId: string;
+  serverConversationId?: string | null;
+  messages: ReportMessage[];
+  sanitizedMessages: ReportMessage[];
+  piiRemoved: number;
+  aiSuggestions?: string[];
+  reviewData?: Record<string, unknown> | null;
+  sessionHash: string;
+}): Promise<string | null> {
+  const res = await fetch('/api/reports/server', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      conversationId: payload.serverConversationId || payload.conversationId,
+      messages: payload.sanitizedMessages,
+      reviewData: payload.reviewData || null,
+      sessionHash: payload.sessionHash,
+      metadata: {
+        localReportId: payload.localReportId,
+        clientConversationId: payload.conversationId,
+        sanitizedMessages: payload.sanitizedMessages,
+        piiRemoved: payload.piiRemoved,
+        aiSuggestions: payload.aiSuggestions || [],
+      },
+    }),
+  });
+
+  if (!res.ok) return null;
+  const data = await res.json();
+  return typeof data.id === 'string' ? data.id : null;
+}
+
+export async function deleteReportFromServer(serverId: string): Promise<boolean> {
+  const res = await fetch('/api/reports/server', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: serverId }),
+  });
+
+  return res.ok;
+}
+
+export async function loadAllPublicReports(sessionHash: string): Promise<Report[]> {
+  const [allRes, ownRes] = await Promise.all([
+    fetch('/api/reports/server'),
+    sessionHash
+      ? fetch(`/api/reports/server?ownOnly=true&sessionHash=${encodeURIComponent(sessionHash)}`)
+      : Promise.resolve(new Response(JSON.stringify({ reports: [] }))),
+  ]);
+
+  const allData = allRes.ok ? (await allRes.json() as { reports: ServerReportPayload[] }) : { reports: [] as ServerReportPayload[] };
+  const ownData = ownRes.ok ? (await ownRes.json() as { reports: ServerReportPayload[] }) : { reports: [] as ServerReportPayload[] };
+
+  const ownIds = new Set((ownData.reports || []).map((r: ServerReportPayload) => r.id));
+
+  return (allData.reports || []).map((r: ServerReportPayload) => ({
+    ...normalizeServerReport(r),
+    isOwn: ownIds.has(r.id),
+  }));
 }

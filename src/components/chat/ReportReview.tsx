@@ -8,7 +8,8 @@ import {
 } from 'lucide-react';
 import { scanForPII, sanitizeText, getPIISummary, type PIIFinding } from '@/lib/pii-scanner';
 import {
-  createReport, shareReport, deleteReport, getShareUrl,
+  createReport, shareReport, deleteReport, getShareUrl, getReport,
+  syncReportToServer, deleteReportFromServer,
   type ReportMessage
 } from '@/lib/report-store';
 
@@ -24,6 +25,8 @@ interface ReviewData {
 interface Props {
   messages: Array<{ role: string; content: string }>;
   conversationId: string;
+  serverConversationId?: string | null;
+  sessionHash: string;
   onClose: () => void;
   onSuggestionClick?: (suggestion: string, reviewSummary?: string) => void;
 }
@@ -50,7 +53,7 @@ function formatReviewForChat(data: ReviewData): string {
   return lines.join('\n');
 }
 
-export default function ReportReview({ messages, conversationId, onClose, onSuggestionClick }: Props) {
+export default function ReportReview({ messages, conversationId, serverConversationId, sessionHash, onClose, onSuggestionClick }: Props) {
   const [step, setStep] = useState<Step>('scanning');
   const [piiFindings, setPiiFindings] = useState<PIIFinding[]>([]);
   const [acceptedRemovals, setAcceptedRemovals] = useState<Set<number>>(new Set());
@@ -141,7 +144,7 @@ export default function ReportReview({ messages, conversationId, onClose, onSugg
     }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     const sanitized = getSanitizedMessages();
     const report = createReport(
       conversationId,
@@ -150,13 +153,32 @@ export default function ReportReview({ messages, conversationId, onClose, onSugg
       acceptedRemovals.size,
       reviewData?.sugestoes,
     );
-    shareReport(report.id);
+
+    const serverReportId = sessionHash
+      ? await syncReportToServer({
+          localReportId: report.id,
+          conversationId,
+          serverConversationId,
+          messages: report.messages,
+          sanitizedMessages: sanitized,
+          piiRemoved: acceptedRemovals.size,
+          aiSuggestions: reviewData?.sugestoes,
+          reviewData: reviewData ? { ...reviewData } : null,
+          sessionHash,
+        })
+      : null;
+
+    shareReport(report.id, serverReportId || undefined);
     setReportId(report.id);
     setStep('shared');
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (reportId) {
+      const localReport = getReport(reportId);
+      if (localReport?.serverId) {
+        await deleteReportFromServer(localReport.serverId);
+      }
       deleteReport(reportId);
       setReportId(null);
     }

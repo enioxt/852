@@ -1,5 +1,5 @@
 import { generateText } from 'ai';
-import { getProvider, getModelId, hasAvailableProvider } from '@/lib/ai-provider';
+import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const maxDuration = 60;
@@ -63,8 +63,7 @@ export async function POST(req: Request) {
       });
     }
 
-    const provider = getProvider();
-    const modelId = getModelId();
+    const { provider, modelId } = getModelConfig('html_report');
 
     const { text } = await generateText({
       model: provider.chat(modelId),

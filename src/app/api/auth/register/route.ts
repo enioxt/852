@@ -3,7 +3,7 @@ import { recordEvent } from '@/lib/telemetry';
 
 export async function POST(req: Request) {
   try {
-    const { email, password, displayName } = await req.json();
+    const { email, password, displayName, masp, lotacao } = await req.json();
     if (!email || !password) {
       return Response.json({ error: 'Email e senha obrigatórios' }, { status: 400 });
     }
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Senha deve ter pelo menos 6 caracteres' }, { status: 400 });
     }
 
-    const result = await registerUser(email, password, displayName);
+    const result = await registerUser(email, password, displayName, masp, lotacao);
     if (result.error) {
       return Response.json({ error: result.error }, { status: 400 });
     }

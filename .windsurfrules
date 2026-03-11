@@ -30,6 +30,7 @@ architecture: "MCP-FIRST + NEXUS-ZERO + INTELINK + RHO"
 - **MCPs:** `.guarani/MCP_ORCHESTRATION_GUIDE.md`
 - **Código:** `.guarani/PREFERENCES.md`
 - **Shared EGOS:** `.egos/guarani/PREFERENCES_SHARED.md`
+- **System Map:** `SYSTEM_MAP.md` ou `docs/SYSTEM_MAP.md` (ler primeiro se existir)
 - **Design Standards:** `.guarani/DESIGN_STANDARDS.md`
 - **Orquestração:** `.guarani/orchestration/PIPELINE.md`
 
@@ -57,6 +58,9 @@ Agents MUST mask CPF/email, specific names, and process numbers in all output.
 `docker-compose.yml` (repo root) é SSOT do runtime no Contabo.
 Deploy por rsync DEVE excluir symlinks/artefatos locais do mesh EGOS.
 Se o Caddy fizer proxy por nome de container, o app DEVE compartilhar a rede reversa correta.
+
+### Activation Contract
+`/start` DEVE carregar handoff, TASKS, System Map, module roots e deploy surface antes de mudanças amplas.
 
 ### SSOT Tasks
 ```

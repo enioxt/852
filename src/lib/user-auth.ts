@@ -33,9 +33,20 @@ async function verifyPassword(password: string, storedHash: string, salt: string
 
 // ── User Registration ────────────────────────────────────
 
-export async function registerUser(email: string, password: string, displayName?: string) {
+export async function registerUser(
+  email: string,
+  password: string,
+  displayName?: string,
+  masp?: string,
+  lotacao?: string,
+) {
   const sb = getSupabase();
   if (!sb) return { error: 'Supabase não configurado' };
+
+  // Validate MASP format (numeric, 5-9 chars)
+  if (masp && !/^\d{5,9}$/.test(masp.trim())) {
+    return { error: 'MASP inválido — deve conter apenas números (5 a 9 dígitos)' };
+  }
 
   // Check if email already exists
   const { data: existing } = await sb
@@ -46,6 +57,16 @@ export async function registerUser(email: string, password: string, displayName?
 
   if (existing) return { error: 'Este email já está cadastrado' };
 
+  // Check if MASP already exists
+  if (masp) {
+    const { data: maspExisting } = await sb
+      .from('user_accounts_852')
+      .select('id')
+      .eq('masp', masp.trim())
+      .maybeSingle();
+    if (maspExisting) return { error: 'Este MASP já está cadastrado' };
+  }
+
   const { hash, salt } = await hashPassword(password);
 
   const { data, error } = await sb
@@ -54,8 +75,11 @@ export async function registerUser(email: string, password: string, displayName?
       email: email.toLowerCase().trim(),
       password_hash: `${salt}:${hash}`,
       display_name: displayName || null,
+      masp: masp?.trim() || null,
+      lotacao: lotacao?.trim() || null,
+      validation_status: masp ? 'pending' : null,
     })
-    .select('id, email, display_name')
+    .select('id, email, display_name, masp, lotacao, validation_status')
     .single();
 
   if (error) return { error: error.message };
@@ -129,7 +153,7 @@ export async function getCurrentUser() {
 
   const { data: user } = await sb
     .from('user_accounts_852')
-    .select('id, email, display_name')
+    .select('id, email, display_name, masp, lotacao, validation_status')
     .eq('id', session.user_id)
     .maybeSingle();
 

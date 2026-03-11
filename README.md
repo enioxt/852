@@ -38,7 +38,7 @@ Landing (/)
   │     ├── Relatos Compartilhados (view/delete)
   │     └── Gerador de Relatórios (AI HTML reports)
   │
-  └── /dashboard, /ethik, /admin/telemetry
+  └── /dashboard, /admin/telemetry
 ```
 
 ## Stack
@@ -70,7 +70,6 @@ src/
 │   ├── chat/page.tsx             # Chat UI + report review modal
 │   ├── reports/page.tsx          # Shared reports + AI report generator
 │   ├── dashboard/page.tsx        # Insights dashboard
-│   ├── ethik/page.tsx            # Gamification leaderboard
 │   ├── admin/telemetry/page.tsx  # Admin telemetry
 │   ├── layout.tsx                # Root layout (Clarity, fonts, metadata)
 │   └── page.tsx                  # Landing page
@@ -88,7 +87,6 @@ src/
     ├── rate-limit.ts             # In-memory rate limiting
     ├── report-store.ts           # localStorage reports (Supabase-ready)
     ├── telemetry.ts              # Dual telemetry (Supabase + JSON logs)
-    └── ethik.ts                  # ETHIK gamification engine
 ```
 
 ## Quick Start
@@ -135,7 +133,7 @@ curl -I https://852.egos.ia.br
 | **P1** | Admin auth for telemetry/reports |
 | **P2** | Session hashing (unique hash per interaction) |
 | **P2** | Agent memory across sessions |
-| **P2** | ETHIK gamification with real data |
+| **P2** | Insight enrichment with real operational data |
 | **P2** | ATRiAN v2: NeMo Guardrails integration |
 | **P3** | Tool use: web search for institutional data |
 | **P3** | Voice input (speech-to-text) |

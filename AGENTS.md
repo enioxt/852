@@ -56,7 +56,6 @@
 │   ├── chat/page.tsx                 # Main chat UI (history, export, review modal)
 │   ├── reports/page.tsx              # Shared reports + AI report generator (tabs)
 │   ├── dashboard/page.tsx            # Insights dashboard (Recharts)
-│   ├── ethik/page.tsx                # ETHIK leaderboard + gamification
 │   ├── admin/telemetry/page.tsx      # Admin telemetry dashboard
 │   ├── layout.tsx                    # Root layout (metadata, Clarity, fonts)
 │   └── page.tsx                      # Landing page
@@ -76,7 +75,6 @@
 │   ├── rate-limit.ts                 # In-memory rate limiting
 │   ├── report-store.ts              # localStorage report persistence (Supabase-ready)
 │   ├── telemetry.ts                  # Dual telemetry: Supabase + structured JSON logs
-│   └── ethik.ts                      # ETHIK gamification engine
 │
 ├── src/components/
 │   ├── ClarityAnalytics.tsx          # Microsoft Clarity tracking component
@@ -84,7 +82,6 @@
 │
 ├── sql/
 │   ├── schema.sql                    # Supabase schema (chats, messages, insights + RLS)
-│   └── ethik.sql                     # ETHIK gamification schema
 │
 ├── AGENTS.md                         # THIS FILE — system map + capabilities + roadmap
 ├── TASKS.md                          # SSOT for tasks (P0/P1/P2)
@@ -123,7 +120,7 @@
 | 7 | Real-time collaboration suggestions (proactive) | P2 | Prompt engineering |
 | 8 | Tool use: web search for institutional data | P3 | AI SDK tools |
 | 9 | Voice input (speech-to-text) | P3 | Browser API |
-| 10 | ETHIK gamification with real data | P2 | Supabase |
+| 10 | Observability and insight enrichment with real data | P2 | Supabase |
 | 11 | Dashboard with real metrics | P1 | Supabase |
 | 12 | Admin auth for telemetry/reports | P1 | NextAuth or Supabase Auth |
 | 13 | Automated PDF report generation from aggregated data | P2 | Multiple reports |
@@ -149,8 +146,7 @@ Landing (/)
   │     └── Tab: Gerador de Relatórios → AI HTML report from prompt
   │
   └── Internal pages
-        ├── /dashboard → insights (mock data currently)
-        ├── /ethik → gamification leaderboard
+        ├── /dashboard → insights com métricas agregadas reais
         └── /admin/telemetry → KPIs, model usage, events
 ```
 

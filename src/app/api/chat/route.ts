@@ -1,9 +1,12 @@
 import { streamText } from 'ai';
-import { agentPrompt } from '@/lib/prompt';
+import { buildAgentPrompt } from '@/lib/prompt';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
-import { getProvider, getModelId, getProviderLabel, hasAvailableProvider, PRICING } from '@/lib/ai-provider';
+import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { recordChatCompletion, recordRateLimitHit, recordChatError, recordEvent } from '@/lib/telemetry';
 import { validateAndLog } from '@/lib/atrian';
+import { getCurrentUser } from '@/lib/user-auth';
+import { getConversationMemory } from '@/lib/conversation-memory';
+import { getIdentityKey } from '@/lib/session';
 
 export const maxDuration = 60;
 
@@ -77,6 +80,10 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const messages = sanitizeMessages(body?.messages);
+    const sessionHash = req.headers.get('x-session-hash');
+    const user = await getCurrentUser();
+    const identityKey = getIdentityKey(sessionHash, user?.id);
+    const memoryBlock = await getConversationMemory(identityKey);
 
     if (messages.length === 0) {
       return new Response(JSON.stringify({ error: 'Nenhuma mensagem válida foi enviada.' }), {
@@ -89,14 +96,11 @@ export async function POST(req: Request) {
       });
     }
 
-    const provider = getProvider();
-    const modelId = getModelId();
-    const providerLabel = getProviderLabel();
-    const pricing = PRICING[modelId] || { input: 0, output: 0 };
+    const { provider, modelId, providerLabel, pricing, routingReason } = getModelConfig('chat');
 
     const result = streamText({
       model: provider.chat(modelId),
-      system: agentPrompt,
+      system: buildAgentPrompt(memoryBlock),
       messages,
       temperature: 0.7,
       onFinish: async ({ text, usage }) => {
@@ -120,6 +124,7 @@ export async function POST(req: Request) {
         'X-Model-Id': modelId,
         'X-Provider': providerLabel,
         'X-Model-Free': pricing.free ? 'true' : 'false',
+        'X-Model-Routing': routingReason,
         'X-RateLimit-Remaining': String(rate.remaining),
         'X-RateLimit-Reset': String(rate.resetAt),
       },
