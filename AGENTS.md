@@ -117,6 +117,7 @@
 | 22 | Reports ↔ Issues ↔ AI Reports SSOT (bidirectional links) | `supabase.ts` | Active |
 | 23 | Seeded police issues (Helios, Olho Vivo, PF integration, etc.) | `sql/seed_issues_v4.sql` | Active |
 | 24 | CI pipeline (lint + build + local smoke on push/PR) | `.github/workflows/ci.yml` | Active |
+| 25 | Admin validation dashboard for MASP registrations | `admin/validations/page.tsx` | Active |
 
 ## Agent 852 — Roadmap
 
@@ -124,11 +125,10 @@
 
 | # | Feature | Notes |
 |---|---------|-------|
-| 1 | Admin validation dashboard for MASP registrations | pending_validations_852 view ready |
-| 2 | Issue vote dedup by user_id (not just session_hash) | migration_v4.sql adds user_id FK |
-| 3 | PDF/document upload for police issues | multer or presigned S3 |
-| 4 | Real notification pipeline (Telegram/webhook on new issue/vote) | fire-and-forget fetch |
-| 5 | User-linked conversation persistence (load from Supabase when logged in) | cross-device chat |
+| 1 | Issue vote dedup by user_id (not just session_hash) | migration_v4.sql adds user_id FK |
+| 2 | PDF/document upload for police issues | multer or presigned S3 |
+| 3 | Real notification pipeline (Telegram/webhook on new issue/vote) | fire-and-forget fetch |
+| 4 | User-linked conversation persistence (load from Supabase when logged in) | cross-device chat |
 
 ### P2 (Backlog)
 
