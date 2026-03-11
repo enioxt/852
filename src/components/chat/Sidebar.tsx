@@ -1,10 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock, Home, FileText, AlertCircle, User, LogOut, Loader2 } from 'lucide-react';
 import { listConversations, deleteConversation, type Conversation } from '@/lib/chat-store';
+import { getIdentityKey, getOrCreateSessionHash } from '@/lib/session';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -41,10 +42,9 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
   const [authLoading, setAuthLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ id: string; email: string; display_name?: string; masp?: string; lotacao?: string; validation_status?: string } | null>(null);
 
-  // Check auth on mount
-  useState(() => {
+  useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setCurrentUser(d.user); }).catch(() => {});
-  });
+  }, []);
 
   const handleAuth = async () => {
     setAuthError('');
@@ -62,6 +62,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
       const data = await res.json();
       if (data.error) { setAuthError(data.error); return; }
       setCurrentUser(data.user);
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('852-auth-changed'));
       setShowAuth(false);
       setAuthEmail('');
       setAuthPassword('');
@@ -75,13 +76,15 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     setCurrentUser(null);
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('852-auth-changed'));
   };
 
-  const conversations: Conversation[] = listConversations();
+  const conversationScope = getIdentityKey(typeof window === 'undefined' ? null : getOrCreateSessionHash(), currentUser?.id) || undefined;
+  const conversations: Conversation[] = listConversations(conversationScope);
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    deleteConversation(id);
+    deleteConversation(id, conversationScope);
     forceRefresh(current => current + 1);
     if (id === activeConversationId) {
       onNewConversation();

@@ -16,39 +16,55 @@ export interface Conversation {
 
 const STORAGE_KEY = '852-conversations';
 
-function getAll(): Conversation[] {
+function getStorageKey(scope?: string) {
+  return scope ? `${STORAGE_KEY}:${scope}` : STORAGE_KEY;
+}
+
+function readBucket(storageKey: string): Conversation[] {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 }
 
-function saveAll(convs: Conversation[]) {
+function getAll(scope?: string): Conversation[] {
+  const scopedKey = getStorageKey(scope);
+  const scoped = readBucket(scopedKey);
+  if (scoped.length > 0 || !scope || !scope.startsWith('anon:')) return scoped;
+
+  const legacy = readBucket(STORAGE_KEY);
+  if (legacy.length > 0 && typeof window !== 'undefined') {
+    localStorage.setItem(scopedKey, JSON.stringify(legacy));
+  }
+  return legacy;
+}
+
+function saveAll(convs: Conversation[], scope?: string) {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(convs));
+  localStorage.setItem(getStorageKey(scope), JSON.stringify(convs));
 }
 
-export function listConversations(): Conversation[] {
-  return getAll().sort((a, b) => b.updatedAt - a.updatedAt);
+export function listConversations(scope?: string): Conversation[] {
+  return getAll(scope).sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-export function getConversation(id: string): Conversation | undefined {
-  return getAll().find(c => c.id === id);
+export function getConversation(id: string, scope?: string): Conversation | undefined {
+  return getAll(scope).find(c => c.id === id);
 }
 
-export function getConversationServerId(id: string): string | null {
-  return getConversation(id)?.serverId || null;
+export function getConversationServerId(id: string, scope?: string): string | null {
+  return getConversation(id, scope)?.serverId || null;
 }
 
-export function replaceConversations(conversations: Conversation[]) {
-  saveAll(conversations);
+export function replaceConversations(conversations: Conversation[], scope?: string) {
+  saveAll(conversations, scope);
 }
 
-export function upsertConversation(conversation: Conversation) {
-  const all = getAll();
+export function upsertConversation(conversation: Conversation, scope?: string) {
+  const all = getAll(scope);
   const idx = all.findIndex(c => c.id === conversation.id);
   if (idx === -1) {
     all.push(conversation);
@@ -59,18 +75,18 @@ export function upsertConversation(conversation: Conversation) {
       serverId: conversation.serverId || all[idx].serverId,
     };
   }
-  saveAll(all.sort((a, b) => b.updatedAt - a.updatedAt));
+  saveAll(all.sort((a, b) => b.updatedAt - a.updatedAt), scope);
 }
 
-export function setConversationServerId(id: string, serverId: string) {
-  const all = getAll();
+export function setConversationServerId(id: string, serverId: string, scope?: string) {
+  const all = getAll(scope);
   const idx = all.findIndex(c => c.id === id);
   if (idx === -1) return;
   all[idx].serverId = serverId;
-  saveAll(all);
+  saveAll(all, scope);
 }
 
-export function createConversation(seed?: Partial<Conversation>): Conversation {
+export function createConversation(seed?: Partial<Conversation>, scope?: string): Conversation {
   const conv: Conversation = {
     id: seed?.id || crypto.randomUUID(),
     serverId: seed?.serverId,
@@ -79,27 +95,27 @@ export function createConversation(seed?: Partial<Conversation>): Conversation {
     createdAt: seed?.createdAt || Date.now(),
     updatedAt: seed?.updatedAt || Date.now(),
   };
-  const all = getAll();
+  const all = getAll(scope);
   const idx = all.findIndex(existing => existing.id === conv.id);
   if (idx === -1) all.push(conv);
   else all[idx] = conv;
-  saveAll(all.sort((a, b) => b.updatedAt - a.updatedAt));
+  saveAll(all.sort((a, b) => b.updatedAt - a.updatedAt), scope);
   return conv;
 }
 
-export function updateConversation(id: string, messages: StoredMessage[], title?: string) {
-  const all = getAll();
+export function updateConversation(id: string, messages: StoredMessage[], title?: string, scope?: string) {
+  const all = getAll(scope);
   const idx = all.findIndex(c => c.id === id);
   if (idx === -1) return;
   all[idx].messages = messages;
   all[idx].updatedAt = Date.now();
   if (title) all[idx].title = title;
-  saveAll(all);
+  saveAll(all, scope);
 }
 
-export function deleteConversation(id: string) {
-  const all = getAll().filter(c => c.id !== id);
-  saveAll(all);
+export function deleteConversation(id: string, scope?: string) {
+  const all = getAll(scope).filter(c => c.id !== id);
+  saveAll(all, scope);
 }
 
 export function generateTitle(firstMessage: string): string {

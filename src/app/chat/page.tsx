@@ -16,11 +16,11 @@ import FAQModal from '@/components/chat/FAQModal';
 import MarkdownMessage from '@/components/chat/MarkdownMessage';
 import ReportReview from '@/components/chat/ReportReview';
 import {
-  getConversation, createConversation,
-  updateConversation, generateTitle, type StoredMessage,
+  getConversation, createConversation, listConversations,
+  updateConversation, generateTitle, type Conversation, type StoredMessage,
   getConversationServerId, setConversationServerId, upsertConversation
 } from '@/lib/chat-store';
-import { getClientConversationId, getOrCreateSessionHash } from '@/lib/session';
+import { getClientConversationId, getIdentityKey, getOrCreateSessionHash } from '@/lib/session';
 
 const quickActions = [
   { icon: AlertTriangle, label: 'Relatar problema operacional', prompt: 'Quero relatar um problema operacional que afeta o trabalho da equipe na delegacia.' },
@@ -37,6 +37,25 @@ function getMessageText(message: { content?: string; parts?: Array<{ type?: stri
   return '';
 }
 
+function toChatMessages(storedMessages: StoredMessage[]) {
+  return storedMessages.map((message) => ({
+    id: message.id,
+    role: message.role as 'user' | 'assistant',
+    content: message.content,
+    parts: [{ type: 'text' as const, text: message.content }],
+    createdAt: new Date(message.createdAt || Date.now()),
+  }));
+}
+
+interface ServerConversationResponse {
+  id: string;
+  title: string | null;
+  messages: StoredMessage[];
+  created_at: string;
+  updated_at: string;
+  metadata?: Record<string, unknown> | null;
+}
+
 export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showFAQ, setShowFAQ] = useState(false);
@@ -46,9 +65,12 @@ export default function ChatPage() {
   const [showReportReview, setShowReportReview] = useState(false);
   const [sessionHash] = useState<string>(() => (typeof window === 'undefined' ? '' : getOrCreateSessionHash()));
   const [serverConversationId, setServerConversationId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const supabaseIdRef = useRef<string | null>(null);
+  const previousScopeRef = useRef<string | null>(null);
+  const conversationScope = getIdentityKey(sessionHash || null, currentUserId) || undefined;
 
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error, setInput } = useChat({
     api: '/api/chat',
@@ -73,11 +95,87 @@ export default function ChatPage() {
 
   useEffect(() => { adjustTextarea(); }, [input, adjustTextarea]);
 
+  useEffect(() => {
+    const syncAuth = () => {
+      fetch('/api/auth/me')
+        .then(r => r.json())
+        .then(d => setCurrentUserId(d.user?.id || null))
+        .catch(() => setCurrentUserId(null));
+    };
+
+    syncAuth();
+    window.addEventListener('852-auth-changed', syncAuth);
+    return () => window.removeEventListener('852-auth-changed', syncAuth);
+  }, []);
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  const loadConversationIntoChat = useCallback((conversation: {
+    id: string;
+    serverId?: string;
+    messages: StoredMessage[];
+  }) => {
+    supabaseIdRef.current = conversation.serverId || null;
+    setServerConversationId(conversation.serverId || null);
+    setActiveConvId(conversation.id);
+    setMessages(toChatMessages(conversation.messages));
+  }, [setMessages]);
+
+  const clearActiveConversation = useCallback(() => {
+    supabaseIdRef.current = null;
+    setServerConversationId(null);
+    setActiveConvId(null);
+    setMessages([]);
+  }, [setMessages]);
+
   useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    const previousScope = previousScopeRef.current;
+    if (previousScope === conversationScope) return;
+
+    const storedMessages: StoredMessage[] = messages.map(m => ({
+      id: m.id,
+      role: m.role as 'user' | 'assistant',
+      content: getMessageText(m),
+      createdAt: m.createdAt instanceof Date ? m.createdAt.getTime() : Date.now(),
+    }));
+
+    if (previousScope && activeConvId && storedMessages.length > 0) {
+      const previousConversation = getConversation(activeConvId, previousScope);
+      const preservedConversation = {
+        id: activeConvId,
+        serverId: supabaseIdRef.current || previousConversation?.serverId,
+        title: previousConversation?.title || generateTitle(storedMessages[0].content),
+        messages: storedMessages,
+        createdAt: previousConversation?.createdAt || Date.now(),
+        updatedAt: Date.now(),
+      };
+      upsertConversation(preservedConversation, previousScope);
+      if (conversationScope) upsertConversation(preservedConversation, conversationScope);
+    }
+
+    previousScopeRef.current = conversationScope || null;
+
+    const scopedActiveConversation = activeConvId && conversationScope
+      ? getConversation(activeConvId, conversationScope)
+      : null;
+
+    if (scopedActiveConversation) {
+      queueMicrotask(() => loadConversationIntoChat(scopedActiveConversation));
+      return;
+    }
+
+    const scopedConversations = listConversations(conversationScope);
+    if (scopedConversations.length > 0) {
+      queueMicrotask(() => loadConversationIntoChat(scopedConversations[0]));
+      return;
+    }
+
+    queueMicrotask(clearActiveConversation);
+  }, [activeConvId, clearActiveConversation, conversationScope, loadConversationIntoChat, messages]);
 
   useEffect(() => {
     if (!sessionHash) return;
@@ -88,14 +186,7 @@ export default function ChatPage() {
         if (!res.ok) return;
         const data = await res.json();
         const serverConversations = Array.isArray(data.conversations) ? data.conversations : [];
-        const mapped = serverConversations.map((conversation: {
-          id: string;
-          title: string | null;
-          messages: StoredMessage[];
-          created_at: string;
-          updated_at: string;
-          metadata?: Record<string, unknown> | null;
-        }) => ({
+        const mapped: Conversation[] = serverConversations.map((conversation: ServerConversationResponse) => ({
           id: getClientConversationId(conversation.metadata, conversation.id) || conversation.id,
           serverId: conversation.id,
           title: conversation.title || 'Nova conversa',
@@ -111,19 +202,14 @@ export default function ChatPage() {
           updatedAt: new Date(conversation.updated_at).getTime(),
         }));
 
-        mapped.forEach(upsertConversation);
+        mapped.forEach((conversation: Conversation) => upsertConversation(conversation, conversationScope));
 
-        if (!activeConvId && mapped.length > 0) {
-          setActiveConvId(mapped[0].id);
-          supabaseIdRef.current = mapped[0].serverId || null;
-          setServerConversationId(mapped[0].serverId || null);
-          setMessages(mapped[0].messages.map((message: StoredMessage) => ({
-            id: message.id,
-            role: message.role as 'user' | 'assistant',
-            content: message.content,
-            parts: [{ type: 'text' as const, text: message.content }],
-            createdAt: new Date(message.createdAt || Date.now()),
-          })));
+        const scopedActiveConversation = activeConvId && conversationScope
+          ? getConversation(activeConvId, conversationScope)
+          : null;
+
+        if (!scopedActiveConversation && mapped.length > 0) {
+          loadConversationIntoChat(mapped[0]);
         }
       } catch (loadError) {
         console.error('[852-chat] failed to hydrate conversations:', loadError instanceof Error ? loadError.message : 'Unknown');
@@ -131,7 +217,7 @@ export default function ChatPage() {
     };
 
     void loadServerConversations();
-  }, [activeConvId, sessionHash, setMessages]);
+  }, [activeConvId, conversationScope, loadConversationIntoChat, sessionHash]);
 
   // Persist messages to localStorage + background Supabase sync
   useEffect(() => {
@@ -142,7 +228,7 @@ export default function ChatPage() {
       content: getMessageText(m),
     }));
     const title = stored.length > 0 ? generateTitle(stored[0].content) : 'Nova conversa';
-    updateConversation(activeConvId, stored, title);
+    updateConversation(activeConvId, stored, title, conversationScope);
 
     // Background Supabase sync (fire-and-forget)
     const syncToSupabase = async () => {
@@ -155,13 +241,12 @@ export default function ChatPage() {
             title,
             sessionHash,
             clientConversationId: activeConvId,
-            existingId: getConversationServerId(activeConvId) || supabaseIdRef.current,
+            existingId: getConversationServerId(activeConvId, conversationScope) || supabaseIdRef.current,
           }),
         }).then(r => r.json()).then(d => {
           if (d.id) {
             supabaseIdRef.current = d.id;
-            setServerConversationId(d.id);
-            setConversationServerId(activeConvId, d.id);
+            setConversationServerId(activeConvId, d.id, conversationScope);
           }
         });
       } catch (syncError) {
@@ -169,37 +254,26 @@ export default function ChatPage() {
       }
     };
     syncToSupabase();
-  }, [messages, activeConvId, sessionHash]);
+  }, [messages, activeConvId, conversationScope, sessionHash]);
 
   const handleNewConversation = useCallback(() => {
-    const conv = createConversation();
+    const conv = createConversation(undefined, conversationScope);
     supabaseIdRef.current = null;
-    setServerConversationId(null);
     setActiveConvId(conv.id);
     setMessages([]);
     setInput('');
     inputRef.current?.focus();
-  }, [setMessages, setInput]);
+  }, [conversationScope, setMessages, setInput]);
 
   const handleSelectConversation = useCallback((id: string) => {
-    const conv = getConversation(id);
+    const conv = getConversation(id, conversationScope);
     if (!conv) return;
-    supabaseIdRef.current = conv.serverId || null;
-    setServerConversationId(conv.serverId || null);
-    setActiveConvId(id);
-    const restored = conv.messages.map(m => ({
-      id: m.id,
-      role: m.role as 'user' | 'assistant',
-      content: m.content,
-      parts: [{ type: 'text' as const, text: m.content }],
-      createdAt: new Date(),
-    }));
-    setMessages(restored);
-  }, [setMessages]);
+    loadConversationIntoChat(conv);
+  }, [conversationScope, loadConversationIntoChat]);
 
   const handleQuickAction = (prompt: string) => {
     if (!activeConvId) {
-      const conv = createConversation();
+      const conv = createConversation(undefined, conversationScope);
       setActiveConvId(conv.id);
     }
     setInput(prompt);
@@ -210,7 +284,7 @@ export default function ChatPage() {
     e.preventDefault();
     if (!input.trim()) return;
     if (!activeConvId) {
-      const conv = createConversation();
+      const conv = createConversation(undefined, conversationScope);
       setActiveConvId(conv.id);
     }
     handleSubmit(e);

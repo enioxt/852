@@ -101,7 +101,7 @@
 | 6 | PII Auto-Detection (CPF, RG, MASP, plates, etc.) | `pii-scanner.ts` | Active |
 | 7 | AI Conversation Review (completeness score) | `api/review/route.ts` | Active |
 | 8 | Report Sharing — cross-device (Supabase + localStorage) | `report-store.ts` | Active |
-| 9 | Conversation Persistence (localStorage + Supabase) | `chat-store.ts` | Active |
+| 9 | Conversation Persistence (localStorage + Supabase + auth hydration) | `chat-store.ts` | Active |
 | 10 | Export (PDF/DOCX/Markdown) | `chat/page.tsx` | Active |
 | 11 | WhatsApp Sharing | `chat/page.tsx` | Active |
 | 12 | Telemetry (Clarity + Supabase + JSON logs) | `telemetry.ts` | Active |
@@ -127,7 +127,6 @@
 | # | Feature | Notes |
 |---|---------|-------|
 | 1 | PDF/document upload for police issues | multer or presigned S3 |
-| 2 | User-linked conversation persistence (load from Supabase when logged in) | cross-device chat |
 
 ### P2 (Backlog)
 
