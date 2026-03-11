@@ -53,10 +53,10 @@
 │   ├── api/review/route.ts           # POST /api/review — AI conversation analysis
 │   ├── api/report/route.ts           # POST /api/report — AI HTML report generation
 │   ├── api/telemetry/route.ts        # GET  /api/telemetry — stats from Supabase
-│   ├── chat/page.tsx                 # Main chat UI (history, export, review modal)
+│   ├── chat/page.tsx                 # Main chat UI (orchestrator, delegates to components)
 │   ├── reports/page.tsx              # Shared reports + AI report generator (tabs)
 │   ├── dashboard/page.tsx            # Insights dashboard (Recharts)
-│   ├── admin/telemetry/page.tsx      # Admin telemetry dashboard
+│   ├── admin/telemetry/page.tsx      # Admin telemetry + ATRiAN violations dashboard
 │   ├── layout.tsx                    # Root layout (metadata, Clarity, fonts)
 │   └── page.tsx                      # Landing page
 │
@@ -64,11 +64,15 @@
 │   ├── Sidebar.tsx                   # History sidebar + nav (Home, Reports, FAQ)
 │   ├── FAQModal.tsx                  # FAQ modal
 │   ├── MarkdownMessage.tsx           # GFM markdown rendering
-│   └── ReportReview.tsx              # 3-step report review modal (PII → AI → Share)
+│   ├── ReportReview.tsx              # 3-step report review modal (PII → AI → Share)
+│   ├── WelcomeScreen.tsx             # Welcome state with quick actions
+│   ├── MessageList.tsx               # Message rendering + getMessageText utility
+│   ├── ChatInputArea.tsx             # Chat input form
+│   └── ExportMenu.tsx                # PDF/DOCX/MD export + WhatsApp share
 │
 ├── src/lib/
 │   ├── ai-provider.ts               # Shared AI provider config (DRY)
-│   ├── atrian.ts                     # ATRiAN ethical validation (output filter)
+│   ├── atrian.ts                     # ATRiAN ethical validation (90+ known acronyms)
 │   ├── chat-store.ts                 # localStorage conversation persistence
 │   ├── pii-scanner.ts               # PII detection (CPF, RG, MASP, phone, email, REDS, plates, names)
 │   ├── prompt.ts                     # Agent 852 system prompt + truth layer
@@ -102,8 +106,8 @@
 | 7 | AI Conversation Review (completeness score) | `api/review/route.ts` | Active |
 | 8 | Report Sharing — cross-device (Supabase + localStorage) | `report-store.ts` | Active |
 | 9 | Conversation Persistence (localStorage + Supabase + auth hydration) | `chat-store.ts` | Active |
-| 10 | Export (PDF/DOCX/Markdown) | `chat/page.tsx` | Active |
-| 11 | WhatsApp Sharing | `chat/page.tsx` | Active |
+| 10 | Export (PDF/DOCX/Markdown) | `ExportMenu.tsx` | Active |
+| 11 | WhatsApp Sharing | `ExportMenu.tsx` | Active |
 | 12 | Telemetry (Clarity + Supabase + JSON logs) | `telemetry.ts` | Active |
 | 13 | Rate Limiting (per-IP) | `rate-limit.ts` | Active |
 | 14 | Markdown Rendering (GFM) | `MarkdownMessage.tsx` | Active |
@@ -119,6 +123,8 @@
 | 24 | CI pipeline (lint + build + local smoke on push/PR) | `.github/workflows/ci.yml` | Active |
 | 25 | Admin validation dashboard for MASP registrations | `admin/validations/page.tsx` | Active |
 | 26 | Notificações operacionais por webhook/Telegram para `/issues` | `notifications.ts` | Active |
+| 27 | ATRiAN violations dashboard (score, categories, severity) | `admin/telemetry/page.tsx` | Active |
+| 28 | Componentized chat UI (WelcomeScreen, MessageList, InputArea, ExportMenu) | `components/chat/*` | Active |
 
 ## Agent 852 — Roadmap
 
@@ -133,14 +139,11 @@
 | # | Feature | Notes |
 |---|---------|-------|
 | 1 | ATRiAN v2 — NeMo Guardrails or stream-level filtering | Python sidecar |
-| 2 | ATRiAN violations dashboard in /admin/telemetry | Admin auth ready |
-| 3 | Decompose `chat/page.tsx` into WelcomeScreen + MessageList + InputArea + ExportMenu | ~450 lines |
-| 4 | Cross-conversation insight aggregation (themes, patterns, regions) | Supabase aggregation |
-| 5 | Tool use: web search for institutional data (AI SDK tools) | DashScope function calling |
-| 6 | Voice input (speech-to-text via Browser API) | Web Speech API |
-| 7 | Proactive collaboration suggestions (agent suggests topics mid-chat) | Prompt engineering |
-| 8 | Automated PDF report from aggregated discussion data | puppeteer/weasyprint |
-| 9 | Expand KNOWN_ACRONYMS in atrian.ts with delegacia-specific terms | PII/ATRiAN hardening |
+| 2 | Cross-conversation insight aggregation (themes, patterns, regions) | Supabase aggregation |
+| 3 | Tool use: web search for institutional data (AI SDK tools) | DashScope function calling |
+| 4 | Voice input (speech-to-text via Browser API) | Web Speech API |
+| 5 | Proactive collaboration suggestions (agent suggests topics mid-chat) | Prompt engineering |
+| 6 | Automated PDF report from aggregated discussion data | puppeteer/weasyprint |
 
 ## User Flow
 

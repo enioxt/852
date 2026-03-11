@@ -105,15 +105,15 @@
 - [x] Eliminar warnings SSR do Recharts no build do /dashboard
 - [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
 - [ ] Refinar OG image para proporção 1200x630 real
-- [ ] Decompose `chat/page.tsx` (~450 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
+- [x] Decompose `chat/page.tsx` (~450 lines) — extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [x] CI/CD pipeline (lint + build + smoke on push/PR)
 - [x] Consolidar package manager (remover vestígios de bun, manter npm)
-- [ ] Pipeline real de notificações do 852 (Telegram/Discord/webhook/admin alerts) acoplado a eventos críticos
+- [x] Pipeline real de notificações do 852 (Telegram/Discord/webhook/admin alerts) acoplado a eventos críticos
 - [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
-- [ ] ATRiAN dashboard: visualizar violations no /admin/telemetry
-- [ ] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
+- [x] ATRiAN dashboard: visualizar violations no /admin/telemetry
+- [x] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
 - [ ] Admin view para relatórios compartilhados (autenticado)
 - [ ] Tool use: web search para dados institucionais (AI SDK tools)
 - [ ] Voice input (speech-to-text via Browser API)
 - [ ] Proactive collaboration suggestions (agent sugere temas durante a conversa)
-- [ ] User-linked conversation persistence (load from Supabase when logged in)
+- [x] User-linked conversation persistence (load from Supabase when logged in)

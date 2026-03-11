@@ -163,6 +163,14 @@ export function recordChatError(error: string, clientIp?: string) {
 
 // ── Query: Get Stats (for admin dashboard) ────────────────
 
+export interface AtrianStats {
+  totalViolations: number;
+  byCategory: Record<string, number>;
+  byLevel: Record<string, number>;
+  avgScore: number;
+  recentViolations: Array<Record<string, unknown>>;
+}
+
 export interface TelemetryStats {
   totalEvents: number;
   totalChats: number;
@@ -174,6 +182,7 @@ export interface TelemetryStats {
   byModel: Record<string, number>;
   byProvider: Record<string, number>;
   recentEvents: Array<Record<string, unknown>>;
+  atrian?: AtrianStats;
 }
 
 export async function getStats(days: number = 7): Promise<TelemetryStats | null> {
@@ -205,6 +214,8 @@ export async function getStats(days: number = 7): Promise<TelemetryStats | null>
       recentEvents: events.slice(0, 20),
     };
 
+    const atrianEvents: Array<Record<string, unknown>> = [];
+
     for (const e of events) {
       if (e.event_type === 'chat_completion') {
         stats.totalChats++;
@@ -216,6 +227,32 @@ export async function getStats(days: number = 7): Promise<TelemetryStats | null>
       }
       if (e.event_type === 'rate_limit_hit') stats.rateLimitHits++;
       if (e.event_type === 'chat_error' || e.event_type === 'report_error' || e.event_type === 'notification_error') stats.errors++;
+      if (e.event_type === 'atrian_violation') atrianEvents.push(e);
+    }
+
+    if (atrianEvents.length > 0) {
+      const byCategory: Record<string, number> = {};
+      const byLevel: Record<string, number> = {};
+      let scoreSum = 0;
+      for (const ev of atrianEvents) {
+        const meta = (ev.metadata || {}) as Record<string, unknown>;
+        scoreSum += typeof meta.score === 'number' ? meta.score : 0;
+        const cats = Array.isArray(meta.categories) ? meta.categories : [];
+        for (const cat of cats) {
+          if (typeof cat === 'string') byCategory[cat] = (byCategory[cat] || 0) + 1;
+        }
+        const lvls = Array.isArray(meta.levels) ? meta.levels : [];
+        for (const lvl of lvls) {
+          if (typeof lvl === 'string') byLevel[lvl] = (byLevel[lvl] || 0) + 1;
+        }
+      }
+      stats.atrian = {
+        totalViolations: atrianEvents.length,
+        byCategory,
+        byLevel,
+        avgScore: Math.round(scoreSum / atrianEvents.length),
+        recentViolations: atrianEvents.slice(0, 10),
+      };
     }
 
     return stats;

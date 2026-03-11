@@ -41,13 +41,31 @@ const BLOCKED_ENTITIES = [
 ];
 
 const KNOWN_ACRONYMS = new Set([
-  'DP', 'PCMG', 'REDS', 'DH', 'BO', 'TCO', 'IP', 'APF',
-  'MPMG', 'TJMG', 'STF', 'STJ', 'CNJ', 'OAB',
+  // Documentos e processos
+  'DP', 'BO', 'TCO', 'IP', 'APF', 'APFD', 'TC', 'RAI', 'ROC',
+  // PCMG — estrutura e unidades
+  'PCMG', 'REDS', 'DH', 'DIPO', 'DEAM', 'DRCI', 'DEPOL', 'DCPC',
+  'DREX', 'DCCM', 'DICRIM', 'DPC', 'DPCA', 'DPMA', 'DPRC',
+  'COPE', 'GOC', 'DSAP', 'IC', 'IML',
+  // Segurança pública (MG e federal)
+  'PM', 'PC', 'PF', 'PRF', 'SEDS', 'SESP', 'SEJUSP', 'PMMG',
+  'CBMMG', 'GRECO', 'GAECO', 'GEPAR', 'ROTAM', 'CERESP',
+  'RISP', 'AISP', 'CICOM', 'CINDS',
+  // Sistemas e bases de dados
+  'SINESP', 'INFOPEN', 'SISP', 'SISBIN', 'ABIN', 'DEPEN',
+  // Justiça e órgãos de controle
+  'MPMG', 'TJMG', 'STF', 'STJ', 'CNJ', 'OAB', 'TSE', 'TRF',
+  'TRT', 'TCE', 'TCU', 'CGU', 'AGU', 'DPE', 'JECRIM', 'ANPP',
+  // Documentos pessoais
   'CPF', 'RG', 'MASP', 'CNPJ',
-  'MG', 'BH', 'RMBH', 'BR',
-  'PM', 'PC', 'PF', 'PRF', 'SEDS', 'SESP',
-  'RISP', 'AISP', 'DIPO', 'DEAM', 'DRCI',
-  'AI', 'IA', 'LLM', 'API', 'PDF', 'URL',
+  // Geografia
+  'MG', 'BH', 'RMBH', 'BR', 'SP', 'RJ', 'DF',
+  // Governo e administração
+  'SEPLAG', 'DETRAN', 'CIRETRAN',
+  // Tecnologia
+  'AI', 'IA', 'LLM', 'API', 'PDF', 'URL', 'GPS', 'CFTV',
+  'DNA', 'RPA', 'OCR', 'QR', 'NFC',
+  // Geral institucional
   'OG', 'FAQ', 'CEO', 'CTO', 'RH',
   'PIB', 'IDH', 'SUS', 'UBS', 'IBGE',
   'LGPD', 'GDPR', 'RLS',

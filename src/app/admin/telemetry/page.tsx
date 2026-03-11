@@ -6,8 +6,16 @@ import { useRouter } from 'next/navigation';
 import {
   BarChart3, Activity, MessageSquare, AlertTriangle,
   RefreshCw, Loader2, DollarSign, Zap, ShieldAlert,
-  ArrowLeft, Clock, LogOut,
+  ArrowLeft, Clock, LogOut, Shield,
 } from 'lucide-react';
+
+interface AtrianStats {
+  totalViolations: number;
+  byCategory: Record<string, number>;
+  byLevel: Record<string, number>;
+  avgScore: number;
+  recentViolations: Array<Record<string, unknown>>;
+}
 
 interface TelemetryStats {
   totalEvents: number;
@@ -20,6 +28,7 @@ interface TelemetryStats {
   byModel: Record<string, number>;
   byProvider: Record<string, number>;
   recentEvents: Array<Record<string, unknown>>;
+  atrian?: AtrianStats;
 }
 
 interface ApiResponse {
@@ -153,6 +162,51 @@ export default function TelemetryDashboard() {
               </div>
             </div>
 
+            {/* ATRiAN Violations */}
+            {data.stats.atrian && (
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield className="w-5 h-5 text-orange-400" />
+                  <h2 className="text-sm font-semibold text-white">ATRiAN — Validação Ética</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                  <KPICard icon={ShieldAlert} label="Violações" value={data.stats.atrian.totalViolations} color="amber" />
+                  <KPICard icon={Shield} label="Score Médio" value={data.stats.atrian.avgScore} color={data.stats.atrian.avgScore >= 80 ? 'green' : data.stats.atrian.avgScore >= 50 ? 'amber' : 'red'} />
+                  <StatCard title="Por Categoria" items={data.stats.atrian.byCategory} />
+                  <StatCard title="Por Severidade" items={data.stats.atrian.byLevel} />
+                </div>
+                {data.stats.atrian.recentViolations.length > 0 && (
+                  <div className="rounded-xl border border-orange-800/30 bg-orange-900/5 overflow-hidden">
+                    <div className="px-4 py-2.5 border-b border-orange-800/20 flex items-center gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 text-orange-400" />
+                      <span className="text-xs font-semibold text-orange-300">Violações Recentes</span>
+                    </div>
+                    <div className="divide-y divide-neutral-800/50 max-h-48 overflow-y-auto">
+                      {data.stats.atrian.recentViolations.map((ev, i) => {
+                        const meta = (ev.metadata || {}) as Record<string, unknown>;
+                        const cats = Array.isArray(meta.categories) ? meta.categories.join(', ') : '';
+                        const score = typeof meta.score === 'number' ? meta.score : '—';
+                        return (
+                          <div key={i} className="px-4 py-2 flex items-center gap-3 text-xs">
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${
+                              typeof meta.score === 'number' && meta.score < 50
+                                ? 'bg-red-900/40 text-red-400 border-red-800/40'
+                                : 'bg-orange-900/40 text-orange-400 border-orange-800/40'
+                            }`}>{score}</span>
+                            <span className="text-neutral-400">{cats}</span>
+                            <span className="text-neutral-600 flex items-center gap-1 ml-auto">
+                              <Clock className="w-3 h-3" />
+                              {new Date(String(ev.created_at)).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Recent Events */}
             <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 overflow-hidden">
               <div className="px-4 py-3 border-b border-neutral-800 flex items-center gap-2">
@@ -191,6 +245,7 @@ function KPICard({ icon: Icon, label, value, color }: { icon: React.ComponentTyp
     green: 'text-green-400 bg-green-900/20 border-green-800/30',
     amber: 'text-amber-400 bg-amber-900/20 border-amber-800/30',
     purple: 'text-purple-400 bg-purple-900/20 border-purple-800/30',
+    red: 'text-red-400 bg-red-900/20 border-red-800/30',
   };
   return (
     <div className={`rounded-xl border p-4 ${colors[color] || colors.blue}`}>
@@ -235,6 +290,7 @@ function EventBadge({ type }: { type: string }) {
     notification_sent: { label: 'PING', cls: 'bg-emerald-900/40 text-emerald-400 border-emerald-800/40' },
     notification_error: { label: 'ALERT', cls: 'bg-rose-900/40 text-rose-400 border-rose-800/40' },
     provider_unavailable: { label: 'DOWN', cls: 'bg-red-900/40 text-red-400 border-red-800/40' },
+    atrian_violation: { label: 'ATRiAN', cls: 'bg-orange-900/40 text-orange-400 border-orange-800/40' },
   };
   const c = config[type] || { label: type.toUpperCase(), cls: 'bg-neutral-800 text-neutral-400 border-neutral-700' };
   return <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${c.cls}`}>{c.label}</span>;
