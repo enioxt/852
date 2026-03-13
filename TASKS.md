@@ -84,7 +84,7 @@
 - [x] Cross-device report sync: `loadAllPublicReports()` fetches all public reports (not filtered by session) — visível em qualquer dispositivo
 - [x] Delete button visível apenas para `isOwn` reports (relatório pertence à sessão atual)
 - [x] Dashboard live polling: atualização automática a cada 30s conforme conversas acontecem
-- [x] Upvote/downvote agora requer login com MASP — modal de aviso com transparência de dados
+- [x] Upvote/downvote agora requer conta autenticada com identidade protegida; MASP segue em trilha separada de validação institucional
 - [x] Registro de MASP + lotação no cadastro (user_accounts_852) com validação manual
 - [x] SQL migration_v4.sql: campos masp/lotacao/validation_status/nome_partial na tabela de usuários
 - [x] SQL seed_issues_v4.sql: 10 pautas iniciais reais de policiais civis MG (Helios, Olho Vivo, PF, etc.)
@@ -107,13 +107,52 @@
 - [x] **Gamificação**: sistema de pontos (report=10, issue=5, comment=3, vote=1), ranks policiais (Recruta a Comissário), leaderboard anônimo
 - [x] **Mobile bottom nav**: navegação fixa no rodapé para mobile (Home, Chat, Fórum, Relatos, Painel)
 - [x] **Copy rules**: remoção de travessões (em-dashes) de todo o copy público
-- [ ] **Supabase migrations**: aplicar migration_v4 + v5 + v6 no banco (lotação, email verification, gamification)
+- [x] **Supabase migrations**: aplicar migration_v4 + v5 + v6 + v7 no banco via CLI (lotação, email verification, gamification, MASP canonicalization)
+- [x] **Landing page v2**: redesign com 2 opções lado a lado, fluxo completo, código aberto com link GitHub, sem duplicidade de Tópicos
+- [x] **Tradução PT-BR**: todas as páginas verificadas e 100% em português acessível (landing, chat, issues, reports, dashboard, sidebar, mobile nav, FAQ)
+- [x] **SQL migration governance**: regra documentada em `.guarani/PREFERENCES.md` -- sempre via `supabase db push`, nunca manual
 - [ ] **Espiral de Escuta**: relatórios com <85% aprovação reabrem rodada de discussão
 - [ ] **Report flow multi-camada**: usuário itera, IA analisa, revisão humana, votação maioria
-- [ ] **Free-text report mode**: caixa de texto livre na landing + upload com mesma pipeline
 - [ ] **Audio transcription**: Web Speech API / Whisper para transcrever áudio
 - [ ] **LGPD consent banner**: consentimento explícito no cadastro (Lei 13.709/2018)
 - [ ] **User self-service data access**: ver/exportar/deletar dados (LGPD Art. 18)
+
+## 🏃 P1 - Sprint v6 (Biblioteca Jurídica + Dupla Entrada + FAQ)
+
+### Biblioteca Jurídica
+- [x] **Página /legislacao**: 27+ leis, súmulas e normativas organizadas por categoria (Federal, Estadual MG, Súmulas, Normativas PCMG)
+- [x] **Descrições em linguagem simples**: cada lei com "para que serve" em 1 frase + link oficial (Planalto, ALMG, STF, STJ)
+- [x] **Busca client-side**: filtro por nome, assunto ou palavra-chave com normalização de acentos
+- [x] **Nav header + mobile**: "Legislação" adicionado ao SiteHeader e MobileNav
+- [x] **Referências legais no prompt da IA**: seção REFERÊNCIA LEGAL no prompt.ts para chat e intelligence_report
+- [ ] **Glossário policial**: termos, siglas, acrônimos da PCMG (REDS, SIDS, BO, TC, IP, APF, etc.)
+
+### Landing Page Redesign
+- [ ] **Header fixo com nav completa**: Início, Chat, Sugestão, Tópicos, Legislação, Relatórios, Painel
+- [ ] **Duas entradas lado a lado**: "Conversar com IA" + "Enviar sugestão direto" (texto livre, sem IA)
+- [ ] **Fix duplicação de Tópicos**: remover seção inline duplicada, manter apenas link no header
+- [ ] **FAQ completa no bottom**: ~15 perguntas, collapsed por default, linguagem acessível
+- [ ] **CTA para Biblioteca Jurídica**: card ou banner convidando a consultar a legislação
+
+### Página /sugestao (Texto Livre)
+- [ ] **Textarea grande**: digitação livre sem interação com IA
+- [ ] **Upload de arquivos**: drag & drop + botão (PDF, DOC, DOCX, TXT, MD)
+- [ ] **API /api/upload/parse**: parsing server-side (pdf-parse, mammoth, native TXT/MD), limite 5MB
+- [ ] **Mesma pipeline ATRiAN + PII**: validação automática antes de publicar
+- [ ] **Preview antes de enviar**: usuário vê resultado da validação
+- [ ] **Categoria/tags opcionais**: classificação da sugestão
+- [ ] **Histórico de sugestões**: localStorage (anon) / Supabase (logado)
+- [ ] **Exportar em PDF/MD**: mesma funcionalidade do chat
+
+### Melhorias de Experiência
+- [ ] **QR Code para delegacias**: gerar QR imprimível que leva ao Tira-Voz, para mural da delegacia
+- [ ] **Templates de relato**: modelos prontos para problemas comuns (falta de viatura, efetivo, sistema)
+- [ ] **Redirect canais formais**: botão visível "Denúncia formal" → Corregedoria/Ouvidoria/MP
+- [ ] **PWA/Offline**: instalar como app no celular, funcionar offline com sync posterior
+- [ ] **Acessibilidade**: tamanho de fonte ajustável, alto contraste, suporte a leitor de tela
+- [ ] **Notificação por email**: quando tópico que você votou recebe atividade
+- [ ] **Estatísticas por região**: dashboard filtrado por Departamento de Polícia (sem identificar unidades)
+- [ ] **Modo guiado "Não sei o que falar"**: wizard com perguntas guiadas para quem não sabe por onde começar
 
 ## ⏭️ Backlog
 

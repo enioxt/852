@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useChat } from '@ai-sdk/react';
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { Suspense, useRef, useEffect, useState, useCallback } from 'react';
 import { Send, Menu, Home } from 'lucide-react';
 import Sidebar from '@/components/chat/Sidebar';
 import FAQModal from '@/components/chat/FAQModal';
@@ -38,7 +39,18 @@ interface ServerConversationResponse {
 }
 
 export default function ChatPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  return (
+    <Suspense fallback={<div className="flex flex-1 min-h-0 items-center justify-center bg-neutral-950 text-neutral-400">Carregando chat...</div>}>
+      <ChatPageClient />
+    </Suspense>
+  );
+}
+
+function ChatPageClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const authIntent = searchParams.get('auth') === 'register' ? 'register' : searchParams.get('auth') === 'login' ? 'login' : null;
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showFAQ, setShowFAQ] = useState(false);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -75,6 +87,11 @@ export default function ChatPage() {
   }, []);
 
   useEffect(() => { adjustTextarea(); }, [input, adjustTextarea]);
+
+  useEffect(() => {
+    if (!authIntent) return;
+    router.replace(`/conta?auth=${authIntent}&next=/chat`);
+  }, [authIntent, router]);
 
   useEffect(() => {
     const syncAuth = () => {
@@ -149,12 +166,6 @@ export default function ChatPage() {
       return;
     }
 
-    const scopedConversations = listConversations(conversationScope);
-    if (scopedConversations.length > 0) {
-      queueMicrotask(() => loadConversationIntoChat(scopedConversations[0]));
-      return;
-    }
-
     queueMicrotask(clearActiveConversation);
   }, [activeConvId, clearActiveConversation, conversationScope, loadConversationIntoChat, messages]);
 
@@ -189,9 +200,7 @@ export default function ChatPage() {
           ? getConversation(activeConvId, conversationScope)
           : null;
 
-        if (!scopedActiveConversation && mapped.length > 0) {
-          loadConversationIntoChat(mapped[0]);
-        }
+        if (!scopedActiveConversation && mapped.length > 0) return;
       } catch (loadError) {
         console.error('[852-chat] failed to hydrate conversations:', loadError instanceof Error ? loadError.message : 'Unknown');
       }
@@ -238,13 +247,13 @@ export default function ChatPage() {
   }, [messages, activeConvId, conversationScope, sessionHash]);
 
   const handleNewConversation = useCallback(() => {
-    const conv = createConversation(undefined, conversationScope);
     supabaseIdRef.current = null;
-    setActiveConvId(conv.id);
+    setServerConversationId(null);
+    setActiveConvId(null);
     setMessages([]);
     setInput('');
     inputRef.current?.focus();
-  }, [conversationScope, setMessages, setInput]);
+  }, [setMessages, setInput]);
 
   const handleSelectConversation = useCallback((id: string) => {
     const conv = getConversation(id, conversationScope);
@@ -277,9 +286,13 @@ export default function ChatPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  if (authIntent) {
+    return <div className="flex flex-1 min-h-0 items-center justify-center bg-neutral-950 text-neutral-400">Redirecionando para a conta...</div>;
+  }
+
   return (
     <div
-      className="flex h-screen bg-neutral-950 text-neutral-200 font-[family-name:var(--font-geist-sans)]"
+      className="flex min-h-0 flex-1 bg-neutral-950 text-neutral-200 font-[family-name:var(--font-geist-sans)]"
       style={{
         backgroundImage: "linear-gradient(to bottom, rgba(10,10,10,0.95), rgba(10,10,10,0.98)), url('/brand/bg-pattern.png')",
         backgroundSize: 'cover',
@@ -297,12 +310,14 @@ export default function ChatPage() {
       {/* Sidebar */}
       <div className={`${sidebarOpen ? 'fixed inset-y-0 left-0 z-40 md:relative md:z-auto' : 'hidden md:block'}`}>
       <Sidebar
+        key={authIntent ?? 'default'}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         activeConversationId={activeConvId}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
         onShowFAQ={() => setShowFAQ(true)}
+        requestedAuthMode={authIntent}
       />
       </div>
 
@@ -321,8 +336,8 @@ export default function ChatPage() {
             <Link href="/" className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition" title="Página inicial">
               <Home className="w-4 h-4" />
             </Link>
-            <h1 className="text-sm font-semibold text-white">Tira-Voz</h1>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-900/40 text-green-400 font-medium">Anônimo</span>
+            <h1 className="text-sm font-semibold text-white">{activeConvId ? 'Conversa em andamento' : 'Novo chat'}</h1>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-900/40 text-green-400 font-medium">Identidade protegida</span>
           </div>
           <div className="flex items-center gap-1">
             {messages.length > 0 && (

@@ -8,6 +8,7 @@
 import { generateText } from 'ai';
 import { getModelConfig } from './ai-provider';
 import { generateNicknames } from './nickname-generator';
+import { buildNameValidationPrompt } from './prompt';
 
 export interface NameValidationResult {
   valid: boolean;
@@ -38,12 +39,8 @@ export async function validateDisplayName(name: string): Promise<NameValidationR
     const config = getModelConfig('name_validation');
     const { text } = await generateText({
       model: config.provider(config.modelId),
-      prompt: `You are a name classifier for an anonymous platform. Analyze if this text is a real Brazilian person's name (first + last name). Text: "${trimmed}"
-
-Reply ONLY with a JSON object, nothing else:
-{"isRealName": true, "confidence": 0.9}
-or
-{"isRealName": false, "confidence": 0.1}`,
+      system: buildNameValidationPrompt(),
+      prompt: `Texto para classificar: "${trimmed}". Responda apenas com JSON válido.`,
       temperature: 0,
     });
 

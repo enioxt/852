@@ -16,6 +16,11 @@
 2. **Comments:** Explain "WHY", not "WHAT".
 3. **Supabase Client:** NEVER create Supabase clients at module top-level. ALWAYS use lazy initialization.
 4. **Automation First:** Prefer repo-native scripts and package commands over long ad hoc terminal sequences for recurring tasks.
+5. **Supabase CLI Only:** Schema changes and SQL migrations are applied ONLY via Supabase CLI. NEVER use dashboard SQL editor, ad hoc raw queries, or manual remote execution for tracked schema changes.
+6. **Canonical Flow:** For schema work, follow this order: `supabase login` → `supabase link --project-ref <ref>` → place files in `supabase/migrations/` with timestamp prefix → `npx supabase db push`.
+7. **History Drift Protocol:** If remote migration history is out of sync, first inspect the mismatch, then repair tracking with `supabase migration repair --status reverted <versions>` and only then run `npx supabase db push --include-all` when needed to force local tracked migrations.
+8. **No Manual Hotfixes:** If an urgent production fix starts as raw SQL for investigation, it MUST be converted into a proper migration file before the task is considered done. Repo state and remote state must end aligned.
+9. **Verification After Push:** After every migration push, verify the expected columns/tables/indexes from the application surface that depends on them and record the result in project docs or TASKS when the migration was part of planned work.
 
 ## Deploy Contract
 

@@ -2,33 +2,11 @@ import { generateText } from 'ai';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { recordEvent } from '@/lib/telemetry';
+import { buildReviewPrompt } from '@/lib/prompt';
 
 export const maxDuration = 30;
 
 const REVIEW_LIMIT = { limit: 6, windowMs: 10 * 60 * 1000 };
-
-const REVIEW_PROMPT = `Você é um analista de qualidade do Agente 852 — sistema de inteligência institucional da Polícia Civil de Minas Gerais.
-
-Sua tarefa: analisar uma conversa entre um policial e o Agente 852 e fornecer uma avaliação estruturada.
-
-## REGRAS ABSOLUTAS
-1. NUNCA cite nomes, CPFs, REDS, ou dados pessoais — mesmo que apareçam na conversa.
-2. Foque em padrões sistêmicos, não em casos individuais.
-3. Seja objetivo e construtivo.
-4. RESPONDA EXCLUSIVAMENTE com JSON válido. Sem markdown, sem texto antes ou depois, sem comentários.
-5. Todas as strings devem usar aspas duplas. Não use aspas simples.
-6. Não use caracteres de controle ou quebras de linha dentro de strings JSON.
-
-## FORMATO EXATO (copie esta estrutura):
-{"completude":7,"resumo":"Resumo aqui","temas":["tema1","tema2"],"pontosCegos":["ponto1"],"sugestoes":["pergunta1","pergunta2"],"impacto":"Impacto aqui"}
-
-## CAMPOS
-- completude: número inteiro de 1 a 10
-- resumo: síntese em 2-3 frases (sem quebras de linha)
-- temas: array de strings curtas (ex: infraestrutura, efetivo, assédio, tecnologia)
-- pontosCegos: áreas não exploradas que enriqueceriam o relato
-- sugestoes: perguntas concretas para o policial completar o relato
-- impacto: relevância para inteligência institucional (1 frase)`;
 
 export async function POST(req: Request) {
   try {
@@ -71,7 +49,7 @@ export async function POST(req: Request) {
 
     const result = await generateText({
       model: provider.chat(modelId),
-      system: REVIEW_PROMPT,
+      system: buildReviewPrompt(),
       messages: [{ role: 'user', content: `Analise esta conversa e responda APENAS com JSON válido:\n\n${conversationText}` }],
       temperature: 0.2,
     });

@@ -16,10 +16,12 @@ interface WelcomeScreenProps {
 
 export default function WelcomeScreen({ onQuickAction }: WelcomeScreenProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-full px-4">
+    <div className="flex min-h-full flex-col items-center justify-start px-4 py-8 sm:justify-center sm:py-10">
       <div className="max-w-2xl w-full text-center space-y-8">
         <div className="space-y-4">
-          <Image src="/brand/logo-852.png" alt="Tira-Voz" width={72} height={72} className="w-18 h-18 rounded-2xl object-cover mx-auto shadow-lg shadow-amber-900/30" />
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-neutral-950/70 p-3 shadow-lg shadow-amber-900/20">
+            <Image src="/brand/logo-852.png" alt="Tira-Voz" width={80} height={80} className="h-full w-full object-contain" priority />
+          </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Fala, parceiro. Aqui é o Tira-Voz.
           </h2>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
-  ArrowLeft, Plus, MessageCircle, ChevronUp, Tag,
+  Plus, MessageCircle, ChevronUp, Tag,
   Loader2, AlertCircle, Clock, Bot, User, Send, X,
 } from 'lucide-react';
 import { getOrCreateSessionHash } from '@/lib/session';
@@ -55,8 +55,8 @@ const CATEGORY_COLORS: Record<string, string> = {
 interface CurrentUser {
   id: string;
   email: string;
-  masp?: string;
-  validation_status?: string;
+  display_name?: string;
+  validation_status?: string | null;
 }
 
 export default function IssuesPage() {
@@ -75,12 +75,21 @@ export default function IssuesPage() {
   const [creating, setCreating] = useState(false);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [showLoginNotice, setShowLoginNotice] = useState(false);
+  const [loginNoticeMode, setLoginNoticeMode] = useState<'auth' | 'validation'>('auth');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     setAiReportId(params.get('aiReportId'));
-    fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setCurrentUser(d.user as CurrentUser); }).catch(() => {});
+    const syncAuth = () => {
+      fetch('/api/auth/me')
+        .then(r => r.json())
+        .then(d => setCurrentUser((d.user as CurrentUser) || null))
+        .catch(() => setCurrentUser(null));
+    };
+    syncAuth();
+    window.addEventListener('852-auth-changed', syncAuth);
+    return () => window.removeEventListener('852-auth-changed', syncAuth);
   }, []);
 
   const loadIssues = useCallback(async () => {
@@ -99,7 +108,8 @@ export default function IssuesPage() {
   useEffect(() => { loadIssues(); }, [loadIssues]);
 
   const handleVote = async (issueId: string) => {
-    if (!currentUser?.masp || currentUser.validation_status !== 'approved') {
+    if (!currentUser?.id) {
+      setLoginNoticeMode('auth');
       setShowLoginNotice(true);
       return;
     }
@@ -110,7 +120,13 @@ export default function IssuesPage() {
       body: JSON.stringify({ action: 'vote', issueId, sessionHash }),
     });
     const data = await res.json();
-    if (!res.ok && data?.needsValidatedOfficer) {
+    if (!res.ok && data?.needsAuth) {
+      setLoginNoticeMode('auth');
+      setShowLoginNotice(true);
+      return;
+    }
+    if (!res.ok && data?.needsValidation) {
+      setLoginNoticeMode('validation');
       setShowLoginNotice(true);
       return;
     }
@@ -133,7 +149,8 @@ export default function IssuesPage() {
 
   const handleComment = async (issueId: string) => {
     if (!commentText.trim()) return;
-    if (!currentUser?.masp || currentUser.validation_status !== 'approved') {
+    if (!currentUser?.id) {
+      setLoginNoticeMode('auth');
       setShowLoginNotice(true);
       return;
     }
@@ -143,7 +160,13 @@ export default function IssuesPage() {
       body: JSON.stringify({ action: 'comment', issueId, commentBody: commentText }),
     });
     const data = await res.json();
-    if (!res.ok && data?.needsValidatedOfficer) {
+    if (!res.ok && data?.needsAuth) {
+      setLoginNoticeMode('auth');
+      setShowLoginNotice(true);
+      return;
+    }
+    if (!res.ok && data?.needsValidation) {
+      setLoginNoticeMode('validation');
       setShowLoginNotice(true);
       return;
     }
@@ -180,7 +203,9 @@ export default function IssuesPage() {
               <button onClick={() => setShowLoginNotice(false)} className="text-neutral-500 hover:text-white"><X className="w-4 h-4" /></button>
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed">
-              Para votar e fazer follow-up nas pautas, você precisa estar cadastrado como <strong className="text-white">Policial Civil de MG</strong> com MASP validado.
+              {loginNoticeMode === 'auth'
+                ? <>Para votar e fazer follow-up nas pautas, você precisa ter uma <strong className="text-white">conta protegida</strong>.</>
+                : <>Para votar e fazer follow-up nas pautas, você precisa estar cadastrado como <strong className="text-white">Policial Civil de MG com MASP validado</strong>.</>}
             </p>
             <p className="text-xs text-neutral-500 leading-relaxed">
               Anônimos podem abrir conversas e gerar relatos. A governança dos tópicos públicos exige validação para evitar duplicidade, abuso e dar legitimidade ao processo.
@@ -195,7 +220,7 @@ export default function IssuesPage() {
             </div>
             <div className="flex gap-2">
               <Link
-                href="/chat"
+                href={loginNoticeMode === 'auth' ? '/conta?auth=register&next=/issues' : '/conta?next=/issues'}
                 onClick={() => setShowLoginNotice(false)}
                 className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium text-center transition"
               >
@@ -212,25 +237,26 @@ export default function IssuesPage() {
         </div>
       )}
 
-      <header className="border-b border-neutral-800/50 px-6 py-4 flex items-center justify-between sticky top-0 bg-neutral-950/95 backdrop-blur z-10">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="p-2 rounded-lg hover:bg-neutral-800 transition">
-            <ArrowLeft className="w-4 h-4 text-neutral-400" />
-          </Link>
-          <AlertCircle className="w-5 h-5 text-green-400" />
-          <h1 className="text-lg font-semibold text-white">Tópicos em Discussão</h1>
-          <span className="text-xs text-neutral-500 hidden sm:inline">Leitura aberta. Voto e follow-up só com MASP validado.</span>
-        </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition"
-        >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">Novo Tópico</span>
-        </button>
-      </header>
-
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="rounded-2xl bg-green-900/20 p-3">
+              <AlertCircle className="w-5 h-5 text-green-400" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-white">Tópicos em Discussão</h1>
+              <p className="text-sm text-neutral-400">Leitura aberta. Voto e comentários com conta protegida.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Novo Tópico</span>
+          </button>
+        </div>
+
         {aiReportId && (
           <div className="mb-4 rounded-xl border border-emerald-800/40 bg-emerald-900/10 p-4">
             <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -425,7 +451,7 @@ export default function IssuesPage() {
                       <input
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Adicionar follow-up (somente MASP validado)..."
+                        placeholder="Adicionar comentário com sua conta protegida..."
                         className="flex-1 h-9 px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-green-700 transition"
                         onKeyDown={(e) => e.key === 'Enter' && handleComment(issue.id)}
                       />

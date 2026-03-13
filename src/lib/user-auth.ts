@@ -5,15 +5,16 @@
  * Uses PBKDF2 hashing (Web Crypto API) + session tokens in Supabase.
  */
 
+import { cookies } from 'next/headers';
+import { validateDisplayName } from './name-validator';
 import { getSupabase } from './supabase';
 import { recordEvent } from './telemetry';
-import { cookies } from 'next/headers';
 
 const SESSION_COOKIE = '852_user_session';
-const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 const EMAIL_VERIFICATION_WINDOW_MS = 24 * 60 * 60 * 1000;
 
-type AuthUser = {
+type AuthUserRow = {
   id: string;
   email: string;
   display_name: string | null;
@@ -21,10 +22,45 @@ type AuthUser = {
   lotacao: string | null;
   validation_status: string | null;
   email_verified_at: string | null;
+  email_verification_sent_at?: string | null;
+  password_hash: string | null;
+  auth_provider: string | null;
+  google_sub: string | null;
+  avatar_url: string | null;
+  profile_completed_at: string | null;
+  reputation_points?: number | null;
+  is_active?: boolean | null;
+};
+
+export type CurrentAuthUser = {
+  id: string;
+  email: string;
+  display_name: string | null;
+  displayName: string | null;
+  masp: string | null;
+  lotacao: string | null;
+  validation_status: string | null;
+  email_verified_at: string | null;
+  auth_provider: string | null;
+  avatar_url: string | null;
+  profile_completed_at: string | null;
+  reputation_points: number;
+  has_password: boolean;
+  is_profile_complete: boolean;
 };
 
 function normalizeEmail(email: string) {
   return email.toLowerCase().trim();
+}
+
+function normalizeDisplayName(displayName?: string | null) {
+  const trimmed = displayName?.trim() || '';
+  return trimmed || null;
+}
+
+function normalizeMasp(masp?: string | null) {
+  const digits = (masp || '').replace(/\D/g, '');
+  return digits || null;
 }
 
 function getPublicBaseUrl() {
@@ -32,6 +68,26 @@ function getPublicBaseUrl() {
     return process.env.PUBLIC_BASE_URL.replace(/\/$/, '');
   }
   return process.env.NODE_ENV === 'production' ? 'https://852.egos.ia.br' : 'http://localhost:3000';
+}
+
+function buildPublicUser(user: AuthUserRow): CurrentAuthUser {
+  const isProfileComplete = Boolean(user.profile_completed_at || user.display_name);
+  return {
+    id: user.id,
+    email: user.email,
+    display_name: user.display_name,
+    displayName: user.display_name,
+    masp: user.masp,
+    lotacao: user.lotacao,
+    validation_status: user.validation_status,
+    email_verified_at: user.email_verified_at,
+    auth_provider: user.auth_provider,
+    avatar_url: user.avatar_url,
+    profile_completed_at: user.profile_completed_at,
+    reputation_points: user.reputation_points || 0,
+    has_password: Boolean(user.password_hash),
+    is_profile_complete: isProfileComplete,
+  };
 }
 
 async function sha256(value: string): Promise<string> {
@@ -116,8 +172,6 @@ async function issueEmailVerification(params: { userId: string; email: string; d
   };
 }
 
-// ── Password Hashing (PBKDF2) ───────────────────────────
-
 async function hashPassword(password: string, salt?: string): Promise<{ hash: string; salt: string }> {
   const encoder = new TextEncoder();
   const useSalt = salt || crypto.randomUUID();
@@ -125,9 +179,9 @@ async function hashPassword(password: string, salt?: string): Promise<{ hash: st
   const bits = await crypto.subtle.deriveBits(
     { name: 'PBKDF2', salt: encoder.encode(useSalt), iterations: 100000, hash: 'SHA-256' },
     keyMaterial,
-    256
+    256,
   );
-  const hashHex = Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+  const hashHex = Array.from(new Uint8Array(bits)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
   return { hash: hashHex, salt: useSalt };
 }
 
@@ -136,7 +190,47 @@ async function verifyPassword(password: string, storedHash: string, salt: string
   return hash === storedHash;
 }
 
-// ── User Registration ────────────────────────────────────
+async function createSession(userId: string) {
+  const sb = getSupabase();
+  if (!sb) throw new Error('Supabase não configurado');
+
+  const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`;
+  const expiresAt = new Date(Date.now() + SESSION_DURATION_MS).toISOString();
+
+  await sb.from('user_sessions_852').insert({
+    user_id: userId,
+    token,
+    expires_at: expiresAt,
+  });
+
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: SESSION_DURATION_MS / 1000,
+    path: '/',
+  });
+}
+
+async function updateLastLogin(userId: string) {
+  const sb = getSupabase();
+  if (!sb) return;
+  await sb.from('user_accounts_852').update({ last_login: new Date().toISOString() }).eq('id', userId);
+}
+
+async function getUserById(userId: string) {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data: user } = await sb
+    .from('user_accounts_852')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+    .eq('id', userId)
+    .maybeSingle();
+
+  return (user as AuthUserRow | null) || null;
+}
 
 export async function registerUser(
   email: string,
@@ -147,14 +241,26 @@ export async function registerUser(
 ) {
   const sb = getSupabase();
   if (!sb) return { error: 'Supabase não configurado' };
-  const normalizedEmail = normalizeEmail(email);
 
-  // Validate MASP format (numeric, 5-9 chars)
-  if (masp && !/^\d{5,9}$/.test(masp.trim())) {
-    return { error: 'MASP inválido — deve conter apenas números (5 a 9 dígitos)' };
+  const normalizedEmail = normalizeEmail(email);
+  const normalizedDisplayName = normalizeDisplayName(displayName);
+  const normalizedMasp = normalizeMasp(masp);
+
+  if (!normalizedDisplayName) {
+    return { error: 'Codinome obrigatório' };
   }
 
-  // Check if email already exists
+  if (normalizedDisplayName) {
+    const nameValidation = await validateDisplayName(normalizedDisplayName);
+    if (!nameValidation.valid) {
+      return { error: nameValidation.reason || 'Codinome inválido' };
+    }
+  }
+
+  if (normalizedMasp && !/^\d{8}$/.test(normalizedMasp)) {
+    return { error: 'MASP inválido. Use o número com 8 dígitos. Exemplo: 12571402.' };
+  }
+
   const { data: existing } = await sb
     .from('user_accounts_852')
     .select('id')
@@ -163,39 +269,46 @@ export async function registerUser(
 
   if (existing) return { error: 'Este email já está cadastrado' };
 
-  // Check if MASP already exists
-  if (masp) {
+  if (normalizedMasp) {
     const { data: maspExisting } = await sb
       .from('user_accounts_852')
       .select('id')
-      .eq('masp', masp.trim())
+      .eq('masp', normalizedMasp)
       .maybeSingle();
     if (maspExisting) return { error: 'Este MASP já está cadastrado' };
   }
 
   const { hash, salt } = await hashPassword(password);
+  const now = new Date().toISOString();
 
   const { data, error } = await sb
     .from('user_accounts_852')
     .insert({
       email: normalizedEmail,
       password_hash: `${salt}:${hash}`,
-      display_name: displayName || null,
-      masp: masp?.trim() || null,
+      display_name: normalizedDisplayName,
+      masp: normalizedMasp,
       lotacao: lotacao?.trim() || null,
-      validation_status: masp ? 'pending' : 'none',
+      validation_status: normalizedMasp ? 'pending' : 'none',
       email_verified_at: null,
+      auth_provider: 'password',
+      profile_completed_at: normalizedDisplayName ? now : null,
+      password_set_at: now,
     })
-    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points')
     .single();
 
   if (error) return { error: error.message };
 
-  const verificationResult = await issueEmailVerification({ userId: data.id, email: data.email, displayName: data.display_name });
+  const verificationResult = await issueEmailVerification({
+    userId: data.id,
+    email: data.email,
+    displayName: data.display_name,
+  });
   if ('error' in verificationResult) return { error: verificationResult.error };
 
   return {
-    user: data as AuthUser,
+    user: buildPublicUser(data as AuthUserRow),
     requiresEmailVerification: true,
     verificationEmailSent: verificationResult.sent,
     warning: verificationResult.sent ? undefined : verificationResult.warning,
@@ -203,63 +316,156 @@ export async function registerUser(
   };
 }
 
-// ── User Login ───────────────────────────────────────────
-
 export async function loginUser(email: string, password: string) {
   const sb = getSupabase();
   if (!sb) return { error: 'Supabase não configurado' };
-  const normalizedEmail = normalizeEmail(email);
 
+  const normalizedEmail = normalizeEmail(email);
   const { data: user } = await sb
     .from('user_accounts_852')
-    .select('id, email, display_name, password_hash, is_active, email_verified_at, email_verification_sent_at')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, email_verification_sent_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
     .eq('email', normalizedEmail)
     .maybeSingle();
 
-  if (!user) return { error: 'Email ou senha incorretos' };
-  if (!user.is_active) return { error: 'Conta desativada' };
+  const authUser = user as AuthUserRow | null;
+  if (!authUser) return { error: 'Email ou senha incorretos' };
+  if (!authUser.is_active) return { error: 'Conta desativada' };
+  if (!authUser.password_hash) {
+    return {
+      error: 'Esta conta foi criada com Google. Entre com Google ou defina uma senha na sua conta.',
+      status: 400,
+    };
+  }
 
-  const [salt, storedHash] = user.password_hash.split(':');
+  const [salt, storedHash] = authUser.password_hash.split(':');
   const valid = await verifyPassword(password, storedHash, salt);
   if (!valid) return { error: 'Email ou senha incorretos' };
-  if (!user.email_verified_at && user.email_verification_sent_at) {
+
+  if (!authUser.email_verified_at && authUser.email_verification_sent_at) {
     return {
       error: 'Verifique seu email antes de entrar.',
       status: 403,
       needsEmailVerification: true,
-      email: user.email,
+      email: authUser.email,
     };
   }
 
-  // Create session
-  const token = crypto.randomUUID() + '-' + crypto.randomUUID();
-  const expiresAt = new Date(Date.now() + SESSION_DURATION_MS).toISOString();
-
-  await sb.from('user_sessions_852').insert({
-    user_id: user.id,
-    token,
-    expires_at: expiresAt,
-  });
-
-  // Update last login
-  await sb.from('user_accounts_852').update({ last_login: new Date().toISOString() }).eq('id', user.id);
-
-  // Set cookie
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: SESSION_DURATION_MS / 1000,
-    path: '/',
-  });
+  await createSession(authUser.id);
+  await updateLastLogin(authUser.id);
 
   return {
-    user: { id: user.id, email: user.email, displayName: user.display_name },
+    user: buildPublicUser(authUser),
   };
 }
 
-// ── Session Check ────────────────────────────────────────
+export async function loginWithGoogleIdentity(profile: {
+  sub: string;
+  email: string;
+  email_verified?: boolean;
+  picture?: string;
+}) {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado' };
+
+  if (!profile.sub || !profile.email) {
+    return { error: 'Google não retornou identidade suficiente.' };
+  }
+
+  if (profile.email_verified === false) {
+    return { error: 'O email retornado pelo Google não está verificado.' };
+  }
+
+  const normalizedEmail = normalizeEmail(profile.email);
+  let finalUser: AuthUserRow | null = null;
+  let created = false;
+  let linked = false;
+
+  const { data: byGoogle } = await sb
+    .from('user_accounts_852')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+    .eq('google_sub', profile.sub)
+    .maybeSingle();
+
+  if (byGoogle) {
+    const { data: updated } = await sb
+      .from('user_accounts_852')
+      .update({
+        email: normalizedEmail,
+        avatar_url: profile.picture || byGoogle.avatar_url || null,
+        email_verified_at: byGoogle.email_verified_at || new Date().toISOString(),
+        auth_provider: byGoogle.password_hash ? 'hybrid' : 'google',
+      })
+      .eq('id', byGoogle.id)
+      .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+      .single();
+
+    finalUser = (updated as AuthUserRow | null) || null;
+  } else {
+    const { data: byEmail } = await sb
+      .from('user_accounts_852')
+      .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+
+    if (byEmail?.google_sub && byEmail.google_sub !== profile.sub) {
+      return { error: 'Este email já está vinculado a outra conta Google.' };
+    }
+
+    if (byEmail) {
+      linked = true;
+      const { data: updated } = await sb
+        .from('user_accounts_852')
+        .update({
+          google_sub: profile.sub,
+          avatar_url: profile.picture || byEmail.avatar_url || null,
+          email_verified_at: byEmail.email_verified_at || new Date().toISOString(),
+          auth_provider: byEmail.password_hash ? 'hybrid' : 'google',
+        })
+        .eq('id', byEmail.id)
+        .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+        .single();
+
+      finalUser = (updated as AuthUserRow | null) || null;
+    } else {
+      created = true;
+      const { data: inserted, error } = await sb
+        .from('user_accounts_852')
+        .insert({
+          email: normalizedEmail,
+          password_hash: null,
+          display_name: null,
+          validation_status: 'none',
+          email_verified_at: new Date().toISOString(),
+          auth_provider: 'google',
+          google_sub: profile.sub,
+          avatar_url: profile.picture || null,
+          profile_completed_at: null,
+        })
+        .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+        .single();
+
+      if (error) return { error: error.message };
+      finalUser = inserted as AuthUserRow;
+    }
+  }
+
+  if (!finalUser) {
+    return { error: 'Não foi possível concluir o login com Google.' };
+  }
+  if (finalUser.is_active === false) {
+    return { error: 'Conta desativada' };
+  }
+
+  await createSession(finalUser.id);
+  await updateLastLogin(finalUser.id);
+
+  return {
+    user: buildPublicUser(finalUser),
+    created,
+    linked,
+    needsOnboarding: !Boolean(finalUser.profile_completed_at || finalUser.display_name),
+  };
+}
 
 export async function getCurrentUser() {
   const sb = getSupabase();
@@ -277,13 +483,129 @@ export async function getCurrentUser() {
 
   if (!session || new Date(session.expires_at) < new Date()) return null;
 
+  const user = await getUserById(session.user_id);
+  if (!user) return null;
+  return buildPublicUser(user);
+}
+
+export async function updateCurrentUserProfile(input: {
+  displayName: string;
+  masp?: string | null;
+  lotacao?: string | null;
+}) {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado' };
+
+  const currentUser = await getCurrentUser();
+  if (!currentUser) return { error: 'Sessão inválida', status: 401 };
+
+  const normalizedDisplayName = normalizeDisplayName(input.displayName);
+  if (!normalizedDisplayName) return { error: 'Codinome obrigatório', status: 400 };
+
+  const nameValidation = await validateDisplayName(normalizedDisplayName);
+  if (!nameValidation.valid) {
+    return { error: nameValidation.reason || 'Codinome inválido', status: 400, suggestions: nameValidation.suggestions };
+  }
+
+  const normalizedMasp = normalizeMasp(input.masp);
+  if (normalizedMasp && !/^\d{8}$/.test(normalizedMasp)) {
+    return { error: 'MASP inválido. Use o número com 8 dígitos.', status: 400 };
+  }
+
+  const { data: existing } = await sb
+    .from('user_accounts_852')
+    .select('id, masp, validation_status')
+    .eq('id', currentUser.id)
+    .single();
+
+  if (!existing) {
+    return { error: 'Conta não encontrada', status: 404 };
+  }
+
+  if (normalizedMasp && normalizedMasp !== existing.masp) {
+    const { data: maspExisting } = await sb
+      .from('user_accounts_852')
+      .select('id')
+      .eq('masp', normalizedMasp)
+      .neq('id', currentUser.id)
+      .maybeSingle();
+
+    if (maspExisting) {
+      return { error: 'Este MASP já está vinculado a outra conta.', status: 400 };
+    }
+  }
+
+  let validationStatus = existing.validation_status || 'none';
+  if (!normalizedMasp) {
+    validationStatus = 'none';
+  } else if (normalizedMasp !== existing.masp || validationStatus === 'none' || validationStatus === 'rejected') {
+    validationStatus = 'pending';
+  }
+
+  const { data: updated, error } = await sb
+    .from('user_accounts_852')
+    .update({
+      display_name: normalizedDisplayName,
+      masp: normalizedMasp,
+      lotacao: input.lotacao?.trim() || null,
+      validation_status: validationStatus,
+      profile_completed_at: new Date().toISOString(),
+    })
+    .eq('id', currentUser.id)
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+    .single();
+
+  if (error) return { error: error.message, status: 500 };
+
+  await recordEvent({ event_type: 'user_registered', metadata: { userId: currentUser.id, action: 'profile_completed' } });
+
+  return { user: buildPublicUser(updated as AuthUserRow) };
+}
+
+export async function updateCurrentUserPassword(input: {
+  currentPassword?: string;
+  newPassword: string;
+}) {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado' };
+
+  const currentUser = await getCurrentUser();
+  if (!currentUser) return { error: 'Sessão inválida', status: 401 };
+  if (!input.newPassword || input.newPassword.length < 8) {
+    return { error: 'A nova senha deve ter pelo menos 8 caracteres.', status: 400 };
+  }
+
   const { data: user } = await sb
     .from('user_accounts_852')
-    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at')
-    .eq('id', session.user_id)
-    .maybeSingle();
+    .select('id, password_hash, google_sub')
+    .eq('id', currentUser.id)
+    .single();
 
-  return user || null;
+  if (!user) {
+    return { error: 'Conta não encontrada', status: 404 };
+  }
+
+  if (user.password_hash) {
+    if (!input.currentPassword) {
+      return { error: 'Informe a senha atual para alterá-la.', status: 400 };
+    }
+    const [salt, storedHash] = user.password_hash.split(':');
+    const valid = await verifyPassword(input.currentPassword, storedHash, salt);
+    if (!valid) return { error: 'Senha atual incorreta.', status: 400 };
+  }
+
+  const { hash, salt } = await hashPassword(input.newPassword);
+  const { error } = await sb
+    .from('user_accounts_852')
+    .update({
+      password_hash: `${salt}:${hash}`,
+      password_set_at: new Date().toISOString(),
+      auth_provider: user.google_sub ? 'hybrid' : 'password',
+    })
+    .eq('id', currentUser.id);
+
+  if (error) return { error: error.message, status: 500 };
+  return { success: true };
 }
 
 export async function verifyEmailToken(token: string) {
@@ -373,8 +695,6 @@ export async function resendVerificationEmail(email: string) {
     debugVerificationUrl: verificationResult.debugVerificationUrl,
   };
 }
-
-// ── Logout ───────────────────────────────────────────────
 
 export async function logoutUser() {
   const sb = getSupabase();

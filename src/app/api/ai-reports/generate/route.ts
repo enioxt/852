@@ -1,6 +1,7 @@
 import { generateText } from 'ai';
 import { getModelConfig } from '@/lib/ai-provider';
 import { recordEvent } from '@/lib/telemetry';
+import { buildIntelligenceReportPrompt } from '@/lib/prompt';
 import {
   getSupabase,
   saveAIReport,
@@ -9,37 +10,6 @@ import {
 } from '@/lib/supabase';
 
 const AI_REPORT_TRIGGER_COUNT = 5;
-
-const REPORT_PROMPT = `Você é um analista de inteligência institucional da Polícia Civil de Minas Gerais.
-Sua função é analisar conversas anônimas de policiais civis e gerar um relatório completo de inteligência.
-
-## INSTRUÇÕES
-1. Analise TODAS as conversas fornecidas (relatos brutos dos policiais + respostas do agente IA)
-2. Analise TODAS as revisões de IA dos relatórios (sugestões, pontos cegos, temas identificados)
-3. Identifique padrões, problemas recorrentes, áreas críticas
-4. Gere insights acionáveis para a gestão
-5. Liste TÓPICOS PENDENTES: sugestões da IA que os policiais NÃO seguiram — estes devem virar issues para discussão
-
-## FORMATO DE RESPOSTA (JSON ESTRITO)
-Responda APENAS com JSON válido:
-{
-  "titulo": "Relatório de Inteligência #N — Período",
-  "resumo_executivo": "Resumo em 2-3 parágrafos...",
-  "insights": [
-    {"titulo": "...", "descricao": "...", "categoria": "infraestrutura|efetivo|assedio|plantao|carreira|tecnologia|outro", "severidade": "critica|alta|media|baixa", "evidencias": "Citações anonimizadas..."}
-  ],
-  "padroes_detectados": ["padrão 1", "padrão 2"],
-  "topicos_pendentes": [
-    {"titulo": "...", "descricao": "...", "categoria": "...", "origem": "ai_suggestion"}
-  ],
-  "recomendacoes": ["recomendação 1", "recomendação 2"],
-  "metricas": {
-    "total_conversas_analisadas": 0,
-    "total_relatorios_analisados": 0,
-    "temas_mais_frequentes": ["tema1", "tema2"],
-    "severidade_media": "alta|media|baixa"
-  }
-}`;
 
 export async function POST(req: Request) {
   try {
@@ -107,7 +77,7 @@ export async function POST(req: Request) {
 
     const result = await generateText({
       model: provider.chat(modelId),
-      system: REPORT_PROMPT,
+      system: buildIntelligenceReportPrompt(),
       messages: [{ role: 'user', content: userMessage }],
       temperature: 0.3,
     });

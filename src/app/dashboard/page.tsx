@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Bot, ArrowLeft, BarChart3, Users, AlertTriangle, TrendingUp, Search } from 'lucide-react';
-import Link from 'next/link';
+import { Bot, BarChart3, Users, AlertTriangle, TrendingUp, Search } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line
@@ -80,23 +79,17 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800 shadow-sm sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="p-2 hover:bg-slate-800 rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5 text-slate-400" />
-          </Link>
-          <div className="p-2 bg-purple-600/20 rounded-full">
+      <main className="p-6 max-w-7xl mx-auto space-y-6">
+        <div className="flex items-start gap-3">
+          <div className="p-3 bg-purple-600/20 rounded-2xl">
             <BarChart3 className="w-5 h-5 text-purple-500" />
           </div>
           <div>
             <h1 className="font-bold text-lg leading-tight text-white">Painel de Inteligência</h1>
-            <p className="text-xs text-slate-400">EGOS Insights</p>
+            <p className="text-sm text-slate-400">Leitura operacional das conversas, relatos e tópicos ativos do Tira-Voz.</p>
           </div>
         </div>
-      </header>
 
-      <main className="p-6 max-w-7xl mx-auto space-y-6">
         {!configured && (
           <div className="p-4 bg-amber-900/20 border border-amber-800/40 rounded-2xl text-sm text-amber-300">
             O painel depende do Supabase configurado no servidor para exibir métricas reais.

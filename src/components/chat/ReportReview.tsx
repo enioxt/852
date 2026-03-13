@@ -147,11 +147,7 @@ export default function ReportReview({ messages, conversationId, serverConversat
 
   const handleShare = async () => {
     const sanitized = getSanitizedMessages();
-    const reporterTypeLabel = currentUser?.masp && currentUser.validation_status === 'approved'
-      ? 'Policial validado'
-      : currentUser
-        ? 'Conta vinculada'
-        : 'Relator anônimo';
+    const reporterTypeLabel = currentUser ? 'Conta vinculada' : 'Relator anônimo';
     const formattedReport = buildFormattedReport({
       messages: sanitized,
       reviewData,
@@ -223,11 +219,7 @@ export default function ReportReview({ messages, conversationId, serverConversat
 
   const shareWhatsApp = () => {
     const shareUrl = reportId ? getShareUrl(reportId) : (typeof window !== 'undefined' ? `${window.location.origin}/chat` : '');
-    const reporterTypeLabel = currentUser?.masp && currentUser.validation_status === 'approved'
-      ? 'Policial validado'
-      : currentUser
-        ? 'Conta vinculada'
-        : 'Relator anônimo';
+    const reporterTypeLabel = currentUser ? 'Conta vinculada' : 'Relator anônimo';
     const formattedReport = buildFormattedReport({
       messages: getSanitizedMessages(),
       reviewData,
@@ -241,11 +233,7 @@ export default function ReportReview({ messages, conversationId, serverConversat
   };
 
   const userMessageCount = messages.filter(m => m.role === 'user').length;
-  const reporterTypeLabel = currentUser?.masp && currentUser.validation_status === 'approved'
-    ? 'Policial validado'
-    : currentUser
-      ? 'Conta vinculada'
-      : 'Relator anônimo';
+  const reporterTypeLabel = currentUser ? 'Conta vinculada' : 'Relator anônimo';
   const formattedReport = buildFormattedReport({
     messages: getSanitizedMessages(),
     reviewData,

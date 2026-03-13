@@ -1,6 +1,7 @@
 import { generateText } from 'ai';
 import { getModelConfig } from '@/lib/ai-provider';
 import { getSupabase } from '@/lib/supabase';
+import { buildConversationSummaryPrompt } from '@/lib/prompt';
 
 const MAX_MEMORY_ITEMS = 3;
 
@@ -16,7 +17,7 @@ export async function summarizeConversation(messages: Array<{ role: string; cont
 
     const result = await generateText({
       model: provider.chat(modelId),
-      system: 'Resuma a conversa em até 6 bullets curtos. Foque em contexto institucional, problemas relatados, padrões recorrentes, soluções sugeridas e pendências. Nunca inclua nomes, identificadores, CPFs, emails, números de processo ou detalhes sensíveis. Responda em texto simples.',
+      system: buildConversationSummaryPrompt(),
       prompt: transcript,
       temperature: 0.2,
     });

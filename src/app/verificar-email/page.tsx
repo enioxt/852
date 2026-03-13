@@ -98,7 +98,7 @@ function VerifyEmailContent() {
         return 'Aguarde alguns segundos enquanto validamos o token enviado para sua conta.';
       case 'success':
         return result.validationStatus === 'pending'
-          ? 'Seu email foi validado. Se você informou MASP, a aprovação institucional continua pendente no painel administrativo.'
+          ? 'Seu email foi validado. Se você informou MASP, esses dados continuam privados e vinculados apenas ao contexto institucional da sua conta.'
           : 'Seu acesso foi ativado. Você já pode entrar no Tira-Voz.';
       case 'already_verified':
         return 'Você pode entrar normalmente com o email e a senha cadastrados.';

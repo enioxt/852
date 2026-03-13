@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, BarChart3, FileText, AlertCircle, Home } from 'lucide-react';
+import { MessageSquare, Scale, FileText, AlertCircle, Home } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Início', icon: Home },
   { href: '/chat', label: 'Chat', icon: MessageSquare },
   { href: '/issues', label: 'Fórum', icon: AlertCircle },
   { href: '/reports', label: 'Relatos', icon: FileText },
-  { href: '/dashboard', label: 'Painel', icon: BarChart3 },
+  { href: '/legislacao', label: 'Leis', icon: Scale },
 ];
 
 export default function MobileNav() {

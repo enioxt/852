@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  ArrowLeft, FileText, Loader2, Download, Eye, Sparkles,
+  FileText, Loader2, Download, Eye, Sparkles,
   Users, Trash2, MessageCircle, ArrowRight, Shield, Clock, Bot, AlertCircle
 } from 'lucide-react';
 import { listSharedReports, deleteReport, type Report, loadAllPublicReports, deleteReportFromServer } from '@/lib/report-store';
@@ -172,17 +172,14 @@ export default function ReportsPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col">
-      <header className="flex items-center justify-between p-4 bg-neutral-900 border-b border-neutral-800 sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="p-2 hover:bg-neutral-800 rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5 text-neutral-400" />
-          </Link>
-          <div className="p-2 bg-blue-600/20 rounded-full">
+      <div className="mx-auto flex w-full max-w-4xl items-start justify-between gap-4 px-4 pt-6 sm:px-6">
+        <div className="flex items-start gap-3">
+          <div className="rounded-2xl bg-blue-600/20 p-3">
             <FileText className="w-5 h-5 text-blue-400" />
           </div>
           <div>
             <h1 className="font-bold text-lg leading-tight text-white">Relatórios</h1>
-            <p className="text-xs text-neutral-400">Relatos compartilhados e gerador de relatórios</p>
+            <p className="text-sm text-neutral-400">Relatos compartilhados, relatórios de inteligência e gerador HTML.</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -192,10 +189,10 @@ export default function ReportsPage() {
             </button>
           )}
         </div>
-      </header>
+      </div>
 
       {/* Tabs */}
-      <div className="border-b border-neutral-800 bg-neutral-950">
+      <div className="mt-4 border-b border-neutral-800 bg-neutral-950">
         <div className="max-w-4xl mx-auto flex">
           <button
             onClick={() => setTab('shared')}

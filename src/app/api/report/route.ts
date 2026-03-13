@@ -1,6 +1,7 @@
 import { generateText } from 'ai';
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { buildHtmlReportPrompt } from '@/lib/prompt';
 
 export const maxDuration = 60;
 
@@ -8,25 +9,6 @@ const REPORT_LIMIT = {
   limit: 6,
   windowMs: 10 * 60 * 1000,
 };
-
-const REPORT_SYSTEM_PROMPT = `Você é um gerador de relatórios HTML para a plataforma Tira-Voz.
-Ao receber um prompt do usuário, gere um relatório HTML COMPLETO e profissional.
-
-REGRAS:
-1. Retorne APENAS o código HTML completo (com <!DOCTYPE html>, <head>, <body>)
-2. Use CSS inline ou <style> no <head> — NÃO use links externos de CSS
-3. Design: dark mode (bg #0f172a, text #e2e8f0), fontes sans-serif, visual profissional estilo Palantir
-4. Inclua: título, data/hora, seções com ícones Unicode, gráficos em texto/ASCII se necessário
-5. O HTML deve ser auto-contido e renderizável standalone
-6. NUNCA inclua dados reais de PII — use dados fictícios se necessário
-7. Rodapé: "Relatório gerado por Tira-Voz — EGOS Ecosystem"
-8. Responsivo (mobile-friendly)
-
-ESTILO VISUAL:
-- Header com gradiente azul
-- Cards com borda sutil
-- Tabelas estilizadas
-- Badges coloridos para prioridades (Crítica=vermelho, Alta=laranja, Média=amarelo, Baixa=verde)`;
 
 export async function POST(req: Request) {
   try {
@@ -67,7 +49,7 @@ export async function POST(req: Request) {
 
     const { text } = await generateText({
       model: provider.chat(modelId),
-      system: REPORT_SYSTEM_PROMPT,
+      system: buildHtmlReportPrompt(),
       prompt: `Gere um relatório HTML completo para: ${prompt}`,
       temperature: 0.5,
     });

@@ -3,8 +3,12 @@ import { recordEvent } from '@/lib/telemetry';
 import { getCurrentUser } from '@/lib/user-auth';
 import { queueIssueNotification } from '@/lib/notifications';
 
-function isValidatedOfficer(user: Awaited<ReturnType<typeof getCurrentUser>>) {
-  return Boolean(user?.masp && user.validation_status === 'approved');
+function isAuthenticatedParticipant(user: Awaited<ReturnType<typeof getCurrentUser>>) {
+  return Boolean(user?.id);
+}
+
+function hasValidatedMasp(user: Awaited<ReturnType<typeof getCurrentUser>>) {
+  return Boolean(user?.id && user.validation_status === 'approved');
 }
 
 export async function GET(req: Request) {
@@ -26,8 +30,11 @@ export async function POST(req: Request) {
     if (action === 'vote') {
       const { issueId, sessionHash } = body;
       const user = await getCurrentUser();
-      if (!isValidatedOfficer(user)) {
-        return Response.json({ error: 'Apenas policiais com MASP validado podem votar.', needsValidatedOfficer: true }, { status: 403 });
+      if (!isAuthenticatedParticipant(user)) {
+        return Response.json({ error: 'Entre com sua conta para votar.', needsAuth: true }, { status: 403 });
+      }
+      if (!hasValidatedMasp(user)) {
+        return Response.json({ error: 'Seu MASP precisa estar validado para votar.', needsValidation: true }, { status: 403 });
       }
       if (!issueId || (!sessionHash && !user?.id)) {
         return Response.json({ error: 'issueId e identidade do votante obrigatórios' }, { status: 400 });
@@ -47,8 +54,11 @@ export async function POST(req: Request) {
     if (action === 'comment') {
       const { issueId, commentBody } = body;
       const user = await getCurrentUser();
-      if (!isValidatedOfficer(user)) {
-        return Response.json({ error: 'Apenas policiais com MASP validado podem fazer follow-up.', needsValidatedOfficer: true }, { status: 403 });
+      if (!isAuthenticatedParticipant(user)) {
+        return Response.json({ error: 'Entre com sua conta para comentar.', needsAuth: true }, { status: 403 });
+      }
+      if (!hasValidatedMasp(user)) {
+        return Response.json({ error: 'Seu MASP precisa estar validado para comentar.', needsValidation: true }, { status: 403 });
       }
       if (!issueId || !commentBody) return Response.json({ error: 'issueId e body obrigatórios' }, { status: 400 });
       const id = await addIssueComment(issueId, commentBody);

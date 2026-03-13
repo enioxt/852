@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClarityAnalytics from "@/components/ClarityAnalytics";
 import MobileNav from "@/components/MobileNav";
+import SiteHeader from "@/components/SiteHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,10 +60,13 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <ClarityAnalytics />
-        {children}
+        <SiteHeader />
+        <div className="flex flex-1 flex-col min-h-0">
+          {children}
+        </div>
         <MobileNav />
       </body>
     </html>

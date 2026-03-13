@@ -14,6 +14,7 @@ interface SidebarProps {
   onSelectConversation: (id: string) => void;
   onNewConversation: () => void;
   onShowFAQ: () => void;
+  requestedAuthMode?: 'login' | 'register' | null;
 }
 
 function timeAgo(ts: number): string {
@@ -28,11 +29,15 @@ function timeAgo(ts: number): string {
   return new Date(ts).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
 }
 
-export default function Sidebar({ isOpen, onToggle, activeConversationId, onSelectConversation, onNewConversation, onShowFAQ }: SidebarProps) {
+function normalizeMaspInput(value: string) {
+  return value.replace(/\D/g, '').slice(0, 8);
+}
+
+export default function Sidebar({ isOpen, onToggle, activeConversationId, onSelectConversation, onNewConversation, onShowFAQ, requestedAuthMode = null }: SidebarProps) {
   const [, forceRefresh] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [showAuth, setShowAuth] = useState(requestedAuthMode !== null);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>(requestedAuthMode ?? 'login');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authNickname, setAuthNickname] = useState('');
@@ -53,6 +58,17 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(d => { if (d.user) setCurrentUser(d.user); }).catch(() => { });
   }, []);
+
+  useEffect(() => {
+    if (!showAuth || authMode !== 'register' || authNickname.trim()) return;
+
+    fetch('/api/auth/generate-nickname')
+      .then(r => r.json())
+      .then(d => {
+        if (d.nicknames?.[0]) setAuthNickname(d.nicknames[0]);
+      })
+      .catch(() => {});
+  }, [authMode, authNickname, showAuth]);
 
   const handleAuth = async () => {
     setAuthError('');
@@ -171,6 +187,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
 
   const conversationScope = getIdentityKey(typeof window === 'undefined' ? null : getOrCreateSessionHash(), currentUser?.id) || undefined;
   const conversations: Conversation[] = listConversations(conversationScope);
+  const isDraftSelected = activeConversationId === null;
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -190,7 +207,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
       <div className={`flex items-center ${isOpen ? 'justify-between' : 'justify-center'} p-3 h-14`}>
         {isOpen && (
           <div className="flex items-center gap-2 min-w-0">
-            <Image src="/brand/logo-852.png" alt="Tira-Voz" width={28} height={28} className="w-7 h-7 rounded-lg object-cover flex-shrink-0" />
+            <Image src="/brand/logo-852.png" alt="Tira-Voz" width={28} height={28} className="w-7 h-7 rounded-lg object-contain bg-neutral-950/70 p-0.5 flex-shrink-0" />
             <span className="text-sm font-semibold text-white truncate">Tira-Voz</span>
           </div>
         )}
@@ -208,7 +225,11 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
         <button
           onClick={onNewConversation}
           className={`flex items-center gap-2 w-full rounded-lg text-sm font-medium transition
-            ${isOpen ? 'px-3 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white' : 'justify-center p-2.5 hover:bg-neutral-800 text-neutral-400 hover:text-white'}`}
+            ${isOpen
+              ? isDraftSelected
+                ? 'px-3 py-2.5 bg-neutral-800 text-white'
+                : 'px-3 py-2.5 text-neutral-300 hover:bg-neutral-800 hover:text-white'
+              : 'justify-center p-2.5 hover:bg-neutral-800 text-neutral-400 hover:text-white'}`}
           title="Nova conversa"
         >
           <MessageSquarePlus className="w-4 h-4 flex-shrink-0" />
@@ -341,15 +362,16 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
                   onClick={() => setShowMaspFields(!showMaspFields)}
                   className="w-full text-[10px] text-neutral-500 hover:text-neutral-300 text-left transition"
                 >
-                  {showMaspFields ? '▾ Ocultar campos MASP' : '▸ Policial civil? Adicione MASP para votar e fazer follow-up'}
+                  {showMaspFields ? '▾ Ocultar dados institucionais opcionais' : '▸ Se quiser, adicione MASP e lotação para contextualizar sua atuação'}
                 </button>
                 {showMaspFields && (
                   <div className="space-y-2 pl-2 border-l-2 border-neutral-800">
                     <input
                       value={authMasp}
-                      onChange={e => setAuthMasp(e.target.value.replace(/\D/g, ''))}
-                      placeholder="MASP (obrigatório para governança pública)"
-                      maxLength={9}
+                      onChange={e => setAuthMasp(normalizeMaspInput(e.target.value))}
+                      placeholder="MASP opcional, ex: 12571402"
+                      inputMode="numeric"
+                      maxLength={8}
                       className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
                     />
                     <input
@@ -358,7 +380,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
                       placeholder="Lotação atual (ex: 1ª DPCAMI BH)"
                       className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
                     />
-                    <p className="text-[9px] text-neutral-600">MASP e lotação nunca são exibidos publicamente. Após validação manual, sua conta pode votar e conduzir follow-ups nos tópicos públicos.</p>
+                    <p className="text-[9px] text-neutral-600">Aceita formatos como 1.257.140-2 ou 1257140-2 e converte para 12571402. MASP e lotação nunca são exibidos publicamente.</p>
                   </div>
                 )}
               </>
@@ -422,7 +444,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
               }}
               className="w-full text-[10px] text-neutral-500 hover:text-white transition"
             >
-              {authMode === 'login' ? 'Não tem conta? Cadastrar como policial civil' : 'Já tem conta? Entrar'}
+              {authMode === 'login' ? 'Não tem conta? Criar identidade protegida' : 'Já tem conta? Entrar'}
             </button>
             {authMode === 'register' && (
               <p className="text-[9px] text-neutral-600 leading-relaxed">
@@ -447,8 +469,8 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
                   <span className="text-[10px] text-neutral-300 truncate block">{currentUser.display_name || currentUser.displayName || 'Anônimo'}</span>
                   <div className="flex items-center gap-1">
                     {currentUser.masp && (
-                      <span className={`text-[9px] px-1 py-0.5 rounded ${currentUser.validation_status === 'approved' ? 'bg-green-900/30 text-green-400' : 'bg-amber-900/30 text-amber-400'}`}>
-                        MASP {currentUser.validation_status === 'approved' ? '✓' : 'pendente'}
+                      <span className="text-[9px] px-1 py-0.5 rounded bg-blue-900/30 text-blue-400">
+                        MASP informado
                       </span>
                     )}
                     {typeof currentUser.reputation_points === 'number' && currentUser.reputation_points > 0 && (
@@ -465,15 +487,15 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
             )}
           </div>
         ) : (
-          <button
-            onClick={() => { setShowAuth(true); setAuthMode('login'); }}
+          <Link
+            href="/conta?auth=login&next=/chat"
             className={`flex items-center gap-2 w-full rounded-lg text-neutral-500 hover:text-blue-400 hover:bg-neutral-800 transition
               ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
             title="Entrar / Criar conta"
           >
             <User className="w-4 h-4 flex-shrink-0" />
             {isOpen && <span>Entrar / Criar conta</span>}
-          </button>
+          </Link>
         )}
 
         <Link
