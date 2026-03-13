@@ -1,10 +1,12 @@
 import { cookies } from 'next/headers';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 const GOOGLE_STATE_COOKIE = '852_google_oauth';
 const GOOGLE_AUTH_BASE = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_USERINFO_URL = 'https://openidconnect.googleapis.com/v1/userinfo';
 const GOOGLE_STATE_TTL_MS = 10 * 60 * 1000;
+const GOOGLE_JWKS = createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
 
 type GoogleStatePayload = {
   state: string;
@@ -24,8 +26,16 @@ export type GoogleUserProfile = {
   picture?: string;
 };
 
+function getGoogleClientIds() {
+  return Array.from(new Set([
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    process.env.AUTH_GOOGLE_ID,
+  ].filter((value): value is string => Boolean(value && value.trim())).map((value) => value.trim())));
+}
+
 function getGoogleClientId() {
-  return process.env.GOOGLE_CLIENT_ID || process.env.AUTH_GOOGLE_ID || '';
+  return getGoogleClientIds()[0] || '';
 }
 
 function getGoogleClientSecret() {
@@ -60,8 +70,41 @@ function normalizeNextPath(nextPath?: string | null) {
   return nextPath;
 }
 
+export function hasGoogleIdentityConfig() {
+  return getGoogleClientIds().length > 0;
+}
+
 export function hasGoogleOAuthConfig() {
   return Boolean(getGoogleClientId() && getGoogleClientSecret());
+}
+
+export async function verifyGoogleIdToken(idToken: string): Promise<GoogleUserProfile> {
+  const audiences = getGoogleClientIds();
+  if (!idToken?.trim()) {
+    throw new Error('Credencial Google ausente.');
+  }
+  if (audiences.length === 0) {
+    throw new Error('Google Identity não configurado. Defina GOOGLE_CLIENT_ID ou NEXT_PUBLIC_GOOGLE_CLIENT_ID.');
+  }
+
+  const { payload } = await jwtVerify(idToken, GOOGLE_JWKS, {
+    issuer: ['https://accounts.google.com', 'accounts.google.com'],
+    audience: audiences,
+  });
+
+  if (typeof payload.sub !== 'string' || typeof payload.email !== 'string') {
+    throw new Error('Google não retornou identidade suficiente.');
+  }
+
+  return {
+    sub: payload.sub,
+    email: payload.email,
+    email_verified: Boolean(payload.email_verified),
+    name: typeof payload.name === 'string' ? payload.name : undefined,
+    given_name: typeof payload.given_name === 'string' ? payload.given_name : undefined,
+    family_name: typeof payload.family_name === 'string' ? payload.family_name : undefined,
+    picture: typeof payload.picture === 'string' ? payload.picture : undefined,
+  };
 }
 
 export async function createGoogleAuthUrl(input?: { nextPath?: string | null; mode?: 'login' | 'register' }) {

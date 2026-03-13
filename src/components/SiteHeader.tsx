@@ -17,6 +17,7 @@ const navItems = [
   { href: '/', label: 'Início' },
   { href: '/chat', label: 'Chat' },
   { href: '/sugestao', label: 'Sugestão' },
+  { href: '/papo-de-corredor', label: 'Corredor' },
   { href: '/issues', label: 'Tópicos' },
   { href: '/legislacao', label: 'Legislação' },
   { href: '/reports', label: 'Relatórios' },

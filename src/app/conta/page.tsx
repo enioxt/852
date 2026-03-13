@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import { Loader2, LogOut, Mail, RefreshCw, Shield, Trophy, User, Waypoints, Lock, BadgeCheck } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Flame, Loader2, Lock, LogOut, Mail, RefreshCw, Shield, Trophy, User, Waypoints } from 'lucide-react';
+import GoogleIdentityButton from '@/components/auth/GoogleIdentityButton';
 
 type CurrentUser = {
   id: string;
@@ -16,6 +17,7 @@ type CurrentUser = {
   reputation_points?: number;
   validation_status?: string | null;
   auth_provider?: string | null;
+  avatar_url?: string | null;
   has_password?: boolean;
   is_profile_complete?: boolean;
 } | null;
@@ -59,15 +61,22 @@ function getValidationLabel(status?: string | null) {
 function AccountPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const requestedAuthMode = searchParams.get('auth') === 'register' ? 'register' : 'login';
+  const requestedAuthMode = searchParams.get('auth') === 'register'
+    ? 'register'
+    : searchParams.get('auth') === 'forgot'
+      ? 'forgot'
+      : searchParams.get('auth') === 'reset'
+        ? 'reset'
+        : 'login';
   const nextPath = normalizeNextPath(searchParams.get('next'));
   const onboardingRequested = searchParams.get('onboarding') === '1';
+  const resetToken = searchParams.get('token') || '';
   const initialError = getFriendlyAuthError(searchParams.get('error'));
 
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>(requestedAuthMode);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot' | 'reset'>(requestedAuthMode);
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [registerNickname, setRegisterNickname] = useState('');
@@ -78,7 +87,11 @@ function AccountPageContent() {
   const [authNotice, setAuthNotice] = useState('');
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState('');
   const [authDebugVerificationUrl, setAuthDebugVerificationUrl] = useState('');
+  const [authDebugResetUrl, setAuthDebugResetUrl] = useState('');
   const [resendingVerification, setResendingVerification] = useState(false);
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetPasswordConfirm, setResetPasswordConfirm] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileNotice, setProfileNotice] = useState('');
   const [profileError, setProfileError] = useState('');
@@ -144,11 +157,20 @@ function AccountPageContent() {
     }
   }, [authMode, currentUser, registerNickname]);
 
+  const finishAuthenticatedRedirect = (targetPath: string) => {
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('852-auth-changed'));
+    if (targetPath !== '/conta') router.push(targetPath);
+    else router.replace(targetPath);
+    router.refresh();
+  };
+
   const handleAuth = async () => {
+    if (authMode !== 'login' && authMode !== 'register') return;
     setAuthLoading(true);
     setAuthError('');
     setAuthNotice('');
     setAuthDebugVerificationUrl('');
+    setAuthDebugResetUrl('');
     try {
       const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
       const payload = authMode === 'login'
@@ -189,10 +211,7 @@ function AccountPageContent() {
       }
 
       setCurrentUser(data.user);
-      window.dispatchEvent(new Event('852-auth-changed'));
-      if (nextPath !== '/conta') router.push(nextPath);
-      else router.replace('/conta');
-      router.refresh();
+      finishAuthenticatedRedirect(nextPath);
     } catch {
       setAuthError('Erro de conexão');
     } finally {
@@ -200,8 +219,9 @@ function AccountPageContent() {
     }
   };
 
-  const handleGoogle = () => {
-    window.location.href = `/api/auth/google?mode=${authMode}&next=${encodeURIComponent(nextPath)}`;
+  const handleGoogleSuccess = (payload: { nextPath: string }) => {
+    void syncAuth();
+    finishAuthenticatedRedirect(payload.nextPath);
   };
 
   const handleResendVerification = async () => {
@@ -225,6 +245,71 @@ function AccountPageContent() {
       setAuthError('Erro de conexão');
     } finally {
       setResendingVerification(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setAuthLoading(true);
+    setAuthError('');
+    setAuthNotice('');
+    setAuthDebugResetUrl('');
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: authEmail }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setAuthError(data.error || 'Falha ao iniciar recuperação.');
+        return;
+      }
+      setAuthNotice(data.warning || data.message || 'Se o email existir, enviaremos um link de redefinição.');
+      setAuthDebugResetUrl(data.debugResetUrl || '');
+    } catch {
+      setAuthError('Erro de conexão');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetToken) {
+      setAuthError('Link de redefinição inválido.');
+      return;
+    }
+    if (resetPassword.length < 8) {
+      setAuthError('A nova senha deve ter pelo menos 8 caracteres.');
+      return;
+    }
+    if (resetPassword !== resetPasswordConfirm) {
+      setAuthError('As senhas não coincidem.');
+      return;
+    }
+
+    setResetLoading(true);
+    setAuthError('');
+    setAuthNotice('');
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: resetToken, newPassword: resetPassword }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setAuthError(data.error || 'Falha ao redefinir senha.');
+        return;
+      }
+      if (data.user) {
+        setCurrentUser(data.user);
+      }
+      setAuthNotice('Senha redefinida com sucesso.');
+      finishAuthenticatedRedirect('/conta');
+    } catch {
+      setAuthError('Erro de conexão');
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -309,127 +394,232 @@ function AccountPageContent() {
 
   if (!currentUser) {
     return (
-      <div className="flex flex-1 items-center justify-center bg-neutral-950 px-4 py-10">
-        <div className="w-full max-w-xl rounded-3xl border border-neutral-800 bg-neutral-900/70 p-6 sm:p-8">
-          <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-neutral-800 p-3">
-              <User className="h-5 w-5 text-neutral-200" />
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-neutral-950 px-4 py-8 sm:px-6 sm:py-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(37,99,235,0.16),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(245,158,11,0.14),_transparent_24%)]" />
+        <div className="relative mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <section className="rounded-[2rem] border border-neutral-800 bg-neutral-900/55 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur sm:p-8 lg:p-10">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-900/40 bg-blue-950/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-blue-300">
+              <Shield className="h-3.5 w-3.5" />
+              Conta protegida
             </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-white">Conta protegida</h1>
-              <p className="text-sm text-neutral-400">Entrada única para login, Google, onboarding, nickname e validação institucional.</p>
-            </div>
-          </div>
+            <h1 className="mt-5 text-3xl font-semibold leading-tight text-white sm:text-4xl">
+              Entre rápido, continue anônimo, sincronize quando quiser.
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-neutral-400 sm:text-base">
+              O acesso com Google reduz atrito, o email e senha continuam disponíveis, e o codinome segue sendo sua identidade pública. Dados privados ficam reservados para autenticação, reputação e validação funcional.
+            </p>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            <button
-              onClick={() => setAuthMode('login')}
-              className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${authMode === 'login' ? 'bg-neutral-100 text-neutral-950' : 'border border-neutral-700 text-neutral-200 hover:border-neutral-500 hover:bg-neutral-800'}`}
-            >
-              Entrar
-            </button>
-            <button
-              onClick={() => setAuthMode('register')}
-              className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${authMode === 'register' ? 'bg-amber-500 text-black' : 'border border-neutral-700 text-neutral-200 hover:border-neutral-500 hover:bg-neutral-800'}`}
-            >
-              Criar conta
-            </button>
-          </div>
-
-          <div className="mt-6 space-y-4">
-            {authError && <div className="rounded-2xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{authError}</div>}
-            {authNotice && <div className="rounded-2xl border border-blue-900/50 bg-blue-950/30 px-4 py-3 text-sm text-blue-200">{authNotice}</div>}
-            {pendingVerificationEmail && (
-              <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 px-4 py-4 text-sm text-neutral-300 space-y-3">
-                <p>Email pendente: <span className="text-white">{pendingVerificationEmail}</span></p>
-                <button
-                  onClick={handleResendVerification}
-                  disabled={resendingVerification}
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 transition hover:border-neutral-500 hover:bg-neutral-800 disabled:opacity-60"
-                >
-                  {resendingVerification ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  Reenviar verificação
-                </button>
-                {authDebugVerificationUrl ? (
-                  <a href={authDebugVerificationUrl} className="block break-all text-xs text-blue-400 hover:text-blue-300">
-                    Abrir link de verificação gerado neste ambiente
-                  </a>
-                ) : null}
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-4">
+                <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">Mais fluido</p>
+                <p className="mt-2 text-sm font-medium text-white">Google entra em segundos no desktop e no mobile.</p>
               </div>
-            )}
-
-            <button
-              onClick={handleGoogle}
-              disabled={authLoading}
-              className="flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-white px-4 text-sm font-medium text-neutral-900 transition hover:bg-neutral-100 disabled:opacity-60"
-            >
-              {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              Continuar com Google
-            </button>
-
-            <div className="relative py-2">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-800" /></div>
-              <div className="relative flex justify-center"><span className="bg-neutral-900 px-3 text-xs text-neutral-500">ou use email e senha</span></div>
+              <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-4">
+                <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">Mais seguro</p>
+                <p className="mt-2 text-sm font-medium text-white">Senha local opcional, redefinição por link assinado e sessão protegida.</p>
+              </div>
+              <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 p-4">
+                <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">Mais institucional</p>
+                <p className="mt-2 text-sm font-medium text-white">MASP e lotação ficam privados, nickname e reputação seguem públicos.</p>
+              </div>
             </div>
 
-            {authMode === 'register' && (
-              <div className="space-y-3 rounded-2xl border border-neutral-800 bg-neutral-950/60 p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <label className="text-xs font-medium text-neutral-400">Codinome obrigatório</label>
-                  <button onClick={() => void generateNickname('register')} className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300">
-                    <RefreshCw className="h-3 w-3" /> Gerar outro
+            <div className="mt-6 rounded-3xl border border-amber-900/40 bg-amber-950/20 p-5">
+              <div className="flex items-center gap-2 text-amber-300">
+                <Flame className="h-4 w-4" />
+                <span className="text-sm font-medium">Por que criar conta no Tira-Voz</span>
+              </div>
+              <div className="mt-3 space-y-3 text-sm text-neutral-300">
+                <p>Persistência de histórico, relatórios e reputação entre dispositivos.</p>
+                <p>Entrada híbrida: Google para rapidez, senha local para contingência.</p>
+                <p>Onboarding guiado para definir codinome e liberar validação institucional.</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-[2rem] border border-neutral-800 bg-neutral-900/75 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur sm:p-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-neutral-500">Acesso</p>
+                <h2 className="mt-2 text-2xl font-semibold text-white">
+                  {authMode === 'register'
+                    ? 'Criar conta'
+                    : authMode === 'forgot'
+                      ? 'Recuperar senha'
+                      : authMode === 'reset'
+                        ? 'Nova senha'
+                        : 'Entrar'}
+                </h2>
+                <p className="mt-2 text-sm text-neutral-400">
+                  {authMode === 'register'
+                    ? 'Cadastre email, senha e codinome para ativar persistência e reputação.'
+                    : authMode === 'forgot'
+                      ? 'Informe seu email e enviaremos um link seguro para redefinir sua senha.'
+                      : authMode === 'reset'
+                        ? 'Crie uma nova senha para voltar a entrar com email quando quiser.'
+                        : 'Use Google ou email e senha para retomar sua conta.'}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-neutral-950/80 p-3">
+                <User className="h-5 w-5 text-neutral-200" />
+              </div>
+            </div>
+
+            {authMode !== 'reset' ? (
+              <div className="mt-6 grid grid-cols-3 gap-2 rounded-2xl border border-neutral-800 bg-neutral-950/70 p-1.5 text-xs font-medium text-neutral-400">
+                <button onClick={() => setAuthMode('login')} className={`rounded-xl px-3 py-2 transition ${authMode === 'login' ? 'bg-white text-neutral-950' : 'hover:bg-neutral-900 hover:text-white'}`}>Entrar</button>
+                <button onClick={() => setAuthMode('register')} className={`rounded-xl px-3 py-2 transition ${authMode === 'register' ? 'bg-amber-500 text-black' : 'hover:bg-neutral-900 hover:text-white'}`}>Criar conta</button>
+                <button onClick={() => setAuthMode('forgot')} className={`rounded-xl px-3 py-2 transition ${authMode === 'forgot' ? 'bg-blue-600 text-white' : 'hover:bg-neutral-900 hover:text-white'}`}>Recuperar</button>
+              </div>
+            ) : null}
+
+            <div className="mt-6 space-y-4">
+              {authError ? <div className="rounded-2xl border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">{authError}</div> : null}
+              {authNotice ? <div className="rounded-2xl border border-blue-900/50 bg-blue-950/30 px-4 py-3 text-sm text-blue-200">{authNotice}</div> : null}
+
+              {pendingVerificationEmail ? (
+                <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 px-4 py-4 text-sm text-neutral-300">
+                  <p>Email pendente: <span className="font-medium text-white">{pendingVerificationEmail}</span></p>
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    <button
+                      onClick={handleResendVerification}
+                      disabled={resendingVerification}
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-neutral-700 px-4 text-sm text-neutral-200 transition hover:border-neutral-500 hover:bg-neutral-800 disabled:opacity-60"
+                    >
+                      {resendingVerification ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                      Reenviar verificação
+                    </button>
+                    {authDebugVerificationUrl ? <a href={authDebugVerificationUrl} className="inline-flex items-center text-xs text-blue-400 hover:text-blue-300">Abrir link local</a> : null}
+                  </div>
+                </div>
+              ) : null}
+
+              {authDebugResetUrl ? (
+                <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 px-4 py-3 text-sm text-neutral-300">
+                  <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">Ambiente local</p>
+                  <a href={authDebugResetUrl} className="mt-2 block break-all text-blue-400 hover:text-blue-300">{authDebugResetUrl}</a>
+                </div>
+              ) : null}
+
+              {authMode === 'reset' ? (
+                <div className="space-y-3">
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={resetPassword}
+                    onChange={(event) => setResetPassword(event.target.value)}
+                    placeholder="Nova senha"
+                    className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-950/80 px-4 text-sm text-white outline-none transition focus:border-blue-700"
+                  />
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={resetPasswordConfirm}
+                    onChange={(event) => setResetPasswordConfirm(event.target.value)}
+                    placeholder="Confirme a nova senha"
+                    className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-950/80 px-4 text-sm text-white outline-none transition focus:border-blue-700"
+                  />
+                  <button
+                    onClick={handleResetPassword}
+                    disabled={resetLoading || resetPassword.length < 8 || resetPasswordConfirm.length < 8}
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 text-sm font-medium text-white transition hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
+                  >
+                    {resetLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                    Salvar nova senha
+                  </button>
+                  <button onClick={() => setAuthMode('login')} className="w-full text-center text-sm text-neutral-500 transition hover:text-white">
+                    Voltar para entrada
                   </button>
                 </div>
-                <input
-                  value={registerNickname}
-                  onChange={(event) => setRegisterNickname(event.target.value)}
-                  placeholder="Ex: Falcão Tático"
-                  className="h-11 w-full rounded-2xl border border-neutral-800 bg-neutral-900 px-4 text-sm text-white outline-none transition focus:border-blue-700"
-                />
-                <input
-                  value={registerMasp}
-                  onChange={(event) => setRegisterMasp(event.target.value)}
-                  placeholder="MASP opcional (8 dígitos)"
-                  className="h-11 w-full rounded-2xl border border-neutral-800 bg-neutral-900 px-4 text-sm text-white outline-none transition focus:border-blue-700"
-                />
-                <input
-                  value={registerLotacao}
-                  onChange={(event) => setRegisterLotacao(event.target.value)}
-                  placeholder="Lotação opcional"
-                  className="h-11 w-full rounded-2xl border border-neutral-800 bg-neutral-900 px-4 text-sm text-white outline-none transition focus:border-blue-700"
-                />
-                <p className="text-xs leading-relaxed text-neutral-500">Seu nickname é público. Email, MASP e lotação nunca aparecem nos relatos.</p>
-              </div>
-            )}
+              ) : (
+                <>
+                  <GoogleIdentityButton
+                    mode={authMode === 'register' ? 'register' : 'login'}
+                    nextPath={nextPath}
+                    onSuccess={handleGoogleSuccess}
+                    onError={setAuthError}
+                  />
 
-            <input
-              type="email"
-              value={authEmail}
-              onChange={(event) => setAuthEmail(event.target.value)}
-              placeholder="Seu email"
-              className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-900 px-4 text-sm text-white outline-none transition focus:border-blue-700"
-            />
-            <input
-              type="password"
-              value={authPassword}
-              onChange={(event) => setAuthPassword(event.target.value)}
-              placeholder="Sua senha"
-              className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-900 px-4 text-sm text-white outline-none transition focus:border-blue-700"
-            />
+                  <div className="relative py-1">
+                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-800" /></div>
+                    <div className="relative flex justify-center"><span className="bg-neutral-900 px-3 text-xs text-neutral-500">ou continue com email</span></div>
+                  </div>
 
-            <button
-              onClick={handleAuth}
-              disabled={authLoading || !authEmail || !authPassword || (authMode === 'register' && !registerNickname.trim())}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 text-sm font-medium text-white transition hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
-            >
-              {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {authMode === 'login' ? 'Entrar' : 'Criar conta'}
-            </button>
+                  {authMode === 'register' ? (
+                    <div className="space-y-3 rounded-3xl border border-neutral-800 bg-neutral-950/70 p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <label className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-500">Codinome</label>
+                        <button onClick={() => void generateNickname('register')} className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300">
+                          <RefreshCw className="h-3 w-3" /> Gerar outro
+                        </button>
+                      </div>
+                      <input
+                        value={registerNickname}
+                        onChange={(event) => setRegisterNickname(event.target.value)}
+                        placeholder="Ex: Falcão Tático"
+                        className="h-11 w-full rounded-2xl border border-neutral-800 bg-neutral-900 px-4 text-sm text-white outline-none transition focus:border-blue-700"
+                      />
+                      <input
+                        value={registerMasp}
+                        onChange={(event) => setRegisterMasp(event.target.value)}
+                        placeholder="MASP opcional (8 dígitos)"
+                        className="h-11 w-full rounded-2xl border border-neutral-800 bg-neutral-900 px-4 text-sm text-white outline-none transition focus:border-blue-700"
+                      />
+                      <input
+                        value={registerLotacao}
+                        onChange={(event) => setRegisterLotacao(event.target.value)}
+                        placeholder="Lotação opcional"
+                        className="h-11 w-full rounded-2xl border border-neutral-800 bg-neutral-900 px-4 text-sm text-white outline-none transition focus:border-blue-700"
+                      />
+                      <p className="text-xs leading-relaxed text-neutral-500">Seu codinome é público. Email, MASP e lotação nunca aparecem nos relatos.</p>
+                    </div>
+                  ) : null}
 
-            <p className="text-center text-xs text-neutral-500">
-              O chat continua anônimo. A conta existe para persistência, nickname, continuidade e validação institucional quando você quiser desbloquear recursos restritos.
-            </p>
-          </div>
+                  <input
+                    type="email"
+                    autoComplete="email"
+                    name="email"
+                    value={authEmail}
+                    onChange={(event) => setAuthEmail(event.target.value)}
+                    placeholder="Seu email institucional ou pessoal"
+                    className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-950/80 px-4 text-sm text-white outline-none transition focus:border-blue-700"
+                  />
+
+                  {authMode !== 'forgot' ? (
+                    <input
+                      type="password"
+                      autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
+                      name="password"
+                      value={authPassword}
+                      onChange={(event) => setAuthPassword(event.target.value)}
+                      placeholder="Sua senha"
+                      className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-950/80 px-4 text-sm text-white outline-none transition focus:border-blue-700"
+                    />
+                  ) : null}
+
+                  <button
+                    onClick={authMode === 'forgot' ? handleForgotPassword : handleAuth}
+                    disabled={authLoading || !authEmail || (authMode !== 'forgot' && !authPassword) || (authMode === 'register' && !registerNickname.trim())}
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 text-sm font-medium text-white transition hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
+                  >
+                    {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                    {authMode === 'register' ? 'Criar conta' : authMode === 'forgot' ? 'Enviar link de recuperação' : 'Entrar com email'}
+                  </button>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-neutral-500">
+                    <button onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')} className="transition hover:text-white">
+                      {authMode === 'login' ? 'Ainda não tem conta? Criar agora' : 'Já tem conta? Entrar'}
+                    </button>
+                    {authMode === 'login' ? <button onClick={() => setAuthMode('forgot')} className="transition hover:text-white">Esqueci minha senha</button> : null}
+                  </div>
+                </>
+              )}
+
+              <p className="text-center text-xs leading-relaxed text-neutral-500">
+                O chat continua anônimo. A conta existe para persistência, nickname, continuidade e validação institucional quando você quiser liberar recursos adicionais.
+              </p>
+            </div>
+          </section>
         </div>
       </div>
     );
@@ -478,11 +668,11 @@ function AccountPageContent() {
                 <div className="rounded-2xl bg-emerald-950/40 p-3"><Shield className="h-5 w-5 text-emerald-300" /></div>
                 <div>
                   <h2 className="text-xl font-semibold text-white">Identidade protegida</h2>
-                  <p className="text-sm text-neutral-400">SSOT do perfil público-anônimo e dos dados privados.</p>
+                  <p className="text-sm text-neutral-400">Gestão do perfil público-anônimo e dos dados privados.</p>
                 </div>
               </div>
               <button onClick={() => void generateNickname('profile')} className="inline-flex items-center gap-2 rounded-xl border border-neutral-700 px-3 py-2 text-xs text-neutral-200 hover:border-neutral-500 hover:bg-neutral-800">
-                <RefreshCw className="h-3.5 w-3.5" /> Gerar nickname
+                <RefreshCw className="h-3.5 w-3.5" /> Gerar codinome
               </button>
             </div>
 
@@ -543,7 +733,7 @@ function AccountPageContent() {
                 <span className="text-sm font-medium">Status institucional</span>
               </div>
               <p className="mt-2 text-sm text-white">{getValidationLabel(currentUser.validation_status)}</p>
-              <p className="mt-2 text-xs leading-relaxed text-neutral-500">Voto e follow-up nas pautas públicas dependem de MASP validado. Enquanto isso, o chat e os relatos seguem anônimos.</p>
+              <p className="mt-2 text-xs leading-relaxed text-neutral-500">Voto e acompanhamento nas pautas públicas dependem de MASP validado. Enquanto isso, o chat e os relatos seguem anônimos.</p>
             </div>
 
             <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-4">
@@ -572,6 +762,7 @@ function AccountPageContent() {
               {currentUser.has_password ? (
                 <input
                   type="password"
+                  autoComplete="current-password"
                   value={currentPassword}
                   onChange={(event) => setCurrentPassword(event.target.value)}
                   placeholder="Senha atual"
@@ -582,6 +773,7 @@ function AccountPageContent() {
               )}
               <input
                 type="password"
+                autoComplete="new-password"
                 value={newPassword}
                 onChange={(event) => setNewPassword(event.target.value)}
                 placeholder={currentUser.has_password ? 'Nova senha' : 'Definir senha'}

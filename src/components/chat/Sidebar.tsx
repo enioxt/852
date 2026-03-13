@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock, Home, FileText, AlertCircle, User, LogOut, Loader2, RefreshCw, Shield, Trophy, PenLine, Radio } from 'lucide-react';
+import GoogleIdentityButton from '@/components/auth/GoogleIdentityButton';
 import { listConversations, deleteConversation, type Conversation } from '@/lib/chat-store';
 import { getIdentityKey, getOrCreateSessionHash } from '@/lib/session';
 
@@ -183,6 +184,22 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
     await fetch('/api/auth/logout', { method: 'POST' });
     setCurrentUser(null);
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('852-auth-changed'));
+  };
+
+  const handleGoogleSuccess = async () => {
+    try {
+      const response = await fetch('/api/auth/me');
+      const data = await response.json();
+      if (data.user) {
+        setCurrentUser(data.user);
+      }
+    } catch {}
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('852-auth-changed'));
+    setShowAuth(false);
+    setAuthError('');
+    setAuthNotice('');
+    setPendingVerificationEmail('');
+    setAuthDebugVerificationUrl('');
   };
 
   const conversationScope = getIdentityKey(typeof window === 'undefined' ? null : getOrCreateSessionHash(), currentUser?.id) || undefined;
@@ -385,11 +402,24 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
                 )}
               </>
             )}
+            <GoogleIdentityButton
+              mode={authMode}
+              nextPath="/chat"
+              fullWidth={false}
+              onSuccess={handleGoogleSuccess}
+              onError={setAuthError}
+            />
+            <div className="relative py-1">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-800" /></div>
+              <div className="relative flex justify-center"><span className="bg-neutral-950 px-2 text-[10px] text-neutral-500">ou use email</span></div>
+            </div>
             <input
               value={authEmail}
               onChange={e => setAuthEmail(e.target.value)}
               placeholder="Email"
               type="email"
+              autoComplete="email"
+              name="email"
               className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
             />
             <input
@@ -397,6 +427,8 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
               onChange={e => setAuthPassword(e.target.value)}
               placeholder="Senha"
               type="password"
+              autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
+              name="password"
               className="w-full h-9 px-3 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-700"
               onKeyDown={e => e.key === 'Enter' && handleAuth()}
             />
@@ -430,6 +462,11 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
               {(authLoading || nicknameValidating) ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
               {nicknameValidating ? 'Validando codinome...' : authMode === 'login' ? 'Entrar' : 'Criar conta'}
             </button>
+            {authMode === 'login' && (
+              <Link href="/conta?auth=forgot&next=/chat" className="block text-center text-[10px] text-neutral-500 hover:text-white transition">
+                Esqueci minha senha
+              </Link>
+            )}
             <button
               onClick={() => {
                 const newMode = authMode === 'login' ? 'register' : 'login';

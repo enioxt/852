@@ -23,6 +23,7 @@ type AuthUserRow = {
   validation_status: string | null;
   email_verified_at: string | null;
   email_verification_sent_at?: string | null;
+  password_set_at?: string | null;
   password_hash: string | null;
   auth_provider: string | null;
   google_sub: string | null;
@@ -225,7 +226,7 @@ async function getUserById(userId: string) {
 
   const { data: user } = await sb
     .from('user_accounts_852')
-    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
     .eq('id', userId)
     .maybeSingle();
 
@@ -323,7 +324,7 @@ export async function loginUser(email: string, password: string) {
   const normalizedEmail = normalizeEmail(email);
   const { data: user } = await sb
     .from('user_accounts_852')
-    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, email_verification_sent_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, email_verification_sent_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
     .eq('email', normalizedEmail)
     .maybeSingle();
 
@@ -382,7 +383,7 @@ export async function loginWithGoogleIdentity(profile: {
 
   const { data: byGoogle } = await sb
     .from('user_accounts_852')
-    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
     .eq('google_sub', profile.sub)
     .maybeSingle();
 
@@ -396,14 +397,14 @@ export async function loginWithGoogleIdentity(profile: {
         auth_provider: byGoogle.password_hash ? 'hybrid' : 'google',
       })
       .eq('id', byGoogle.id)
-      .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+      .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
       .single();
 
     finalUser = (updated as AuthUserRow | null) || null;
   } else {
     const { data: byEmail } = await sb
       .from('user_accounts_852')
-      .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+      .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
       .eq('email', normalizedEmail)
       .maybeSingle();
 
@@ -422,7 +423,7 @@ export async function loginWithGoogleIdentity(profile: {
           auth_provider: byEmail.password_hash ? 'hybrid' : 'google',
         })
         .eq('id', byEmail.id)
-        .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+        .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
         .single();
 
       finalUser = (updated as AuthUserRow | null) || null;
@@ -441,7 +442,7 @@ export async function loginWithGoogleIdentity(profile: {
           avatar_url: profile.picture || null,
           profile_completed_at: null,
         })
-        .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+        .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
         .single();
 
       if (error) return { error: error.message };
@@ -552,7 +553,7 @@ export async function updateCurrentUserProfile(input: {
       profile_completed_at: new Date().toISOString(),
     })
     .eq('id', currentUser.id)
-    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
     .single();
 
   if (error) return { error: error.message, status: 500 };
@@ -606,6 +607,214 @@ export async function updateCurrentUserPassword(input: {
 
   if (error) return { error: error.message, status: 500 };
   return { success: true };
+}
+
+type PasswordResetTokenPayload = {
+  sub: string;
+  email: string;
+  purpose: 'password_reset';
+  exp: number;
+  passwordSetAt: string | null;
+};
+
+function getAuthTokenSecret() {
+  return process.env.AUTH_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+}
+
+function encodeTokenPart(value: Record<string, unknown>) {
+  return Buffer.from(JSON.stringify(value)).toString('base64url');
+}
+
+function decodeTokenPart<T>(value: string) {
+  return JSON.parse(Buffer.from(value, 'base64url').toString('utf8')) as T;
+}
+
+async function signToken(value: string) {
+  const secret = getAuthTokenSecret();
+  if (!secret) throw new Error('AUTH_TOKEN_SECRET não configurado.');
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(value));
+  return Buffer.from(signature).toString('base64url');
+}
+
+async function createSignedToken(payload: PasswordResetTokenPayload) {
+  const header = encodeTokenPart({ alg: 'HS256', typ: 'JWT' });
+  const body = encodeTokenPart(payload);
+  const signature = await signToken(`${header}.${body}`);
+  return `${header}.${body}.${signature}`;
+}
+
+async function verifySignedToken(token: string): Promise<PasswordResetTokenPayload> {
+  const [header, body, signature] = token.split('.');
+  if (!header || !body || !signature) {
+    throw new Error('Token inválido.');
+  }
+  const expectedSignature = await signToken(`${header}.${body}`);
+  if (expectedSignature !== signature) {
+    throw new Error('Token inválido.');
+  }
+  const payload = decodeTokenPart<PasswordResetTokenPayload>(body);
+  if (payload.purpose !== 'password_reset' || !payload.sub || !payload.email) {
+    throw new Error('Token inválido.');
+  }
+  if (!payload.exp || payload.exp * 1000 < Date.now()) {
+    throw new Error('Token expirado.');
+  }
+  return payload;
+}
+
+async function issuePasswordReset(params: { userId: string; email: string; displayName?: string | null; passwordSetAt: string | null }) {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado' };
+
+  const token = await createSignedToken({
+    sub: params.userId,
+    email: params.email,
+    purpose: 'password_reset',
+    exp: Math.floor((Date.now() + EMAIL_VERIFICATION_WINDOW_MS) / 1000),
+    passwordSetAt: params.passwordSetAt,
+  });
+  const resetUrl = `${getPublicBaseUrl()}/conta?auth=reset&token=${encodeURIComponent(token)}`;
+
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <noreply@intelink.ia.br>';
+  if (!resendApiKey) {
+    return {
+      sent: false,
+      warning: 'Recuperação criada, mas o envio de email não está configurado neste ambiente.',
+      debugResetUrl: process.env.NODE_ENV === 'production' ? undefined : resetUrl,
+    };
+  }
+
+  const greeting = params.displayName?.trim() ? `Olá, ${params.displayName.trim()}!` : 'Olá!';
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: resendFromEmail,
+      to: [params.email],
+      subject: 'Redefina sua senha — Tira-Voz',
+      html: `
+        <div style="background:#0a0a0a;padding:32px;font-family:Inter,Arial,sans-serif;color:#e5e7eb;line-height:1.6;">
+          <div style="max-width:560px;margin:0 auto;border:1px solid #262626;border-radius:18px;padding:32px;background:#111111;">
+            <p style="margin:0 0 16px;font-size:14px;color:#93c5fd;">Tira-Voz</p>
+            <h1 style="margin:0 0 16px;font-size:24px;color:#ffffff;">Redefina sua senha de acesso</h1>
+            <p style="margin:0 0 16px;font-size:15px;color:#d4d4d8;">${greeting}</p>
+            <p style="margin:0 0 24px;font-size:15px;color:#d4d4d8;">Use o botão abaixo para criar uma nova senha. O link expira em 24 horas e deixa de valer assim que você salvar outra senha.</p>
+            <a href="${resetUrl}" style="display:inline-block;padding:12px 18px;border-radius:12px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;">Redefinir senha</a>
+            <p style="margin:24px 0 8px;font-size:13px;color:#a1a1aa;">Se o botão não abrir, copie e cole este link:</p>
+            <p style="margin:0;font-size:13px;word-break:break-all;color:#93c5fd;">${resetUrl}</p>
+          </div>
+        </div>
+      `,
+      text: `${greeting}\n\nRedefina sua senha do Tira-Voz em:\n${resetUrl}\n\nEsse link expira em 24 horas e deixa de valer depois que você salvar uma nova senha.`,
+    }),
+  });
+
+  if (!response.ok) {
+    console.error('[852-auth] password reset email error:', await response.text());
+    return {
+      sent: false,
+      warning: 'Não foi possível enviar o email de recuperação agora.',
+      debugResetUrl: process.env.NODE_ENV === 'production' ? undefined : resetUrl,
+    };
+  }
+
+  return {
+    sent: true,
+    debugResetUrl: process.env.NODE_ENV === 'production' ? undefined : resetUrl,
+  };
+}
+
+export async function requestPasswordReset(email: string) {
+  const sb = getSupabase();
+  if (!sb) return { success: false, error: 'Supabase não configurado' };
+
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return { success: false, error: 'Email obrigatório' };
+
+  const { data: user } = await sb
+    .from('user_accounts_852')
+    .select('id, email, display_name, password_set_at, is_active')
+    .eq('email', normalizedEmail)
+    .maybeSingle();
+
+  if (!user || user.is_active === false) {
+    return { success: true };
+  }
+
+  const resetResult = await issuePasswordReset({
+    userId: user.id,
+    email: user.email,
+    displayName: user.display_name,
+    passwordSetAt: user.password_set_at,
+  });
+
+  return {
+    success: true,
+    resetEmailSent: resetResult.sent,
+    warning: resetResult.sent ? undefined : resetResult.warning,
+    debugResetUrl: resetResult.debugResetUrl,
+  };
+}
+
+export async function resetPasswordWithToken(token: string, newPassword: string) {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado', status: 500 };
+  if (!newPassword || newPassword.length < 8) {
+    return { error: 'A nova senha deve ter pelo menos 8 caracteres.', status: 400 };
+  }
+
+  let payload: PasswordResetTokenPayload;
+  try {
+    payload = await verifySignedToken(token.trim());
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : 'Token inválido.', status: 400 };
+  }
+
+  const { data: user } = await sb
+    .from('user_accounts_852')
+    .select('id, email, email_verified_at, password_set_at, google_sub, is_active')
+    .eq('id', payload.sub)
+    .eq('email', normalizeEmail(payload.email))
+    .maybeSingle();
+
+  if (!user) {
+    return { error: 'Link inválido ou expirado.', status: 400 };
+  }
+  if (user.is_active === false) {
+    return { error: 'Conta desativada.', status: 403 };
+  }
+  if ((user.password_set_at || null) !== (payload.passwordSetAt || null)) {
+    return { error: 'Este link já foi substituído por uma senha mais recente.', status: 400 };
+  }
+
+  const { hash, salt } = await hashPassword(newPassword);
+  const { error } = await sb
+    .from('user_accounts_852')
+    .update({
+      password_hash: `${salt}:${hash}`,
+      password_set_at: new Date().toISOString(),
+      auth_provider: user.google_sub ? 'hybrid' : 'password',
+      email_verified_at: user.email_verified_at || new Date().toISOString(),
+    })
+    .eq('id', user.id);
+
+  if (error) {
+    return { error: error.message, status: 500 };
+  }
+
+  await createSession(user.id);
+  await updateLastLogin(user.id);
+  const finalUser = await getUserById(user.id);
+
+  return {
+    success: true,
+    user: finalUser ? buildPublicUser(finalUser) : null,
+  };
 }
 
 export async function verifyEmailToken(token: string) {

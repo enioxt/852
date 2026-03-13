@@ -400,7 +400,7 @@ export default function SugestaoPage() {
             </div>
             <div className="rounded-3xl border border-neutral-800 bg-neutral-900/60 p-5">
               <div className="flex items-center gap-2 text-sm font-medium text-white"><Bot className="h-4 w-4 text-blue-400" /> Revisão opcional</div>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-400">Peça uma leitura automática antes de publicar para ganhar resumo, completude e perguntas de follow-up.</p>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-400">Peça uma leitura automática antes de publicar para ganhar resumo, completude e perguntas de aprofundamento.</p>
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import {
   Plus, MessageCircle, ChevronUp, Tag,
@@ -76,11 +76,19 @@ export default function IssuesPage() {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [showLoginNotice, setShowLoginNotice] = useState(false);
   const [loginNoticeMode, setLoginNoticeMode] = useState<'auth' | 'validation'>('auth');
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const focusRef = useRef<HTMLDivElement | null>(null);
+  const didScrollRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     setAiReportId(params.get('aiReportId'));
+    const idParam = params.get('id');
+    if (idParam) {
+      setFocusId(idParam);
+      setFilter('all');
+    }
     const syncAuth = () => {
       fetch('/api/auth/me')
         .then(r => r.json())
@@ -106,6 +114,25 @@ export default function IssuesPage() {
   }, [aiReportId, filter, sort]);
 
   useEffect(() => { loadIssues(); }, [loadIssues]);
+
+  useEffect(() => {
+    if (!focusId || didScrollRef.current || loading) return;
+    const match = issues.find(i => i.id === focusId);
+    if (!match) return;
+    didScrollRef.current = true;
+    setExpandedIssue(focusId);
+    fetch('/api/issues', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'comments', issueId: focusId }),
+    })
+      .then(r => r.json())
+      .then(d => setComments(d.comments || []))
+      .catch(() => {});
+    setTimeout(() => {
+      focusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+  }, [focusId, issues, loading]);
 
   const handleVote = async (issueId: string) => {
     if (!currentUser?.id) {
@@ -204,8 +231,8 @@ export default function IssuesPage() {
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed">
               {loginNoticeMode === 'auth'
-                ? <>Para votar e fazer follow-up nas pautas, você precisa ter uma <strong className="text-white">conta protegida</strong>.</>
-                : <>Para votar e fazer follow-up nas pautas, você precisa estar cadastrado como <strong className="text-white">Policial Civil de MG com MASP validado</strong>.</>}
+                ? <>Para votar e acompanhar as pautas, você precisa ter uma <strong className="text-white">conta protegida</strong>.</>
+                : <>Para votar e acompanhar as pautas, você precisa estar cadastrado como <strong className="text-white">Policial Civil de MG com MASP validado</strong>.</>}
             </p>
             <p className="text-xs text-neutral-500 leading-relaxed">
               Anônimos podem abrir conversas e gerar relatos. A governança dos tópicos públicos exige validação para evitar duplicidade, abuso e dar legitimidade ao processo.
@@ -365,7 +392,11 @@ export default function IssuesPage() {
         ) : (
           <div className="space-y-3">
             {issues.map(issue => (
-              <div key={issue.id} className="rounded-xl border border-neutral-800 bg-neutral-900/50 hover:border-neutral-700/70 transition">
+              <div
+                key={issue.id}
+                ref={issue.id === focusId ? focusRef : undefined}
+                className={`rounded-xl border bg-neutral-900/50 hover:border-neutral-700/70 transition ${issue.id === focusId ? 'border-blue-700/60 ring-1 ring-blue-800/30' : 'border-neutral-800'}`}
+              >
                 <div className="flex items-start gap-3 p-4">
                   {/* Vote */}
                   <button

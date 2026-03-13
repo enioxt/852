@@ -68,7 +68,7 @@ export default function HotTopicsTicker() {
         {topics.slice(0, 6).map((topic, i) => (
           <Link
             key={topic.id}
-            href="/papo-de-corredor"
+            href={`/issues?id=${topic.id}`}
             className="group flex items-start gap-2.5 rounded-xl px-2.5 py-2 -mx-1 hover:bg-neutral-800/60 transition"
           >
             <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-neutral-800 text-[9px] font-bold text-neutral-400 mt-0.5">

@@ -134,12 +134,25 @@ NEXT_PUBLIC_CLARITY_ID=xxx            # Microsoft Clarity project ID
 SUPABASE_URL=https://xxx.supabase.co          # Server-side persistence
 SUPABASE_SERVICE_ROLE_KEY=xxx                 # Supabase service key
 ADMIN_SETUP_KEY=xxx                           # Bootstrap do primeiro admin
+GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com        # Google Web Client ID
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com # Mesmo client ID exposto ao frontend
 PUBLIC_BASE_URL=https://852.egos.ia.br       # Base publica usada em links/alertas
 ISSUE_ALERT_WEBHOOK_URL=https://hook.example # Webhook para novas pautas/votos
 ISSUE_ALERT_WEBHOOK_SECRET=xxx               # Segredo opcional do webhook
 TELEGRAM_BOT_TOKEN=xxx                       # Bot Telegram opcional
 TELEGRAM_CHAT_ID=xxx                         # Chat destino opcional
 ```
+
+## Google Sign-In Checklist
+
+- Criar ou reutilizar um **OAuth 2.0 Web Client** no Google Cloud Console.
+- Garantir que o mesmo `client_id` esteja configurado em `GOOGLE_CLIENT_ID` e `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
+- Adicionar em **Authorized JavaScript origins**:
+  - `http://localhost:3000`
+  - `https://852.egos.ia.br`
+- Confirmar que a tela de consentimento OAuth esteja publicada para o tipo de usuário correto.
+- O fluxo atual do 852 usa **Google Identity Services + ID token verificado no backend**, então **não exige `GOOGLE_CLIENT_SECRET`** para a UI principal.
+- O endpoint legado `/api/auth/google` continua no código para compatibilidade, mas o caminho preferencial da interface é o botão novo de Google.
 
 ## Deploy
 

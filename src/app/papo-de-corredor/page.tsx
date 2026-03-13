@@ -88,7 +88,7 @@ export default function PapoDeCorredorPage() {
             Papo de Corredor
           </div>
           <h1 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
-            O que a tropa esta falando
+            O que os policiais estao falando
           </h1>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-neutral-400">
             Os temas mais quentes entre os policiais civis. Ranking por engajamento: votos, comentarios e relevancia temporal. Atualizado a cada 2 minutos.
@@ -142,7 +142,7 @@ export default function PapoDeCorredorPage() {
                 {topThree.map((topic, index) => (
                   <Link
                     key={topic.id}
-                    href={`/issues`}
+                    href={`/issues?id=${topic.id}`}
                     className="group relative rounded-2xl border border-neutral-800 bg-gradient-to-b from-neutral-900/80 to-neutral-950/80 p-5 hover:border-neutral-700 transition"
                   >
                     <div className="flex items-center gap-2 mb-3">
@@ -181,7 +181,7 @@ export default function PapoDeCorredorPage() {
                 {rest.map((topic, index) => (
                   <Link
                     key={topic.id}
-                    href={`/issues`}
+                    href={`/issues?id=${topic.id}`}
                     className="group flex items-start gap-3 rounded-xl border border-neutral-800/60 bg-neutral-900/40 p-4 hover:border-neutral-700 transition"
                   >
                     <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-neutral-800 text-[10px] font-bold text-neutral-400">

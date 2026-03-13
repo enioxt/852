@@ -64,3 +64,26 @@ body {
     padding-bottom: 0;
   }
 }
+
+@keyframes hot-topics-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.hot-topics-marquee {
+  animation: hot-topics-marquee 42s linear infinite;
+}
+
+.hot-topics-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hot-topics-marquee {
+    animation: none;
+  }
+}
