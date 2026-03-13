@@ -8,7 +8,9 @@ import {
   ArrowRight, Lock, MessageSquare, FileDown, Users,
   BarChart3, AlertCircle, Bot, ChevronUp, Loader2,
   Mic, Brain, ClipboardList, ChevronDown, Shield,
-  Github, Code2, Eye, Send,
+  Github, Code2, Eye, Send, PenLine, Scale,
+  Paperclip, HelpCircle, Vote, Upload, FileText,
+  Building2, UserCheck, Megaphone, Bookmark,
 } from 'lucide-react';
 
 interface Stats {
@@ -173,11 +175,14 @@ export default function Home() {
 
           {/* ═══════════ DUAS FORMAS DE PARTICIPAR (lado a lado) ═══════════ */}
           <div className="mt-10 w-full">
-            <h2 className="text-xl font-bold text-white text-center mb-6">
-              Como voce pode participar
+            <h2 className="text-xl font-bold text-white text-center mb-2">
+              Duas formas de participar
             </h2>
+            <p className="text-sm text-neutral-500 text-center mb-6">
+              Escolha a que faz mais sentido pra voce. Ambas sao anonimas e seguras.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Opcao 1: Chatbot */}
+              {/* Opcao 1: Chatbot IA */}
               <Link
                 href="/chat"
                 className="group flex flex-col rounded-2xl border border-amber-800/30 bg-amber-950/20 p-6 hover:border-amber-700/50 hover:bg-amber-950/30 transition-all active:scale-[0.98]"
@@ -187,25 +192,35 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">Conversar com a IA</h3>
                 <p className="text-sm text-neutral-400 leading-relaxed flex-1">
-                  Fale com o agente 852 como se fosse um colega. Descreva o problema, tire duvidas, peça orientação. A IA organiza e cruza seu relato com outros.
+                  Fale com o Tira-Voz como se fosse um colega. Descreva o problema, tire duvidas, peça orientacao. A IA organiza, cruza seu relato com outros e sugere aprofundamentos.
                 </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400/80">Chat interativo</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400/80">Exportar PDF</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400/80">Historico salvo</span>
+                </div>
                 <div className="mt-4 flex items-center gap-2 text-amber-400 group-hover:text-amber-300 font-medium text-sm">
                   Iniciar conversa <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
 
-              {/* Opcao 2: Forum/Issues */}
+              {/* Opcao 2: Texto livre (sem IA) */}
               <Link
                 href="/issues"
                 className="group flex flex-col rounded-2xl border border-green-800/30 bg-green-950/20 p-6 hover:border-green-700/50 hover:bg-green-950/30 transition-all active:scale-[0.98]"
               >
                 <div className="w-14 h-14 rounded-xl bg-green-500/10 flex items-center justify-center mb-4">
-                  <Send className="w-7 h-7 text-green-400" />
+                  <PenLine className="w-7 h-7 text-green-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">Enviar direto no forum</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">Escrever direto</h3>
                 <p className="text-sm text-neutral-400 leading-relaxed flex-1">
-                  Crie um topico, vote nos problemas que te afetam ou comente nos relatos de outros colegas. Tudo anonimo, tudo visivel para a categoria.
+                  Prefere nao usar IA? Sem problema. Escreva sua sugestao, relato ou reclamacao em texto livre. Crie topicos, vote e comente nos relatos de colegas. Tudo anonimo.
                 </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Texto livre</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Votar e comentar</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Sem IA</span>
+                </div>
                 <div className="mt-4 flex items-center gap-2 text-green-400 group-hover:text-green-300 font-medium text-sm">
                   Abrir forum <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -215,6 +230,23 @@ export default function Home() {
               Nao precisa instalar nada. Funciona no celular e no computador.
             </p>
           </div>
+
+          {/* ═══════════ CTA BIBLIOTECA JURIDICA ═══════════ */}
+          <Link
+            href="/legislacao"
+            className="mt-6 w-full group flex items-center gap-4 rounded-2xl border border-blue-800/30 bg-blue-950/20 p-5 hover:border-blue-700/50 hover:bg-blue-950/30 transition-all active:scale-[0.98]"
+          >
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+              <Scale className="w-6 h-6 text-blue-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-semibold text-white">Biblioteca Juridica</h3>
+              <p className="text-sm text-neutral-400 mt-0.5">
+                27+ leis, sumulas e normativas para o policial civil. Constituicao, CPP, Lei Organica, Maria da Penha e mais.
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-blue-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+          </Link>
 
           {/* ═══════════ COMO A INFORMACAO FLUI ═══════════ */}
           <div id="como-funciona" className="mt-10 w-full space-y-3">
@@ -396,6 +428,56 @@ export default function Home() {
               Painel de dados
               <ArrowRight className="w-4 h-4" />
             </Link>
+          </div>
+
+          {/* ═══════════ FAQ COMPLETA ═══════════ */}
+          <div className="mt-12 w-full">
+            <button
+              onClick={() => {
+                const el = document.getElementById('faq-section');
+                const faqToggle = document.getElementById('faq-toggle');
+                if (el && faqToggle) {
+                  const isHidden = el.classList.contains('hidden');
+                  el.classList.toggle('hidden');
+                  faqToggle.setAttribute('data-open', isHidden ? 'true' : 'false');
+                }
+              }}
+              className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800/60 transition-all"
+            >
+              <HelpCircle className="w-5 h-5 text-amber-400" />
+              <span className="text-lg font-semibold text-white">Perguntas frequentes</span>
+              <ChevronDown id="faq-toggle" className="w-5 h-5 text-neutral-500 transition-transform duration-300 data-[open=true]:rotate-180" />
+            </button>
+            <div id="faq-section" className="hidden mt-4 space-y-3">
+              {[
+                { q: 'O que e o Tira-Voz?', a: 'E um canal digital seguro e anonimo onde policiais civis de Minas Gerais podem relatar problemas do dia a dia, sugerir melhorias e construir pautas coletivas para a categoria. Funciona como um radar: capta o que acontece na base e organiza para que chegue onde precisa.' },
+                { q: 'E realmente anonimo?', a: 'Sim. Nao coletamos nomes, CPFs, IPs nem identificamos quem esta usando. O cadastro e opcional e usa codinomes aleatorios (ex: Falcao Noturno, Aguia de Ferro). Suas conversas ficam no seu navegador, nao em servidores.' },
+                { q: 'Quem esta por tras disso?', a: 'O Tira-Voz e um projeto de codigo aberto desenvolvido dentro do ecossistema EGOS. Todo o codigo fonte esta disponivel no GitHub para auditoria publica. Nao e vinculado a nenhuma chefia, sindicato ou organizacao externa.' },
+                { q: 'A IA vai me identificar?', a: 'Nao. A IA nao sabe quem voce e. Ela processa cada mensagem de forma isolada, sem cruzar com dados pessoais. Se voce mencionar algo que possa te identificar (nome, MASP, REDS), o sistema alerta automaticamente e pede que reformule.' },
+                { q: 'E se eu nao confiar na IA?', a: 'Sem problema. Voce pode usar a opcao "Escrever direto" no forum, que funciona como um formulario simples de texto. Nenhuma IA le ou responde, voce so escreve e publica. O filtro de dados sensiveis continua ativo para proteger voce.' },
+                { q: 'Que tipo de relato posso fazer?', a: 'Problemas de fluxo, gargalos operacionais, falta de equipamento ou viatura, demandas repetitivas, sugestoes de melhoria, dificuldades com sistemas (REDS, PCNet), sobrecarga de plantao, questoes de efetivo, tudo que impacta o trabalho da Policia Civil.' },
+                { q: 'O que acontece com meu relato?', a: 'Quando voce compartilha um relato, ele entra na contagem. A cada 5 relatos, a IA gera automaticamente um relatorio de inteligencia cruzando padroes. Os temas mais citados viram topicos publicos onde a categoria pode votar e comentar.' },
+                { q: 'Posso anexar documentos?', a: 'Em breve. Estamos implementando upload de PDF, DOC, DOCX, TXT e MD tanto no chat quanto no formulario de texto livre. Os arquivos passarao pelo mesmo filtro de dados sensiveis antes de serem processados.' },
+                { q: 'Meus dados sao armazenados onde?', a: 'Conversas ficam no localStorage do seu navegador (no seu dispositivo). Se voce criar conta, suas sugestoes e votos ficam em servidor protegido (Supabase), mas nunca vinculados a dados pessoais reais. Voce pode apagar tudo a qualquer momento.' },
+                { q: 'Como funciona a votacao?', a: 'Cada topico no forum pode receber votos positivos ou negativos. Quanto mais votos, mais destaque o tema ganha nos relatorios de inteligencia. Voce precisa de conta (com codinome anonimo) para votar, evitando manipulacao.' },
+                { q: 'Quem pode ver os relatorios?', a: 'Os relatorios de inteligencia e os topicos do forum sao publicos para qualquer pessoa com o link. A ideia e dar visibilidade aos problemas da base. Nenhum relatorio contem dados que identifiquem individuos.' },
+                { q: 'Posso exportar minha conversa?', a: 'Sim. Apos conversar com a IA, use os botoes de exportacao para salvar em PDF, DOCX ou Markdown. O arquivo fica no seu dispositivo, sem passar por nenhum servidor.' },
+                { q: 'O que e a Biblioteca Juridica?', a: 'Uma pagina com 27+ leis, sumulas e normativas relevantes para o policial civil, com descricoes em linguagem simples e links oficiais (Planalto, ALMG, STF). A IA tambem usa essas referencias para orientar respostas sobre questoes legais.' },
+                { q: 'O que e o codigo aberto?', a: 'Significa que qualquer pessoa pode ver, auditar e contribuir com o codigo do Tira-Voz no GitHub. Isso garante transparencia total: voce pode verificar pessoalmente que nenhum dado pessoal e coletado.' },
+                { q: 'Como reportar problemas da ferramenta?', a: 'Voce pode abrir um topico no forum com a tag "bug" ou "sugestao", ou acessar diretamente as Issues do projeto no GitHub. Toda contribuicao e bem-vinda.' },
+                { q: 'Isso vai dar em alguma coisa?', a: 'Ja esta dando. Os relatorios de inteligencia consolidam problemas reais relatados por policiais de todo o estado. Quanto mais gente participar, mais forte fica a voz da base. Os dados agregados podem embasar propostas concretas para gestores, deputados e a propria PCMG.' },
+              ].map((faq, i) => (
+                <details key={i} className="group rounded-xl border border-neutral-800/60 bg-neutral-900/40">
+                  <summary className="flex items-center gap-3 p-4 cursor-pointer list-none select-none hover:bg-neutral-800/40 rounded-xl transition">
+                    <ChevronDown className="w-4 h-4 text-neutral-500 transition-transform duration-300 group-open:rotate-180 flex-shrink-0" />
+                    <span className="text-sm font-medium text-white">{faq.q}</span>
+                  </summary>
+                  <div className="px-4 pb-4 pl-11">
+                    <p className="text-sm text-neutral-400 leading-relaxed">{faq.a}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
           </div>
 
           {/* ═══════════ CTA FINAL ═══════════ */}
