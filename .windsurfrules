@@ -62,8 +62,13 @@ Se o Caddy fizer proxy por nome de container, o app DEVE compartilhar a rede rev
 ### Activation Contract
 `/start` DEVE carregar handoff, TASKS, System Map, module roots e deploy surface antes de mudanças amplas.
 
+### Timeout & Fallback Contract
+Pesquisas externas e MCPs potencialmente lentos DEVEM começar com escopo reduzido, poucas respostas e fallback explícito.
+Se uma ferramenta travar, demorar além do razoável ou ficar sem retorno útil, o agente DEVE interromper cedo, informar o usuário e trocar para leitura local, consulta menor ou fonte alternativa.
+Nunca bloquear a sessão indefinidamente aguardando pesquisa longa.
+
 ### SSOT Tasks
-```
+```text
 TASKS.md (root)     ← ÚNICO local para tasks
 ├── P0 = Blockers (máx 3)
 ├── P1 = Sprint (máx 5)

@@ -19,7 +19,7 @@ A presente proposta visa a criacao formal do **Nucleo de Desenvolvimento e Intel
 - Prestar servico de tecnologia para todo o estado de Minas Gerais
 - Formar multiplicadores em IA aplicada a seguranca publica
 
-O investimento total estimado e de **R$ 135.000 a R$ 185.000** em equipamentos, mais **R$ 3.500 a R$ 4.500 mensais** em servicos de nuvem e assinaturas. Os ganhos em produtividade, desoneramento de servidores e modernizacao institucional justificam amplamente o investimento.
+O investimento total estimado e de **R$ 140.000 a R$ 215.000** em equipamentos e implantacao inicial, mais **R$ 2.500 a R$ 3.600 mensais** em operacao recorrente. Desse valor, uma parte mantem a base minima de producao no ar (VPS, banco, dominio, APIs e observabilidade) e outra parte acelera desenvolvimento, manutencao e pesquisa aplicada em IA. Os ganhos em produtividade, desoneramento de servidores e modernizacao institucional justificam amplamente o investimento.
 
 ---
 
@@ -36,6 +36,8 @@ O Brasil vive um momento historico de investimento em inteligencia artificial ap
 - **Portaria do Ministerio da Justica (junho/2025):** Autorizou formalmente o uso de inteligencia artificial em investigacoes criminais por todas as forcas policiais federais e estaduais que recebem recursos do Fundo Nacional de Seguranca Publica (FNSP).
 
 - **Projeto de Lei — Senado Federal (2025):** Proposta de destinacao de **0,5% do FNSP** exclusivamente para investimentos em Tecnologia da Informacao e Comunicacao (TIC), incluindo IA.
+
+Esse ambiente cria uma **janela normativa e orcamentaria favoravel** para projetos que combinem inovacao, governanca, rastreabilidade e protecao de direitos fundamentais no uso de IA pela seguranca publica.
 
 ### 1.2 O Que Outras Instituicoes Ja Estao Fazendo
 
@@ -109,6 +111,16 @@ Plataforma completa de **inteligencia institucional anonima** para policiais civ
 2. **Estabelecer parcerias** com universidades (UFU, UFMG, PUC Minas, UNIPAM) e centros de pesquisa
 3. **Contribuir com o ecossistema nacional** de IA em seguranca publica
 4. **Tornar Patos de Minas referencia** em inovacao policial no Brasil
+
+### 2.4 Governanca e Salvaguardas Minimas
+
+Para que o NDIA opere com seguranca institucional e legitimidade, recomenda-se adotar desde o inicio:
+
+- **Supervisao humana obrigatoria:** Nenhuma decisao que restrinja direitos deve ser tomada exclusivamente por IA
+- **Ambientes separados:** Distincao clara entre teste, homologacao e producao
+- **Trilha de auditoria:** Logs, versionamento, registro de acessos e governanca de alteracoes
+- **Protecao de dados:** Uso prioritario de modelos locais, filtros de PII, ATRiAN e minimizacao de envio de dados a terceiros
+- **Articulacao institucional:** Ponto focal com inteligencia, TI e controle interno para priorizacao e acompanhamento dos projetos
 
 ---
 
@@ -193,7 +205,20 @@ Plataforma completa de **inteligencia institucional anonima** para policiais civ
 
 **Justificativa:** Um Raspberry Pi 5 consome cerca de **R$ 3/mes de energia** e funciona 24/7 sem intervencao. E a forma mais economica e eficiente de manter agentes autonomos operando continuamente.
 
-### 3.5 Resumo de Custos — Equipamentos
+### 3.5 Infraestrutura de Apoio, Ergonomia e Operacao Diaria
+
+A produtividade do nucleo tambem depende de itens de uso continuo para jornadas longas de desenvolvimento, reunioes, gravacao, transcricao e analise de audio e video.
+
+| Item | Quantidade sugerida | Estimativa |
+|---|---|---|
+| Cadeiras ergonomicas de boa qualidade | 3 | R$ 4.500 a R$ 7.500 |
+| Headphones fechados de boa qualidade (~R$ 400 cada) | 3 | R$ 1.200 |
+| Microfone USB de boa qualidade | 1 | R$ 500 a R$ 1.200 |
+| Kits sem fio de mouse + teclado | 3 | R$ 900 a R$ 1.800 |
+| Monitores, no-break, cabos, hubs e suportes | - | R$ 2.900 a R$ 4.500 |
+| **TOTAL INFRAESTRUTURA DE APOIO** | | **R$ 10.000 a R$ 16.200** |
+
+### 3.6 Resumo de Custos — Equipamentos
 
 | Item | Estimativa Minima | Estimativa Maxima |
 |---|---|---|
@@ -201,29 +226,67 @@ Plataforma completa de **inteligencia institucional anonima** para policiais civ
 | Estacao Processamento de Dados | R$ 15.000 | R$ 25.000 |
 | MacBook Pro M5 Max (64-128GB) | R$ 30.000 | R$ 45.000 |
 | 2x Raspberry Pi 5 + acessorios | R$ 1.600 | R$ 2.000 |
-| Perifericos (monitores, teclados, cabos, no-break) | R$ 5.000 | R$ 8.000 |
-| **TOTAL EQUIPAMENTOS** | **R$ 121.600** | **R$ 175.000** |
+| Infraestrutura de apoio, audio, ergonomia e no-break | R$ 10.000 | R$ 16.200 |
+| **TOTAL EQUIPAMENTOS** | **R$ 126.600** | **R$ 183.200** |
 
 ---
 
 ## 4. SERVICOS DE NUVEM E ASSINATURAS
 
-Para acessar os **melhores modelos de IA do mundo** — que estao em constante evolucao e sao essenciais para desenvolvimento de ponta — sao necessarias assinaturas mensais:
+Para manter o nucleo em operacao continua e com capacidade real de entrega, sao necessarios custos recorrentes de software, nuvem e produtividade.
 
-| Servico | Custo Mensal (USD) | Custo Mensal (BRL*) | Justificativa |
+Esses custos cumprem duas funcoes permanentes:
+
+1. **Manter a operacao em producao**, com disponibilidade, banco de dados, dominio, logs, backup e fallback entre provedores
+2. **Acelerar desenvolvimento, manutencao e pesquisa aplicada**, reduzindo o tempo entre ideia, prototipo, validacao e deploy
+
+| Servico | Custo Mensal (USD) | Custo Mensal (BRL*) | Papel operacional |
 |---|---|---|---|
-| **Claude Code Max 20x** (Anthropic) | $200 | ~R$ 1.200 | Acesso ilimitado ao melhor assistente de programacao do mundo (Claude Opus 4.6). Essencial para desenvolvimento acelerado. Um desenvolvedor com Claude Code produz o equivalente a 3-5 desenvolvedores sem ele |
-| **ChatGPT Pro / Codex** (OpenAI) | $20 | ~R$ 120 | Acesso ao GPT-4o e Codex para tarefas complementares, geracao de codigo e prototipagem rapida |
-| **VPS (Contabo/DigitalOcean)** | $50-100 | ~R$ 300-600 | Servidor na nuvem para hospedar sistemas em producao (Tira-Voz, APIs, bancos de dados). Inclui armazenamento, backup e CDN |
+| **Claude Max 20x** (Anthropic) | $200 | ~R$ 1.200 | Assinatura de alta intensidade para Claude Code, sessoes longas de arquitetura, refatoracao, testes, documentacao e manutencao de repositorios grandes. A Anthropic posiciona o plano Max para usuarios frequentes e diarios, com acesso ao Claude Code em uma mesma assinatura |
+| **ChatGPT / Codex** (complementar) | $20 | ~R$ 120 | Apoio complementar para brainstorming, comparacao de saidas, revisao cruzada e prototipagem rapida |
+| **VPS (Contabo/DigitalOcean)** | $50-100 | ~R$ 300-600 | Servidor virtual privado 24/7 para hospedar sistemas em producao com sistema operacional, CPU, memoria, disco, rede, HTTPS, logs, backup e monitoramento |
 | **Supabase Pro** | $25 | ~R$ 150 | Banco de dados PostgreSQL gerenciado, autenticacao, storage e edge functions para aplicacoes em producao |
-| **DashScope (Alibaba)** | $20-50 | ~R$ 120-300 | API do Qwen (modelo primario do Tira-Voz). Custo por token muito inferior a OpenAI/Anthropic |
-| **OpenRouter** | $10-30 | ~R$ 60-180 | Gateway para modelos diversos (Gemini, Llama, Mistral). Fallback e routing inteligente |
-| **Dominio + DNS** | $5 | ~R$ 30 | Dominio `.ia.br` e servicos de DNS/SSL |
-| **GitHub Pro** | $4 | ~R$ 25 | Repositorios privados, CI/CD, Actions para deploy automatizado |
-| **TOTAL MENSAL** | **$334-434** | **~R$ 2.000-2.600** |
-| **TOTAL ANUAL** | | **~R$ 24.000-31.200** |
+| **DashScope (Alibaba)** | $20-50 | ~R$ 120-300 | API do Qwen, modelo primario do Tira-Voz, com boa relacao custo-beneficio |
+| **OpenRouter** | $10-30 | ~R$ 60-180 | Gateway para modelos alternativos (Gemini, Llama, Mistral), resiliencia e fallback |
+| **Dominio + DNS** | $5 | ~R$ 30 | Endereco institucional, DNS e SSL |
+| **GitHub Pro** | $4 | ~R$ 25 | Repositorios, CI/CD, Actions e trilha de auditoria tecnica |
+| **TOTAL MENSAL SOFTWARE/NUVEM** | **$334-434** | **~R$ 2.000-2.600** | Base tecnica recorrente do nucleo |
+| **TOTAL ANUAL SOFTWARE/NUVEM** | - | **~R$ 24.000-31.200** | Sem energia e internet dedicadas |
 
-*Conversao estimada: 1 USD = 6,00 BRL
+*Conversao estimada: 1 USD = 6,00 BRL*
+
+### 4.1 O que sao esses gastos fixos mensais
+
+Na pratica, ha duas camadas de gasto recorrente:
+
+- **Base operacional minima:** VPS, Supabase, DashScope, OpenRouter, dominio e GitHub. Sem isso, o sistema nao fica no ar com estabilidade, historico, seguranca, observabilidade e rota de fallback.
+- **Camada de produtividade e P&D:** Claude Max e ferramenta complementar de IA. Sem isso, o nucleo ainda opera, mas desenvolve, testa, documenta e itera mais lentamente.
+
+Em resumo: os custos fixos nao sao luxo. Eles compram disponibilidade, continuidade operacional e velocidade de entrega.
+
+### 4.2 Por que uma assinatura como Claude Max ajuda
+
+Essa assinatura nao serve apenas para "ter mais um chatbot". Ela serve para dar continuidade a sessoes longas de desenvolvimento, auditoria de codigo, leitura de repositorios inteiros e trabalho agentico no terminal.
+
+Segundo a Anthropic, o plano Max e voltado a **usuarios frequentes e diarios** e inclui acesso ao **Claude Code**. Isso importa porque desenvolvimento de software com IA deixou de ser apenas conversa pontual e passou a envolver refatoracoes multi-arquivo, geracao de testes, documentacao tecnica e manutencao de contexto por longos periodos.
+
+Simon Willison, uma das vozes mais respeitadas em IA aplicada a programacao, sustenta que LLMs **amplificam a expertise existente** e que sua maior vantagem pratica e a **velocidade de desenvolvimento**, desde que haja supervisao humana. Andrej Karpathy, ex-OpenAI e ex-Tesla, relatou recentemente a mudanca de um fluxo majoritariamente manual para um fluxo majoritariamente agentico, no qual se "programa em ingles" e se revisa com criterio humano.
+
+Para um nucleo pequeno, isso significa fazer mais com menos gente: escrever parsers, revisar codigo, estruturar APIs, gerar testes, documentar processos e reduzir o tempo entre problema, prototipo e deploy.
+
+### 4.3 O que e VPS e em que ele ajuda
+
+A sigla **VPS** significa **Virtual Private Server**. Em termos simples, e um servidor virtualizado que se comporta como um servidor dedicado, com sistema operacional proprio e recursos reservados ao projeto. Em provedores como DigitalOcean, um VPS equivale a uma maquina virtual pronta para hospedar aplicacoes reais na internet.
+
+No contexto do NDIA, a VPS ajuda a:
+
+1. Manter sistemas como o Tira-Voz disponiveis 24 horas por dia
+2. Publicar APIs e paginas web com dominio oficial, HTTPS e controle de versao
+3. Concentrar logs, backup, monitoramento e rotinas de atualizacao
+4. Separar o ambiente institucional de producao do notebook pessoal do desenvolvedor
+5. Viabilizar pilotos reais com usuarios de varias unidades, sem depender de maquina local ligada
+
+Sem VPS, o projeto fica restrito a demonstracoes locais e perde continuidade institucional.
 
 **Nota:** Esses valores sao **fracoes** do que custaria contratar desenvolvedores adicionais ou terceirizar o mesmo servico. Um unico desenvolvedor pleno no mercado privado custa R$ 12.000-20.000/mes em salario + encargos.
 
@@ -259,6 +322,7 @@ O quarto andar do predio da Delegacia Regional atualmente abriga o setor de Inte
 **Opcao B — Locacao de Espaco Externo**
 
 Em caso de inviabilidade da reforma, um espaco comercial proximo a delegacia com:
+
 - Sala comercial de 30-50m2
 - Infraestrutura de rede ja instalada
 - Aluguel estimado: R$ 2.000-4.000/mes
@@ -287,6 +351,7 @@ Em caso de inviabilidade da reforma, um espaco comercial proximo a delegacia com
 O **OpenClaw** e um assistente de IA autonomo de codigo aberto que roda **localmente**, sem enviar dados para servidores externos. Isso e critico para uso policial, onde a confidencialidade e mandatoria (LC 129/2013 Art. 84, Lei 12.527/2011).
 
 **Aplicacoes no contexto policial:**
+
 - Triagem automatica de documentos e emails institucionais
 - Gerenciamento de prazos processuais (flagrante, inquerito, cautelares)
 - Rascunho de pecas procedimentais (portarias, relatorios, oficios)
@@ -333,7 +398,15 @@ Com a estacao de IA proposta, o nucleo podera executar localmente:
 - **Ganho de inteligencia:** Capacidade de analise de padroes que seria impossivel manualmente
 - **Escalabilidade:** O modelo pode ser replicado para todas as 850+ delegacias de MG
 
-### 7.3 Disponibilidade para o Estado
+### 7.3 Indicadores Sugeridos de Acompanhamento
+
+- **Horas-homem economizadas** em OCR, digitacao, corte de video e consolidacao de dados
+- **Quantidade de relatorios** produzidos com apoio de IA ou automacao
+- **Tempo medio de resposta** em fluxos que passem a usar ferramentas do nucleo
+- **Numero de policiais capacitados** em IA e automacao por semestre
+- **Numero de unidades atendidas** por solucoes desenvolvidas em Patos de Minas
+
+### 7.4 Disponibilidade para o Estado
 
 O NDIA se coloca **a disposicao de todo o estado de Minas Gerais** para:
 
@@ -354,7 +427,7 @@ O plano e que **o conhecimento desenvolvido em Patos de Minas se espalhe por tod
 | Contratar empresa terceirizada de TI | R$ 30.000-80.000/mes | Dependencia externa, sem transferencia de conhecimento |
 | Contratar 3 desenvolvedores CLT | R$ 50.000-80.000/mes (salarios + encargos) | Alto custo recorrente, rotatividade |
 | Comprar software comercial de IA | R$ 100.000-500.000/ano (licencas) | Vendor lock-in, sem customizacao, dados em nuvem terceira |
-| **NDIA (esta proposta)** | **R$ 135.000-175.000 (unico) + R$ 2.500/mes** | Autonomia total, codigo aberto, dados locais, conhecimento institucional |
+| **NDIA (esta proposta)** | **R$ 140.000-215.000 (unico) + R$ 2.500-3.600/mes** | Autonomia total, codigo aberto, dados locais, conhecimento institucional |
 
 **O investimento em equipamentos se paga em menos de 3 meses** comparado a alternativa de terceirizacao ou contratacao equivalente.
 
@@ -366,15 +439,16 @@ O plano e que **o conhecimento desenvolvido em Patos de Minas se espalhe por tod
 
 | Categoria | Valor |
 |---|---|
-| Equipamentos (Secao 3) | R$ 121.600 — R$ 175.000 |
+| Equipamentos (Secao 3) | R$ 126.600 — R$ 183.200 |
 | Infraestrutura fisica — reforma (Secao 5) | R$ 15.000 — R$ 30.000 |
-| **TOTAL INICIAL** | **R$ 136.600 — R$ 205.000** |
+| **TOTAL INICIAL** | **R$ 141.600 — R$ 213.200** |
 
 ### 9.2 Custo Mensal Recorrente
 
 | Categoria | Valor |
 |---|---|
-| Servicos de nuvem e assinaturas (Secao 4) | R$ 2.000 — R$ 2.600 |
+| Base operacional minima em software/nuvem (VPS, banco, modelos, dominio, GitHub) | R$ 685 — R$ 1.285 |
+| Assinaturas de produtividade e desenvolvimento (Claude Max + apoio complementar) | R$ 1.320 |
 | Energia eletrica (estimativa) | R$ 300 — R$ 500 |
 | Internet dedicada (se necessario) | R$ 200 — R$ 500 |
 | **TOTAL MENSAL** | **R$ 2.500 — R$ 3.600** |
@@ -384,8 +458,8 @@ O plano e que **o conhecimento desenvolvido em Patos de Minas se espalhe por tod
 
 ## 10. FONTES DE FINANCIAMENTO SUGERIDAS
 
-1. **Fundo Nacional de Seguranca Publica (FNSP)** — Linha especifica para TIC em seguranca publica
-2. **FNDCT/Finep** — Financiamento de inovacao tecnologica no setor publico
+1. **Fundo Nacional de Seguranca Publica (FNSP)** — Linha especifica para TIC, inteligencia e modernizacao em seguranca publica
+2. **FNDCT/Finep** — Financiamento de inovacao tecnologica no setor publico, em linha com a agenda do PBIA e do INSPIRE
 3. **Emendas parlamentares** — Deputados estaduais e federais de Minas Gerais
 4. **Fundo Estadual de Seguranca Publica de MG** — Recursos proprios da PCMG
 5. **Parcerias com universidades** (UNIPAM, UFU, UFMG) — Projetos de extensao e pesquisa
@@ -416,9 +490,9 @@ O cenario nacional ja se movimenta rapidamente: a PM de Sao Paulo cria sua Fabri
 
 Patos de Minas ja demonstrou, com recursos minimos e iniciativa propria, que e possivel desenvolver ferramentas de alto impacto. O Pochete 2.0, o extrator de exames e o Tira-Voz sao provas concretas de viabilidade. O que falta e **infraestrutura, formalizacao e apoio institucional.**
 
-Com um investimento inicial de **R$ 135.000 a R$ 205.000** — menor que o custo de uma unica viatura equipada — a PCMG tera:
+Com um investimento inicial de **R$ 140.000 a R$ 215.000** — ainda compativel com projetos estruturantes de TIC e menor que diversas aquisicoes patrimoniais recorrentes da seguranca publica — a PCMG tera:
 
-- O **primeiro nucleo de IA em Policia Civil do Brasil**
+- O **primeiro nucleo de IA em Policia Civil estadual do Brasil**
 - Capacidade de **rodar modelos de inteligencia artificial localmente**, com sigilo total
 - Ferramentas que **liberam investigadores para investigar**
 - Um **centro de excelencia** a disposicao de todo o estado
@@ -441,6 +515,10 @@ Com um investimento inicial de **R$ 135.000 a R$ 205.000** — menor que o custo
 6. IntuitionLabs (2026). "Claude Max Plan: Pricing, Limits & Features"
 7. KSRED (2026). "Claude Code Pricing Guide: 93% savings vs API pricing"
 8. OpenClaw (2025-2026). "Open-source AI assistant that runs locally"
+9. Anthropic (2026). "Plans & Pricing", "Max plan" e Help Center "What is the Max plan?"
+10. Simon Willison (2025). "Here's how I use LLMs to help me write code"
+11. Andrej Karpathy (2026). Notas publicas sobre AI coding agents e "agentic engineering"
+12. DigitalOcean (2026). "Droplets" e "VPS Hosting"
 
 ### Anexo B — Referencias Institucionais
 
@@ -451,7 +529,7 @@ Com um investimento inicial de **R$ 135.000 a R$ 205.000** — menor que o custo
 5. PM-SP (2025). "Fabrica de Inteligencia Artificial para seguranca publica"
 6. Governo de Goias (2026). "IA Contra o Crime — ferramenta para forcas policiais"
 7. Prefeitura do Rio (2025). "CIVITAS/IRIS — 20.000 cameras inteligentes ate 2028"
-8. PF + ABDI (2025). "Projeto MITRA Nacional — IA/IoT para fronteiras"
+8. Policia Federal + ABDI (2025). "Projeto MITRA Nacional — IA/IoT para fronteiras"
 9. PC de Roraima (2025). "R$ 3,5 milhoes investidos em TI — 400+ computadores"
 10. PC de Santa Catarina (2025). "Inquerito Policial Digital"
 

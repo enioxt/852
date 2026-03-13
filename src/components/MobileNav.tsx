@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, Scale, FileText, AlertCircle, Home } from 'lucide-react';
+import { MessageSquare, Scale, FileText, AlertCircle, Home, PenLine, Radio } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Início', icon: Home },
   { href: '/chat', label: 'Chat', icon: MessageSquare },
+  { href: '/sugestao', label: 'Sugestão', icon: PenLine },
+  { href: '/papo-de-corredor', label: 'Corredor', icon: Radio },
   { href: '/issues', label: 'Fórum', icon: AlertCircle },
   { href: '/reports', label: 'Relatos', icon: FileText },
-  { href: '/legislacao', label: 'Leis', icon: Scale },
 ];
 
 export default function MobileNav() {
@@ -20,7 +21,7 @@ export default function MobileNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-neutral-950 border-t border-neutral-800/60 safe-area-bottom">
-      <div className="flex items-center justify-around h-14 px-1">
+      <div className="grid h-16 grid-cols-6 px-1">
         {NAV_ITEMS.map(item => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
           const Icon = item.icon;
@@ -28,14 +29,14 @@ export default function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[44px] rounded-lg transition ${
+              className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-lg transition ${
                 isActive
                   ? 'text-blue-400'
                   : 'text-neutral-500 active:text-neutral-300'
               }`}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[9px] font-medium">{item.label}</span>
+              <span className="text-[8px] font-medium">{item.label}</span>
             </Link>
           );
         })}

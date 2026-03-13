@@ -16,9 +16,10 @@ type CurrentUser = {
 const navItems = [
   { href: '/', label: 'Início' },
   { href: '/chat', label: 'Chat' },
-  { href: '/reports', label: 'Relatórios' },
+  { href: '/sugestao', label: 'Sugestão' },
   { href: '/issues', label: 'Tópicos' },
   { href: '/legislacao', label: 'Legislação' },
+  { href: '/reports', label: 'Relatórios' },
   { href: '/dashboard', label: 'Painel' },
 ] as const;
 

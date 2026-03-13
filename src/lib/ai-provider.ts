@@ -13,7 +13,8 @@ export type ModelTask =
   | 'html_report'
   | 'intelligence_report'
   | 'conversation_summary'
-  | 'name_validation';
+  | 'name_validation'
+  | 'correlation';
 
 export interface ModelConfig {
   modelId: string;
@@ -112,7 +113,7 @@ export function getModelConfig(task: ModelTask = 'chat'): ModelConfig {
     }
   }
 
-  if (task === 'review' || task === 'html_report' || task === 'conversation_summary') {
+  if (task === 'review' || task === 'html_report' || task === 'conversation_summary' || task === 'correlation') {
     if (hasOpenRouter()) {
       const modelId = 'google/gemini-2.0-flash-001';
       return {

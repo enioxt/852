@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock, Home, FileText, AlertCircle, User, LogOut, Loader2, RefreshCw, Shield, Trophy } from 'lucide-react';
+import { MessageSquarePlus, PanelLeftClose, PanelLeft, Trash2, HelpCircle, Clock, Home, FileText, AlertCircle, User, LogOut, Loader2, RefreshCw, Shield, Trophy, PenLine, Radio } from 'lucide-react';
 import { listConversations, deleteConversation, type Conversation } from '@/lib/chat-store';
 import { getIdentityKey, getOrCreateSessionHash } from '@/lib/session';
 
@@ -515,6 +515,24 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
         >
           <FileText className="w-4 h-4 flex-shrink-0" />
           {isOpen && <span>Relatórios</span>}
+        </Link>
+        <Link
+          href="/sugestao"
+          className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
+            ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
+          title="Sugestão direta"
+        >
+          <PenLine className="w-4 h-4 flex-shrink-0" />
+          {isOpen && <span>Sugestão</span>}
+        </Link>
+        <Link
+          href="/papo-de-corredor"
+          className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
+            ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
+          title="Papo de Corredor"
+        >
+          <Radio className="w-4 h-4 flex-shrink-0" />
+          {isOpen && <span>Corredor</span>}
         </Link>
         <Link
           href="/issues"

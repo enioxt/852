@@ -5,12 +5,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowRight, Lock, MessageSquare, FileDown, Users,
-  BarChart3, AlertCircle, Bot, ChevronUp, Loader2,
+  ArrowRight, Lock, FileDown, Users,
+  BarChart3, AlertCircle, Bot, Loader2,
   Mic, Brain, ClipboardList, ChevronDown, Shield,
-  Github, Code2, Eye, Send, PenLine, Scale,
-  Paperclip, HelpCircle, Vote, Upload, FileText,
-  Building2, UserCheck, Megaphone, Bookmark,
+  Github, Code2, Eye, PenLine, Scale,
+  HelpCircle,
 } from 'lucide-react';
 
 interface Stats {
@@ -206,7 +205,7 @@ export default function Home() {
 
               {/* Opcao 2: Texto livre (sem IA) */}
               <Link
-                href="/issues"
+                href="/sugestao"
                 className="group flex flex-col rounded-2xl border border-green-800/30 bg-green-950/20 p-6 hover:border-green-700/50 hover:bg-green-950/30 transition-all active:scale-[0.98]"
               >
                 <div className="w-14 h-14 rounded-xl bg-green-500/10 flex items-center justify-center mb-4">
@@ -214,15 +213,15 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">Escrever direto</h3>
                 <p className="text-sm text-neutral-400 leading-relaxed flex-1">
-                  Prefere nao usar IA? Sem problema. Escreva sua sugestao, relato ou reclamacao em texto livre. Crie topicos, vote e comente nos relatos de colegas. Tudo anonimo.
+                  Prefere nao conversar com a IA? Sem problema. Escreva sua sugestao em texto livre, anexe arquivos, revise o que for preciso e publique no forum quando estiver pronto.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Texto livre</span>
-                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Votar e comentar</span>
-                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Sem IA</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Upload de anexos</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Preview sanitizado</span>
                 </div>
                 <div className="mt-4 flex items-center gap-2 text-green-400 group-hover:text-green-300 font-medium text-sm">
-                  Abrir forum <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  Abrir sugestao <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             </div>
@@ -263,7 +262,7 @@ export default function Home() {
             </ExpandableCard>
             <ExpandableCard icon={Mic} title="Passo 1: Voce fala">
               <p>
-                Pode ser pelo chatbot (conversa com a IA) ou direto no forum (cria um topico). Conte o que acontece: falta de viatura, sistema fora do ar, sobrecarga, ideias que nunca chegam a chefia.
+                Pode ser pelo chatbot, conversando com a IA, ou pela sugestao direta, escrevendo texto livre com anexos e preview sanitizado antes da publicacao. Conte o que acontece: falta de viatura, sistema fora do ar, sobrecarga, ideias que nunca chegam a chefia.
               </p>
             </ExpandableCard>
             <ExpandableCard icon={Brain} title="Passo 2: A IA le, organiza e cruza">
@@ -413,6 +412,14 @@ export default function Home() {
           {/* ═══════════ LINKS SECUNDARIOS ═══════════ */}
           <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <Link
+              href="/sugestao"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto text-base text-neutral-400 hover:text-white transition px-4 py-3 rounded-xl hover:bg-neutral-800/40 touch-target"
+            >
+              <PenLine className="w-5 h-5" />
+              Enviar sugestao
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
               href="/reports"
               className="flex items-center justify-center gap-2 w-full sm:w-auto text-base text-neutral-400 hover:text-white transition px-4 py-3 rounded-xl hover:bg-neutral-800/40 touch-target"
             >
@@ -454,10 +461,10 @@ export default function Home() {
                 { q: 'E realmente anonimo?', a: 'Sim. Nao coletamos nomes, CPFs, IPs nem identificamos quem esta usando. O cadastro e opcional e usa codinomes aleatorios (ex: Falcao Noturno, Aguia de Ferro). Suas conversas ficam no seu navegador, nao em servidores.' },
                 { q: 'Quem esta por tras disso?', a: 'O Tira-Voz e um projeto de codigo aberto desenvolvido dentro do ecossistema EGOS. Todo o codigo fonte esta disponivel no GitHub para auditoria publica. Nao e vinculado a nenhuma chefia, sindicato ou organizacao externa.' },
                 { q: 'A IA vai me identificar?', a: 'Nao. A IA nao sabe quem voce e. Ela processa cada mensagem de forma isolada, sem cruzar com dados pessoais. Se voce mencionar algo que possa te identificar (nome, MASP, REDS), o sistema alerta automaticamente e pede que reformule.' },
-                { q: 'E se eu nao confiar na IA?', a: 'Sem problema. Voce pode usar a opcao "Escrever direto" no forum, que funciona como um formulario simples de texto. Nenhuma IA le ou responde, voce so escreve e publica. O filtro de dados sensiveis continua ativo para proteger voce.' },
+                { q: 'E se eu nao confiar na IA?', a: 'Sem problema. Voce pode usar a opcao "Escrever direto", que funciona como um formulario simples com upload de anexos e preview sanitizado. A revisao por IA e opcional: voce escolhe se quer usar ou nao antes de publicar o topico.' },
                 { q: 'Que tipo de relato posso fazer?', a: 'Problemas de fluxo, gargalos operacionais, falta de equipamento ou viatura, demandas repetitivas, sugestoes de melhoria, dificuldades com sistemas (REDS, PCNet), sobrecarga de plantao, questoes de efetivo, tudo que impacta o trabalho da Policia Civil.' },
                 { q: 'O que acontece com meu relato?', a: 'Quando voce compartilha um relato, ele entra na contagem. A cada 5 relatos, a IA gera automaticamente um relatorio de inteligencia cruzando padroes. Os temas mais citados viram topicos publicos onde a categoria pode votar e comentar.' },
-                { q: 'Posso anexar documentos?', a: 'Em breve. Estamos implementando upload de PDF, DOC, DOCX, TXT e MD tanto no chat quanto no formulario de texto livre. Os arquivos passarao pelo mesmo filtro de dados sensiveis antes de serem processados.' },
+                { q: 'Posso anexar documentos?', a: 'Sim, no fluxo de sugestao direta. O sistema aceita PDF, DOC, DOCX, TXT e MD, extrai o texto, mostra preview sanitizado e aplica a mesma protecao de dados antes da publicacao.' },
                 { q: 'Meus dados sao armazenados onde?', a: 'Conversas ficam no localStorage do seu navegador (no seu dispositivo). Se voce criar conta, suas sugestoes e votos ficam em servidor protegido (Supabase), mas nunca vinculados a dados pessoais reais. Voce pode apagar tudo a qualquer momento.' },
                 { q: 'Como funciona a votacao?', a: 'Cada topico no forum pode receber votos positivos ou negativos. Quanto mais votos, mais destaque o tema ganha nos relatorios de inteligencia. Voce precisa de conta (com codinome anonimo) para votar, evitando manipulacao.' },
                 { q: 'Quem pode ver os relatorios?', a: 'Os relatorios de inteligencia e os topicos do forum sao publicos para qualquer pessoa com o link. A ideia e dar visibilidade aos problemas da base. Nenhum relatorio contem dados que identifiquem individuos.' },

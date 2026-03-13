@@ -29,6 +29,12 @@ interface LawCategory {
   laws: Law[];
 }
 
+interface GlossaryEntry {
+  term: string;
+  meaning: string;
+  context: string;
+}
+
 /* ── Data ── */
 const categories: LawCategory[] = [
   {
@@ -340,6 +346,21 @@ const categories: LawCategory[] = [
   },
 ];
 
+const glossaryEntries: GlossaryEntry[] = [
+  { term: 'REDS', meaning: 'Registro de Eventos de Defesa Social', context: 'Sistema de registro e consolidação de ocorrências.' },
+  { term: 'BO', meaning: 'Boletim de Ocorrência', context: 'Documento-base do atendimento policial e da narrativa inicial do fato.' },
+  { term: 'TCO', meaning: 'Termo Circunstanciado de Ocorrência', context: 'Procedimento simplificado para infrações de menor potencial ofensivo.' },
+  { term: 'TC', meaning: 'Termo de Compromisso ou Termo Circunstanciado, conforme o contexto', context: 'Sigla recorrente em peças policiais e rotinas operacionais.' },
+  { term: 'IP', meaning: 'Inquérito Policial', context: 'Procedimento investigativo formal presidido pela autoridade policial.' },
+  { term: 'APF', meaning: 'Auto de Prisão em Flagrante', context: 'Formalização da prisão em flagrante com peças, oitivas e comunicações legais.' },
+  { term: 'DEAM', meaning: 'Delegacia Especializada de Atendimento à Mulher', context: 'Unidade especializada em violência doméstica e crimes correlatos.' },
+  { term: 'DIPO', meaning: 'Divisão de Processamento Operacional, conforme uso institucional local', context: 'Sigla ligada a fluxos internos e organização operacional da PCMG.' },
+  { term: 'DREX', meaning: 'Delegacia Regional Executiva, conforme nomenclatura da estrutura interna', context: 'Referência a coordenação regional e gestão operacional.' },
+  { term: 'IML', meaning: 'Instituto Médico-Legal', context: 'Perícia médico-legal em cadáveres, lesões e exames correlatos.' },
+  { term: 'IC', meaning: 'Instituto de Criminalística', context: 'Perícia técnica de local, vestígios, balística, documentos e laboratoriais.' },
+  { term: 'MASP', meaning: 'Matrícula de servidor público estadual', context: 'Identificador funcional usado em rotinas internas, nunca público no Tira-Voz.' },
+];
+
 /* ── Color helpers ── */
 function colorClasses(color: string) {
   const map: Record<string, { bg: string; border: string; text: string; badge: string; icon: string }> = {
@@ -381,6 +402,19 @@ export default function LegislacaoPage() {
         }),
       }))
       .filter(cat => cat.laws.length > 0);
+  }, [search]);
+
+  const filteredGlossary = useMemo(() => {
+    if (!search.trim()) return glossaryEntries;
+    const q = search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return glossaryEntries.filter(entry => {
+      const haystack = [entry.term, entry.meaning, entry.context]
+        .join(' ')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+      return haystack.includes(q);
+    });
   }, [search]);
 
   const totalLaws = categories.reduce((acc, cat) => acc + cat.laws.length, 0);
@@ -434,6 +468,42 @@ export default function LegislacaoPage() {
               Limpar
             </button>
           )}
+        </div>
+
+        <div className="mb-8 rounded-2xl border border-neutral-800/50 bg-neutral-900/50 p-5 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-300">
+                <BookOpen className="h-3.5 w-3.5 text-amber-400" />
+                Glossário operacional
+              </div>
+              <h2 className="mt-3 text-lg font-semibold text-white">Siglas e termos recorrentes da rotina policial</h2>
+              <p className="mt-1 text-sm leading-relaxed text-neutral-400">
+                Referência rápida para leitura de peças, sistemas e fluxos internos. Use a busca acima para localizar termos, siglas e normas no mesmo lugar.
+              </p>
+            </div>
+            <a
+              href="https://www.policiacivil.mg.gov.br/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl border border-neutral-700 bg-neutral-950 px-4 py-2 text-sm text-neutral-300 transition hover:bg-neutral-800 hover:text-white"
+            >
+              Portal oficial PCMG
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {filteredGlossary.map((entry) => (
+              <div key={entry.term} className="rounded-2xl border border-neutral-800/60 bg-neutral-950/70 p-4">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-400">{entry.term}</span>
+                </div>
+                <p className="mt-3 text-sm font-medium text-white">{entry.meaning}</p>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-400">{entry.context}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* ── Categories ── */}
@@ -511,7 +581,7 @@ export default function LegislacaoPage() {
         </div>
 
         {/* ── No results ── */}
-        {filteredCategories.length === 0 && (
+        {filteredCategories.length === 0 && filteredGlossary.length === 0 && (
           <div className="text-center py-12">
             <Search className="w-10 h-10 text-neutral-700 mx-auto mb-3" />
             <p className="text-neutral-400">Nenhuma lei encontrada para &quot;{search}&quot;</p>
@@ -535,10 +605,10 @@ export default function LegislacaoPage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/issues"
+              href="/sugestao"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-neutral-800/60 border border-neutral-700/50 text-neutral-300 hover:bg-neutral-700/60 transition text-sm font-medium"
             >
-              Sugerir no forum
+              Sugerir termo ou norma
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

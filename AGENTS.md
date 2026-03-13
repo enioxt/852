@@ -1,6 +1,6 @@
 # AGENTS.md — 852 Inteligência
 
-> **VERSION:** 2.0.0 | **UPDATED:** 2026-03-10
+> **VERSION:** 3.0.0 | **UPDATED:** 2026-03-13
 > **TYPE:** Next.js production chatbot + report sharing + EGOS-governed public repo
 
 ---
@@ -10,7 +10,7 @@
 ## LLM Reference Signature
 
 - **Role:** workspace map + deploy surface + governance entrypoint
-- **Summary:** Public anonymous institutional intelligence chatbot for Civil Police officers in Minas Gerais. Features AI-powered chat, PII detection, conversation review, report sharing with full user control, and ATRiAN ethical validation. Deployed on Contabo VPS, governed by the EGOS mesh.
+- **Summary:** Public anonymous institutional intelligence chatbot for Civil Police officers in Minas Gerais. Features AI-powered chat, PII detection, conversation review, report sharing, smart correlation engine, trending community topics (Papo de Corredor), and ATRiAN ethical validation. Deployed on Contabo VPS, governed by the EGOS mesh.
 - **Read next:**
   - `.windsurfrules` — active repo governance and local mandates
   - `TASKS.md` — current priorities and blockers
@@ -53,10 +53,16 @@
 │   ├── api/auth/generate-nickname/   # GET  /api/auth/generate-nickname — random codenames
 │   ├── api/auth/validate-name/       # POST /api/auth/validate-name — AI real-name blocker
 │   ├── api/leaderboard/route.ts      # GET  /api/leaderboard — anonymous reputation board
+│   ├── api/upload/parse/route.ts     # POST /api/upload/parse — file parsing for suggestions
 │   ├── api/review/route.ts           # POST /api/review — AI conversation analysis
 │   ├── api/report/route.ts           # POST /api/report — AI HTML report generation
+│   ├── api/correlate/route.ts        # POST /api/correlate — AI tag extraction + issue/report search
+│   ├── api/hot-topics/route.ts       # GET  /api/hot-topics — trending topics by engagement score
 │   ├── api/telemetry/route.ts        # GET  /api/telemetry — stats from Supabase
 │   ├── chat/page.tsx                 # Main chat UI (orchestrator, delegates to components)
+│   ├── sugestao/page.tsx             # Free-text suggestion flow with upload, PII and ATRiAN preview
+│   ├── legislacao/page.tsx           # Legal library + operational glossary
+│   ├── papo-de-corredor/page.tsx    # Trending community topics (hot topics)
 │   ├── reports/page.tsx              # Shared reports + AI report generator (tabs)
 │   ├── dashboard/page.tsx            # Insights dashboard (Recharts)
 │   ├── admin/telemetry/page.tsx      # Admin telemetry + ATRiAN violations dashboard
@@ -74,7 +80,9 @@
 │   └── ExportMenu.tsx                # PDF/DOCX/MD export + WhatsApp share
 │
 ├── src/components/
-│   ├── MobileNav.tsx                 # Mobile bottom navigation (5 tabs, safe-area)
+│   ├── MobileNav.tsx                 # Mobile bottom navigation (6 tabs, safe-area)
+│   ├── CorrelationPanel.tsx          # Smart correlation: AI tags + related issues/reports
+│   ├── HotTopicsTicker.tsx           # Trending topics sidebar widget
 │   ├── ClarityAnalytics.tsx          # Microsoft Clarity tracking component
 │   └── ui/                           # Shared UI components
 │
@@ -90,6 +98,8 @@
 │   ├── gamification.ts               # Points, ranks (Recruta-Comissário), leaderboard
 │   ├── rate-limit.ts                 # In-memory rate limiting
 │   ├── report-store.ts              # localStorage report persistence (Supabase-ready)
+│   ├── suggestion-store.ts           # localStorage drafts/history for direct suggestions
+│   ├── correlate.ts                  # Supabase search for related issues/reports
 │   ├── telemetry.ts                  # Dual telemetry: Supabase + structured JSON logs
 │
 ├── sql/
@@ -101,7 +111,7 @@
 └── .windsurfrules                    # Active Windsurf repo rules
 ```
 
-## Agent 852 — Current Capabilities (v4, 2026-03-13)
+## Agent 852 — Current Capabilities (v6, 2026-03-13)
 
 | # | Capability | Module | Status |
 |---|-----------|--------|--------|
@@ -137,9 +147,20 @@
 | 30 | AI Name Validator (blocks real names via Gemini Flash / OpenRouter) | `name-validator.ts` | Active |
 | 31 | Email Verification Flow (Resend API + token hashing) | `user-auth.ts` | Active |
 | 32 | Gamification (points, police ranks Recruta-Comissário, leaderboard) | `gamification.ts` | Active |
-| 33 | Mobile Bottom Navigation (5-tab fixed bar, safe-area) | `MobileNav.tsx` | Active |
+| 33 | Mobile Bottom Navigation (6-tab fixed bar, safe-area) | `MobileNav.tsx` | Active |
 | 34 | Leaderboard API (anonymous, ranked by reputation points) | `api/leaderboard/route.ts` | Active |
 | 35 | Copy rules enforcement (no em-dashes in public copy) | Global | Active |
+| 36 | Sugestão direta com texto livre, anexos e publicação em `/issues` | `sugestao/page.tsx` | Active |
+| 37 | Parsing de PDF, DOC, DOCX, TXT e MD com rate limit | `api/upload/parse/route.ts` | Active |
+| 38 | Histórico local de sugestões com rascunho, validação e reabertura | `suggestion-store.ts` | Active |
+| 39 | Glossário operacional integrado à biblioteca jurídica | `legislacao/page.tsx` | Active |
+| 40 | Roadmap institucional 852 ↔ polícia ↔ Intelink ↔ EGOS Intelligence ↔ IPED | `docs/ROADMAP_INTELIGENCIA_POLICIAL_INTEGRADA.md` | Active |
+| 41 | Smart Correlation Engine (AI tag extraction + related issues/reports search) | `api/correlate/route.ts` + `correlate.ts` | Active |
+| 42 | CorrelationPanel (debounced AI tags + related content + preview modals) | `CorrelationPanel.tsx` | Active |
+| 43 | Hot Topics API (engagement score = votes + comments + recency) | `api/hot-topics/route.ts` | Active |
+| 44 | Papo de Corredor page (trending community topics, ranked feed) | `papo-de-corredor/page.tsx` | Active |
+| 45 | HotTopicsTicker sidebar widget (top 6 topics with live polling) | `HotTopicsTicker.tsx` | Active |
+| 46 | Autosave visual indicator (green dot + timestamp in /sugestao) | `sugestao/page.tsx` | Active |
 
 ## Agent 852 — Roadmap
 
@@ -148,8 +169,11 @@
 | # | Feature | Notes |
 |---|---------|-------|
 | 1 | Espiral de Escuta (reports <85% approval reopen discussion) | AI re-analysis loop |
-| 2 | PDF/document upload for police issues | multer or presigned S3 |
+| 2 | Histórico remoto de sugestões para usuários autenticados | Supabase drafts + status sync |
 | 3 | LGPD consent banner + self-service data access | Lei 13.709/2018 |
+| 4 | Templates de relato e roteamento formal | sugestão, denúncia formal, triagem reservada |
+| 5 | Correlation in /chat (trigger after AI response) | Reuse CorrelationPanel |
+| 6 | AI summaries in Papo de Corredor (weekly digest) | qwen-plus aggregation |
 
 ### P2 (Backlog)
 
@@ -161,6 +185,7 @@
 | 4 | Voice input (speech-to-text via Browser API) | Web Speech API |
 | 5 | BYOK: users plug own API keys, shared key groups | Model transparency |
 | 6 | Automated PDF report from aggregated discussion data | puppeteer/weasyprint |
+| 7 | Intake institucional → triagem → caso → grafo | integração 852 + polícia + Intelink |
 
 ## User Flow
 
@@ -178,11 +203,33 @@ Landing (/)
   │     ├── Sidebar → conversation history, Home, Reports, FAQ
   │     └── Home icon → back to /
   │
+  ├── "Escrever direto" → /sugestao
+  │     ├── Texto livre + categoria + tags
+  │     ├── Upload de PDF/DOC/DOCX/TXT/MD
+  │     ├── PII scanner + ATRiAN preview
+  │     ├── Smart Correlation (AI tags + related issues/reports)
+  │     ├── Revisão automática opcional
+  │     ├── Export em PDF/Markdown
+  │     ├── Autosave local com indicador visual
+  │     └── Publicação final em /issues
+  │
+  ├── "Papo de Corredor" → /papo-de-corredor
+  │     ├── Top 3 featured topics (medal ranking)
+  │     ├── Full ranked list by engagement score
+  │     ├── Category summary badges
+  │     ├── 2-minute auto-refresh
+  │     └── CTAs → /sugestao, /chat
+  │
+  ├── "Biblioteca Jurídica" → /legislacao
+  │     ├── Leis e normativas por categoria
+  │     └── Glossário operacional com siglas recorrentes
+  │
   ├── "Ver relatórios" → /reports
   │     ├── Tab: Relatos Compartilhados → view/delete shared reports
   │     └── Tab: Gerador de Relatórios → AI HTML report from prompt
   │
   └── Internal pages
+        ├── /issues → discussion board with voting + comments
         ├── /dashboard → insights com métricas agregadas reais
         └── /admin/telemetry → KPIs, model usage, events
 ```

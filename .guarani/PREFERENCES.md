@@ -21,6 +21,7 @@
 7. **History Drift Protocol:** If remote migration history is out of sync, first inspect the mismatch, then repair tracking with `supabase migration repair --status reverted <versions>` and only then run `npx supabase db push --include-all` when needed to force local tracked migrations.
 8. **No Manual Hotfixes:** If an urgent production fix starts as raw SQL for investigation, it MUST be converted into a proper migration file before the task is considered done. Repo state and remote state must end aligned.
 9. **Verification After Push:** After every migration push, verify the expected columns/tables/indexes from the application surface that depends on them and record the result in project docs or TASKS when the migration was part of planned work.
+10. **Bounded Research:** External searches and potentially slow MCP calls MUST start with narrow scope, low result counts, and a clear fallback path. If a tool stalls or yields low-value results, stop early, inform the user, and switch to a smaller query or local evidence.
 
 ## Deploy Contract
 

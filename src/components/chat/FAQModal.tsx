@@ -15,7 +15,7 @@ const faqs = [
   {
     icon: Lock,
     q: 'O que acontece com o que eu escrevo?',
-    a: 'Suas mensagens são processadas em tempo real pela IA e descartadas após a resposta. Não há banco de dados vinculando você a qualquer conversa.',
+    a: 'No chat, suas mensagens são processadas em tempo real pela IA. Se preferir escrever sem conversar, use a página de sugestão direta: ela aceita anexos, mostra preview sanitizado e só publica no fórum quando você confirmar.',
   },
   {
     icon: AlertTriangle,
@@ -30,7 +30,7 @@ const faqs = [
   {
     icon: FileText,
     q: 'Posso exportar minha conversa?',
-    a: 'Sim. Após conversar, use os botões de exportação para salvar em PDF, DOCX ou Markdown. O arquivo fica no seu dispositivo, sem passar por nenhum servidor.',
+    a: 'Sim. No chat você pode exportar em PDF, DOCX ou Markdown. Na sugestão direta, você também pode exportar o texto validado em PDF ou Markdown antes de publicar.',
   },
   {
     icon: Share2,

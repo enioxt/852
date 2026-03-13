@@ -125,24 +125,44 @@
 - [x] **Busca client-side**: filtro por nome, assunto ou palavra-chave com normalização de acentos
 - [x] **Nav header + mobile**: "Legislação" adicionado ao SiteHeader e MobileNav
 - [x] **Referências legais no prompt da IA**: seção REFERÊNCIA LEGAL no prompt.ts para chat e intelligence_report
-- [ ] **Glossário policial**: termos, siglas, acrônimos da PCMG (REDS, SIDS, BO, TC, IP, APF, etc.)
+- [x] **Glossário policial**: termos, siglas e acrônimos operacionais integrados à `/legislacao` com busca compartilhada
 
 ### Landing Page Redesign
-- [ ] **Header fixo com nav completa**: Início, Chat, Sugestão, Tópicos, Legislação, Relatórios, Painel
-- [ ] **Duas entradas lado a lado**: "Conversar com IA" + "Enviar sugestão direto" (texto livre, sem IA)
-- [ ] **Fix duplicação de Tópicos**: remover seção inline duplicada, manter apenas link no header
-- [ ] **FAQ completa no bottom**: ~15 perguntas, collapsed por default, linguagem acessível
-- [ ] **CTA para Biblioteca Jurídica**: card ou banner convidando a consultar a legislação
+- [x] **Header fixo com nav completa**: Início, Chat, Sugestão, Tópicos, Legislação, Relatórios, Painel
+- [x] **Duas entradas lado a lado**: "Conversar com IA" + "Enviar sugestão direto" (texto livre, sem IA)
+- [x] **Fix duplicação de Tópicos**: landing passa a encaminhar o texto livre para `/sugestao`, mantendo o fórum como destino de publicação
+- [x] **FAQ completa no bottom**: FAQ ampliada e alinhada ao novo fluxo direto com anexos
+- [x] **CTA para Biblioteca Jurídica**: card/banner integrado à landing e CTA final na página jurídica
 
 ### Página /sugestao (Texto Livre)
-- [ ] **Textarea grande**: digitação livre sem interação com IA
-- [ ] **Upload de arquivos**: drag & drop + botão (PDF, DOC, DOCX, TXT, MD)
-- [ ] **API /api/upload/parse**: parsing server-side (pdf-parse, mammoth, native TXT/MD), limite 5MB
-- [ ] **Mesma pipeline ATRiAN + PII**: validação automática antes de publicar
-- [ ] **Preview antes de enviar**: usuário vê resultado da validação
-- [ ] **Categoria/tags opcionais**: classificação da sugestão
-- [ ] **Histórico de sugestões**: localStorage (anon) / Supabase (logado)
-- [ ] **Exportar em PDF/MD**: mesma funcionalidade do chat
+- [x] **Textarea grande**: digitação livre sem interação com IA
+- [x] **Upload de arquivos**: drag & drop + botão (PDF, DOC, DOCX, TXT, MD)
+- [x] **API /api/upload/parse**: parsing server-side com limite de 5MB e rate limit
+- [x] **Mesma pipeline ATRiAN + PII**: validação automática antes de publicar
+- [x] **Preview antes de enviar**: usuário vê resultado da validação
+- [x] **Categoria/tags opcionais**: classificação da sugestão
+- [x] **Histórico local de sugestões**: autosave, reabertura e status (rascunho, validado, publicado)
+- [x] **Exportar em PDF/MD**: mesma funcionalidade do chat
+- [ ] **Histórico remoto de sugestões para usuários logados**: sincronizar drafts/validações com Supabase
+
+### Roadmap Institucional
+- [x] **Roadmap integrado**: documento `docs/ROADMAP_INTELIGENCIA_POLICIAL_INTEGRADA.md` conectando `852`, `policia`, `Intelink`, EGOS Intelligence e IPED
+
+## ✅ P1 - Sprint v7 (Smart Correlation + Hot Topics, 2026-03-13)
+
+- [x] **Smart Correlation Engine**: API `/api/correlate` com AI tag extraction (qwen-plus/Gemini) + busca ilike em issues e reports do Supabase
+- [x] **Correlation lib**: `src/lib/correlate.ts` com `searchIssuesAndReports()` deduplicated, sorted
+- [x] **CorrelationPanel component**: debounced (2.5s, min 50 chars), AI-suggested tags, custom tag input, related issues/reports cards, preview modals
+- [x] **Integração /sugestao**: CorrelationPanel + HotTopicsTicker integrados na página de sugestão direta
+- [x] **Autosave visual indicator**: green dot pulsante + timestamp "Rascunho salvo HH:MM" no form
+- [x] **Hot Topics API**: `/api/hot-topics` com scoring (votes*3 + comments*2 + recency_bonus), revalidate 120s
+- [x] **Papo de Corredor page**: `/papo-de-corredor` com top 3 featured, ranked list, category badges, 2-min auto-refresh
+- [x] **HotTopicsTicker widget**: sidebar component com top 6 topics, 3-min polling, category dot colors
+- [x] **MobileNav atualizado**: "Corredor" (Radio icon) substituiu "Leis" na nav mobile
+- [x] **Sidebar atualizado**: link "Corredor" adicionado entre Sugestão e Tópicos
+- [x] **ai-provider.ts**: task type `correlation` adicionado, roteado para modelo rápido/econômico
+- [x] **Tag handling bidirectional**: tags da IA podem ser aceitas/removidas, tags manuais coexistem
+- [x] **Build limpo**: 51 rotas compilam sem erros TypeScript
 
 ### Melhorias de Experiência
 - [ ] **QR Code para delegacias**: gerar QR imprimível que leva ao Tira-Voz, para mural da delegacia
