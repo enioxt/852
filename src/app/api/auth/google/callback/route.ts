@@ -27,7 +27,7 @@ export async function GET(req: Request) {
 
   try {
     const oauthState = await consumeGoogleOAuthState(state);
-    const tokens = await exchangeGoogleCode(code, oauthState.codeVerifier);
+    const tokens = await exchangeGoogleCode(code, oauthState.codeVerifier, requestUrl.origin);
     const profile = await fetchGoogleUserProfile(tokens.access_token);
     const result = await loginWithGoogleIdentity(profile);
 

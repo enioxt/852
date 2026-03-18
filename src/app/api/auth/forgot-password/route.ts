@@ -5,6 +5,7 @@ const FORGOT_PASSWORD_LIMIT = { limit: 3, windowMs: 15 * 60 * 1000 };
 
 export async function POST(req: Request) {
   try {
+    const requestUrl = new URL(req.url);
     const ip = getClientIp(req.headers);
     const rl = checkRateLimit(`forgot-password:${ip}`, FORGOT_PASSWORD_LIMIT.limit, FORGOT_PASSWORD_LIMIT.windowMs);
     if (!rl.allowed) {
@@ -15,9 +16,9 @@ export async function POST(req: Request) {
     }
 
     const { email } = await req.json();
-    const result = await requestPasswordReset(String(email || ''));
+    const result = await requestPasswordReset(String(email || ''), { baseUrl: requestUrl.origin });
     if (!result.success) {
-      return Response.json({ error: result.error || 'Falha ao iniciar recuperação.' }, { status: 400 });
+      return Response.json({ error: result.error || 'Falha ao iniciar recuperação.' }, { status: result.status ?? 400 });
     }
 
     return Response.json({

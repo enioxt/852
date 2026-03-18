@@ -32,6 +32,8 @@ export type TelemetryEventType =
   | 'user_login'
   | 'email_verification_sent'
   | 'email_verified'
+  | 'email_code_sent'
+  | 'email_code_verified'
   | 'rate_limited';
 
 export interface TelemetryEvent {

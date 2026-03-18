@@ -310,14 +310,12 @@ function ChatPageClient() {
       {/* Sidebar */}
       <div className={`${sidebarOpen ? 'fixed inset-y-0 left-0 z-40 md:relative md:z-auto' : 'hidden md:block'}`}>
       <Sidebar
-        key={authIntent ?? 'default'}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         activeConversationId={activeConvId}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
         onShowFAQ={() => setShowFAQ(true)}
-        requestedAuthMode={authIntent}
       />
       </div>
 

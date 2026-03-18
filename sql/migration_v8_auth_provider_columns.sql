@@ -32,6 +32,9 @@ UPDATE user_accounts_852
   WHERE auth_provider IS NULL AND password_hash IS NOT NULL;
 
 -- ── 5. Update pending_validations view to include new columns ─────────
+-- Drop and recreate because column names changed (nome_partial → display_name)
+
+DROP VIEW IF EXISTS pending_validations_852;
 
 CREATE OR REPLACE VIEW pending_validations_852 AS
   SELECT

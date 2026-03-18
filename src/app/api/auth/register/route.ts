@@ -6,6 +6,7 @@ const REGISTER_LIMIT = { limit: 3, windowMs: 30 * 60 * 1000 };
 
 export async function POST(req: Request) {
   try {
+    const requestUrl = new URL(req.url);
     const ip = getClientIp(req.headers);
     const rl = checkRateLimit(`register:${ip}`, REGISTER_LIMIT.limit, REGISTER_LIMIT.windowMs);
     if (!rl.allowed) {
@@ -23,9 +24,9 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Senha deve ter pelo menos 8 caracteres' }, { status: 400 });
     }
 
-    const result = await registerUser(email, password, displayName, masp, lotacao);
+    const result = await registerUser(email, password, displayName, masp, lotacao, { baseUrl: requestUrl.origin });
     if ('error' in result) {
-      return Response.json({ error: result.error }, { status: 400 });
+      return Response.json({ error: result.error }, { status: result.status ?? 400 });
     }
 
     recordEvent({ event_type: 'user_registered', metadata: { userId: result.user?.id } });

@@ -5,6 +5,7 @@ const RESEND_LIMIT = { limit: 3, windowMs: 30 * 60 * 1000 };
 
 export async function POST(req: Request) {
   try {
+    const requestUrl = new URL(req.url);
     const ip = getClientIp(req.headers);
     const rl = checkRateLimit(`auth:resend-verification:${ip}`, RESEND_LIMIT.limit, RESEND_LIMIT.windowMs);
     if (!rl.allowed) {
@@ -19,9 +20,9 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Email obrigatório' }, { status: 400 });
     }
 
-    const result = await resendVerificationEmail(email);
+    const result = await resendVerificationEmail(email, { baseUrl: requestUrl.origin });
     if (!result.success) {
-      return Response.json({ error: result.error || 'Falha ao reenviar verificação' }, { status: 500 });
+      return Response.json({ error: result.error || 'Falha ao reenviar verificação' }, { status: result.status ?? 500 });
     }
 
     return Response.json({

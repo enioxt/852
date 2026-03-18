@@ -64,7 +64,17 @@ function normalizeMasp(masp?: string | null) {
   return digits || null;
 }
 
-function getPublicBaseUrl() {
+function normalizeBaseUrl(baseUrl?: string | null) {
+  const trimmed = baseUrl?.trim() || '';
+  if (!trimmed || !/^https?:\/\//i.test(trimmed)) return '';
+  return trimmed.replace(/\/$/, '');
+}
+
+function getPublicBaseUrl(baseUrl?: string | null) {
+  const runtimeBaseUrl = normalizeBaseUrl(baseUrl);
+  if (runtimeBaseUrl) {
+    return runtimeBaseUrl;
+  }
   if (process.env.PUBLIC_BASE_URL) {
     return process.env.PUBLIC_BASE_URL.replace(/\/$/, '');
   }
@@ -97,15 +107,15 @@ async function sha256(value: string): Promise<string> {
   return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-async function issueEmailVerification(params: { userId: string; email: string; displayName?: string | null }) {
+async function issueEmailVerification(params: { userId: string; email: string; displayName?: string | null; baseUrl?: string | null }) {
   const sb = getSupabase();
-  if (!sb) return { error: 'Supabase não configurado' };
+  if (!sb) return { error: 'Supabase não configurado', status: 503 };
 
   const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`;
   const tokenHash = await sha256(token);
   const now = new Date().toISOString();
   const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_WINDOW_MS).toISOString();
-  const verificationUrl = `${getPublicBaseUrl()}/verificar-email?token=${encodeURIComponent(token)}`;
+  const verificationUrl = `${getPublicBaseUrl(params.baseUrl)}/verificar-email?token=${encodeURIComponent(token)}`;
 
   const { error: updateError } = await sb
     .from('user_accounts_852')
@@ -116,10 +126,10 @@ async function issueEmailVerification(params: { userId: string; email: string; d
     })
     .eq('id', params.userId);
 
-  if (updateError) return { error: updateError.message };
+  if (updateError) return { error: updateError.message, status: 500 };
 
   const resendApiKey = process.env.RESEND_API_KEY;
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <noreply@intelink.ia.br>';
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <onboarding@resend.dev>';
   if (!resendApiKey) {
     return {
       sent: false,
@@ -239,27 +249,28 @@ export async function registerUser(
   displayName?: string,
   masp?: string,
   lotacao?: string,
+  options?: { baseUrl?: string | null },
 ) {
   const sb = getSupabase();
-  if (!sb) return { error: 'Supabase não configurado' };
+  if (!sb) return { error: 'Supabase não configurado', status: 503 };
 
   const normalizedEmail = normalizeEmail(email);
   const normalizedDisplayName = normalizeDisplayName(displayName);
   const normalizedMasp = normalizeMasp(masp);
 
   if (!normalizedDisplayName) {
-    return { error: 'Codinome obrigatório' };
+    return { error: 'Codinome obrigatório', status: 400 };
   }
 
   if (normalizedDisplayName) {
     const nameValidation = await validateDisplayName(normalizedDisplayName);
     if (!nameValidation.valid) {
-      return { error: nameValidation.reason || 'Codinome inválido' };
+      return { error: nameValidation.reason || 'Codinome inválido', status: 400 };
     }
   }
 
   if (normalizedMasp && !/^\d{8}$/.test(normalizedMasp)) {
-    return { error: 'MASP inválido. Use o número com 8 dígitos. Exemplo: 12571402.' };
+    return { error: 'MASP inválido. Use o número com 8 dígitos. Exemplo: 12571402.', status: 400 };
   }
 
   const { data: existing } = await sb
@@ -268,7 +279,7 @@ export async function registerUser(
     .eq('email', normalizedEmail)
     .maybeSingle();
 
-  if (existing) return { error: 'Este email já está cadastrado' };
+  if (existing) return { error: 'Este email já está cadastrado', status: 409 };
 
   if (normalizedMasp) {
     const { data: maspExisting } = await sb
@@ -276,7 +287,7 @@ export async function registerUser(
       .select('id')
       .eq('masp', normalizedMasp)
       .maybeSingle();
-    if (maspExisting) return { error: 'Este MASP já está cadastrado' };
+    if (maspExisting) return { error: 'Este MASP já está cadastrado', status: 409 };
   }
 
   const { hash, salt } = await hashPassword(password);
@@ -299,14 +310,15 @@ export async function registerUser(
     .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points')
     .single();
 
-  if (error) return { error: error.message };
+  if (error) return { error: error.message, status: 500 };
 
   const verificationResult = await issueEmailVerification({
     userId: data.id,
     email: data.email,
     displayName: data.display_name,
+    baseUrl: options?.baseUrl,
   });
-  if ('error' in verificationResult) return { error: verificationResult.error };
+  if ('error' in verificationResult) return { error: verificationResult.error, status: verificationResult.status ?? 500 };
 
   return {
     user: buildPublicUser(data as AuthUserRow),
@@ -319,7 +331,7 @@ export async function registerUser(
 
 export async function loginUser(email: string, password: string) {
   const sb = getSupabase();
-  if (!sb) return { error: 'Supabase não configurado' };
+  if (!sb) return { error: 'Supabase não configurado', status: 503 };
 
   const normalizedEmail = normalizeEmail(email);
   const { data: user } = await sb
@@ -329,8 +341,8 @@ export async function loginUser(email: string, password: string) {
     .maybeSingle();
 
   const authUser = user as AuthUserRow | null;
-  if (!authUser) return { error: 'Email ou senha incorretos' };
-  if (!authUser.is_active) return { error: 'Conta desativada' };
+  if (!authUser) return { error: 'Email ou senha incorretos', status: 401 };
+  if (!authUser.is_active) return { error: 'Conta desativada', status: 403 };
   if (!authUser.password_hash) {
     return {
       error: 'Esta conta foi criada com Google. Entre com Google ou defina uma senha na sua conta.',
@@ -340,7 +352,7 @@ export async function loginUser(email: string, password: string) {
 
   const [salt, storedHash] = authUser.password_hash.split(':');
   const valid = await verifyPassword(password, storedHash, salt);
-  if (!valid) return { error: 'Email ou senha incorretos' };
+  if (!valid) return { error: 'Email ou senha incorretos', status: 401 };
 
   if (!authUser.email_verified_at && authUser.email_verification_sent_at) {
     return {
@@ -442,7 +454,7 @@ export async function loginWithGoogleIdentity(profile: {
           avatar_url: profile.picture || null,
           profile_completed_at: null,
         })
-        .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+        .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points')
         .single();
 
       if (error) return { error: error.message };
@@ -663,10 +675,7 @@ async function verifySignedToken(token: string): Promise<PasswordResetTokenPaylo
   return payload;
 }
 
-async function issuePasswordReset(params: { userId: string; email: string; displayName?: string | null; passwordSetAt: string | null }) {
-  const sb = getSupabase();
-  if (!sb) return { error: 'Supabase não configurado' };
-
+async function issuePasswordReset(params: { userId: string; email: string; displayName?: string | null; passwordSetAt: string | null; baseUrl?: string | null }) {
   const token = await createSignedToken({
     sub: params.userId,
     email: params.email,
@@ -674,10 +683,10 @@ async function issuePasswordReset(params: { userId: string; email: string; displ
     exp: Math.floor((Date.now() + EMAIL_VERIFICATION_WINDOW_MS) / 1000),
     passwordSetAt: params.passwordSetAt,
   });
-  const resetUrl = `${getPublicBaseUrl()}/conta?auth=reset&token=${encodeURIComponent(token)}`;
+  const resetUrl = `${getPublicBaseUrl(params.baseUrl)}/conta?auth=reset&token=${encodeURIComponent(token)}`;
 
   const resendApiKey = process.env.RESEND_API_KEY;
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <noreply@intelink.ia.br>';
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <onboarding@resend.dev>';
   if (!resendApiKey) {
     return {
       sent: false,
@@ -729,12 +738,12 @@ async function issuePasswordReset(params: { userId: string; email: string; displ
   };
 }
 
-export async function requestPasswordReset(email: string) {
+export async function requestPasswordReset(email: string, options?: { baseUrl?: string | null }) {
   const sb = getSupabase();
-  if (!sb) return { success: false, error: 'Supabase não configurado' };
+  if (!sb) return { success: false, error: 'Supabase não configurado', status: 503 };
 
   const normalizedEmail = normalizeEmail(email);
-  if (!normalizedEmail) return { success: false, error: 'Email obrigatório' };
+  if (!normalizedEmail) return { success: false, error: 'Email obrigatório', status: 400 };
 
   const { data: user } = await sb
     .from('user_accounts_852')
@@ -751,6 +760,7 @@ export async function requestPasswordReset(email: string) {
     email: user.email,
     displayName: user.display_name,
     passwordSetAt: user.password_set_at,
+    baseUrl: options?.baseUrl,
   });
 
   return {
@@ -873,12 +883,12 @@ export async function verifyEmailToken(token: string) {
   };
 }
 
-export async function resendVerificationEmail(email: string) {
+export async function resendVerificationEmail(email: string, options?: { baseUrl?: string | null }) {
   const sb = getSupabase();
-  if (!sb) return { success: false, error: 'Supabase não configurado' };
+  if (!sb) return { success: false, error: 'Supabase não configurado', status: 503 };
 
   const normalizedEmail = normalizeEmail(email);
-  if (!normalizedEmail) return { success: false, error: 'Email obrigatório' };
+  if (!normalizedEmail) return { success: false, error: 'Email obrigatório', status: 400 };
 
   const { data: user } = await sb
     .from('user_accounts_852')
@@ -893,15 +903,221 @@ export async function resendVerificationEmail(email: string) {
     userId: user.id,
     email: user.email,
     displayName: user.display_name,
+    baseUrl: options?.baseUrl,
   });
 
-  if ('error' in verificationResult) return { success: false, error: verificationResult.error };
+  if ('error' in verificationResult) {
+    return {
+      success: false,
+      error: verificationResult.error,
+      status: verificationResult.status ?? 500,
+    };
+  }
 
   return {
     success: true,
     verificationEmailSent: verificationResult.sent,
     warning: verificationResult.sent ? undefined : verificationResult.warning,
     debugVerificationUrl: verificationResult.debugVerificationUrl,
+  };
+}
+
+// ── Email Code (OTP) Login ──────────────────────────────────────────
+
+const EMAIL_CODE_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
+const EMAIL_CODE_MAX_ACTIVE = 3; // max pending codes per email in window
+
+function generateOtpCode(): string {
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return String(array[0] % 1000000).padStart(6, '0');
+}
+
+export async function sendEmailCode(
+  email: string,
+  options?: { baseUrl?: string | null; ip?: string | null },
+) {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado', status: 503 };
+
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    return { error: 'Email inválido', status: 400 };
+  }
+
+  // Rate limit: max 3 active codes per email
+  const windowStart = new Date(Date.now() - EMAIL_CODE_EXPIRY_MS).toISOString();
+  const { count } = await sb
+    .from('auth_codes_852')
+    .select('id', { count: 'exact', head: true })
+    .eq('email', normalizedEmail)
+    .is('used_at', null)
+    .gte('created_at', windowStart);
+
+  if ((count ?? 0) >= EMAIL_CODE_MAX_ACTIVE) {
+    return { error: 'Muitos códigos enviados. Aguarde alguns minutos.', status: 429 };
+  }
+
+  const code = generateOtpCode();
+  const codeHash = await sha256(code);
+  const expiresAt = new Date(Date.now() + EMAIL_CODE_EXPIRY_MS).toISOString();
+
+  const { error: insertError } = await sb.from('auth_codes_852').insert({
+    email: normalizedEmail,
+    code_hash: codeHash,
+    expires_at: expiresAt,
+    ip_address: options?.ip || null,
+  });
+
+  if (insertError) return { error: insertError.message, status: 500 };
+
+  // Send email via Resend
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <onboarding@resend.dev>';
+
+  if (!resendApiKey) {
+    return {
+      sent: false,
+      warning: 'Envio de email não está configurado neste ambiente.',
+      debugCode: process.env.NODE_ENV === 'production' ? undefined : code,
+    };
+  }
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: resendFromEmail,
+      to: [normalizedEmail],
+      subject: 'Seu código de acesso — Tira-Voz',
+      html: `
+        <div style="background:#0a0a0a;padding:32px;font-family:Inter,Arial,sans-serif;color:#e5e7eb;line-height:1.6;">
+          <div style="max-width:560px;margin:0 auto;border:1px solid #262626;border-radius:18px;padding:32px;background:#111111;">
+            <p style="margin:0 0 16px;font-size:14px;color:#93c5fd;">Tira-Voz</p>
+            <h1 style="margin:0 0 16px;font-size:24px;color:#ffffff;">Seu código de acesso</h1>
+            <p style="margin:0 0 24px;font-size:15px;color:#d4d4d8;">Use o código abaixo para entrar. Ele expira em 10 minutos.</p>
+            <div style="background:#1a1a2e;border:2px solid #2563eb;border-radius:12px;padding:20px;text-align:center;margin:0 0 24px;">
+              <span style="font-size:36px;font-weight:700;letter-spacing:8px;color:#ffffff;font-family:monospace;">${code}</span>
+            </div>
+            <p style="margin:0;font-size:13px;color:#a1a1aa;">Se você não solicitou este código, ignore este email.</p>
+          </div>
+        </div>
+      `,
+      text: `Seu código de acesso ao Tira-Voz: ${code}\n\nEle expira em 10 minutos. Se você não solicitou, ignore este email.`,
+    }),
+  });
+
+  if (!response.ok) {
+    console.error('[852-auth] code email error:', await response.text());
+    return {
+      sent: false,
+      warning: 'Não foi possível enviar o email agora. Tente novamente.',
+      debugCode: process.env.NODE_ENV === 'production' ? undefined : code,
+    };
+  }
+
+  await recordEvent({ event_type: 'email_code_sent', metadata: { email: normalizedEmail } });
+
+  return {
+    sent: true,
+    debugCode: process.env.NODE_ENV === 'production' ? undefined : code,
+  };
+}
+
+export async function verifyEmailCode(
+  email: string,
+  code: string,
+  options?: { baseUrl?: string | null },
+) {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado', status: 503 };
+
+  const normalizedEmail = normalizeEmail(email);
+  const codeHash = await sha256(code.trim());
+  const now = new Date().toISOString();
+
+  // Find matching unused code
+  const { data: codeRow } = await sb
+    .from('auth_codes_852')
+    .select('id, expires_at')
+    .eq('email', normalizedEmail)
+    .eq('code_hash', codeHash)
+    .is('used_at', null)
+    .gte('expires_at', now)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!codeRow) {
+    return { error: 'Código inválido ou expirado.', status: 401 };
+  }
+
+  // Mark code as used
+  await sb.from('auth_codes_852').update({ used_at: now }).eq('id', codeRow.id);
+
+  // Invalidate other pending codes for this email
+  await sb
+    .from('auth_codes_852')
+    .update({ used_at: now })
+    .eq('email', normalizedEmail)
+    .is('used_at', null);
+
+  // Check if user exists
+  const { data: existingUser } = await sb
+    .from('user_accounts_852')
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points, is_active')
+    .eq('email', normalizedEmail)
+    .maybeSingle();
+
+  if (existingUser) {
+    const authUser = existingUser as AuthUserRow;
+    if (!authUser.is_active) return { error: 'Conta desativada', status: 403 };
+
+    // Mark email as verified if not already
+    if (!authUser.email_verified_at) {
+      await sb
+        .from('user_accounts_852')
+        .update({ email_verified_at: now })
+        .eq('id', authUser.id);
+      authUser.email_verified_at = now;
+    }
+
+    await createSession(authUser.id);
+    await updateLastLogin(authUser.id);
+    await recordEvent({ event_type: 'user_login', metadata: { userId: authUser.id, method: 'email_code' } });
+
+    return {
+      user: buildPublicUser(authUser),
+      isNewUser: false,
+    };
+  }
+
+  // Create new account (no password, will need nickname onboarding)
+  const { data: newUser, error: insertError } = await sb
+    .from('user_accounts_852')
+    .insert({
+      email: normalizedEmail,
+      password_hash: null,
+      display_name: null,
+      validation_status: 'none',
+      email_verified_at: now,
+      auth_provider: 'email_code',
+      profile_completed_at: null,
+    })
+    .select('id, email, display_name, masp, lotacao, validation_status, email_verified_at, password_set_at, password_hash, auth_provider, google_sub, avatar_url, profile_completed_at, reputation_points')
+    .single();
+
+  if (insertError) return { error: insertError.message, status: 500 };
+
+  await createSession(newUser.id);
+  await recordEvent({ event_type: 'user_registered', metadata: { userId: newUser.id, method: 'email_code' } });
+
+  return {
+    user: buildPublicUser(newUser as AuthUserRow),
+    isNewUser: true,
   };
 }
 

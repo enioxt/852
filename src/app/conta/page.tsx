@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, BadgeCheck, Flame, Loader2, Lock, LogOut, Mail, RefreshCw, Shield, Trophy, User, Waypoints } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Flame, KeyRound, Loader2, Lock, LogOut, Mail, RefreshCw, Shield, Trophy, User, Waypoints } from 'lucide-react';
 import GoogleIdentityButton from '@/components/auth/GoogleIdentityButton';
 
 type CurrentUser = {
@@ -103,6 +103,11 @@ function AccountPageContent() {
   const [passwordError, setPasswordError] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [loginMethod, setLoginMethod] = useState<'password' | 'code'>('password');
+  const [codeSent, setCodeSent] = useState(false);
+  const [codeInput, setCodeInput] = useState('');
+  const [codeLoading, setCodeLoading] = useState(false);
+  const [debugCode, setDebugCode] = useState('');
 
   const syncAuth = async () => {
     try {
@@ -136,6 +141,12 @@ function AccountPageContent() {
     setAuthError(initialError);
   }, [initialError]);
 
+  useEffect(() => {
+    if (requestedAuthMode === 'reset' && !resetToken) {
+      setAuthError('Link de redefinição inválido ou incompleto. Solicite um novo link.');
+    }
+  }, [requestedAuthMode, resetToken]);
+
   const isOnboarding = Boolean(currentUser && (!currentUser.is_profile_complete || onboardingRequested));
   const displayName = useMemo(() => {
     return currentUser?.display_name || currentUser?.displayName || 'Conta protegida';
@@ -162,6 +173,31 @@ function AccountPageContent() {
     if (targetPath !== '/conta') router.push(targetPath);
     else router.replace(targetPath);
     router.refresh();
+  };
+
+  const navigateAuthMode = (mode: 'login' | 'register' | 'forgot' | 'reset', options?: { token?: string | null; preserveFeedback?: boolean }) => {
+    if (!options?.preserveFeedback) {
+      setAuthError('');
+      setAuthNotice('');
+      setPendingVerificationEmail('');
+      setAuthDebugVerificationUrl('');
+      setAuthDebugResetUrl('');
+    }
+    if (mode !== 'reset') {
+      setResetPassword('');
+      setResetPasswordConfirm('');
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('auth', mode);
+    if (nextPath && nextPath !== '/conta') params.set('next', nextPath);
+    else params.delete('next');
+    if (mode === 'reset' && options?.token) params.set('token', options.token);
+    else params.delete('token');
+    params.delete('error');
+
+    const query = params.toString();
+    router.replace(query ? `/conta?${query}` : '/conta');
   };
 
   const handleAuth = async () => {
@@ -205,7 +241,7 @@ function AccountPageContent() {
         setPendingVerificationEmail(authEmail);
         setAuthNotice(data.warning || 'Conta criada. Verifique seu email para ativar o acesso.');
         setAuthDebugVerificationUrl(data.debugVerificationUrl || '');
-        setAuthMode('login');
+        navigateAuthMode('login', { preserveFeedback: true });
         setAuthPassword('');
         return;
       }
@@ -372,6 +408,60 @@ function AccountPageContent() {
     }
   };
 
+  const handleSendCode = async () => {
+    setCodeLoading(true);
+    setAuthError('');
+    setAuthNotice('');
+    setDebugCode('');
+    try {
+      const response = await fetch('/api/auth/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: authEmail }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setAuthError(data.error || 'Falha ao enviar código.');
+        return;
+      }
+      setCodeSent(true);
+      setAuthNotice(data.warning || 'Código enviado para seu email. Verifique a caixa de entrada.');
+      if (data.debugCode) setDebugCode(data.debugCode);
+    } catch {
+      setAuthError('Erro de conexão');
+    } finally {
+      setCodeLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    setCodeLoading(true);
+    setAuthError('');
+    setAuthNotice('');
+    try {
+      const response = await fetch('/api/auth/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: authEmail, code: codeInput }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setAuthError(data.error || 'Código inválido.');
+        return;
+      }
+      setCurrentUser(data.user);
+      if (data.isNewUser) {
+        finishAuthenticatedRedirect('/conta?onboarding=1');
+      } else {
+        finishAuthenticatedRedirect(nextPath);
+      }
+    } catch {
+      setAuthError('Erro de conexão');
+    } finally {
+      setCodeLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
@@ -467,9 +557,9 @@ function AccountPageContent() {
 
             {authMode !== 'reset' ? (
               <div className="mt-6 grid grid-cols-3 gap-2 rounded-2xl border border-neutral-800 bg-neutral-950/70 p-1.5 text-xs font-medium text-neutral-400">
-                <button onClick={() => setAuthMode('login')} className={`rounded-xl px-3 py-2 transition ${authMode === 'login' ? 'bg-white text-neutral-950' : 'hover:bg-neutral-900 hover:text-white'}`}>Entrar</button>
-                <button onClick={() => setAuthMode('register')} className={`rounded-xl px-3 py-2 transition ${authMode === 'register' ? 'bg-amber-500 text-black' : 'hover:bg-neutral-900 hover:text-white'}`}>Criar conta</button>
-                <button onClick={() => setAuthMode('forgot')} className={`rounded-xl px-3 py-2 transition ${authMode === 'forgot' ? 'bg-blue-600 text-white' : 'hover:bg-neutral-900 hover:text-white'}`}>Recuperar</button>
+                <button onClick={() => navigateAuthMode('login')} className={`rounded-xl px-3 py-2 transition ${authMode === 'login' ? 'bg-white text-neutral-950' : 'hover:bg-neutral-900 hover:text-white'}`}>Entrar</button>
+                <button onClick={() => navigateAuthMode('register')} className={`rounded-xl px-3 py-2 transition ${authMode === 'register' ? 'bg-amber-500 text-black' : 'hover:bg-neutral-900 hover:text-white'}`}>Criar conta</button>
+                <button onClick={() => navigateAuthMode('forgot')} className={`rounded-xl px-3 py-2 transition ${authMode === 'forgot' ? 'bg-blue-600 text-white' : 'hover:bg-neutral-900 hover:text-white'}`}>Recuperar</button>
               </div>
             ) : null}
 
@@ -503,6 +593,11 @@ function AccountPageContent() {
 
               {authMode === 'reset' ? (
                 <div className="space-y-3">
+                  {!resetToken ? (
+                    <div className="rounded-2xl border border-amber-900/40 bg-amber-950/20 px-4 py-3 text-sm text-amber-200">
+                      Este link não está completo. Gere um novo link de recuperação para continuar.
+                    </div>
+                  ) : null}
                   <input
                     type="password"
                     autoComplete="new-password"
@@ -521,13 +616,16 @@ function AccountPageContent() {
                   />
                   <button
                     onClick={handleResetPassword}
-                    disabled={resetLoading || resetPassword.length < 8 || resetPasswordConfirm.length < 8}
+                    disabled={resetLoading || !resetToken || resetPassword.length < 8 || resetPasswordConfirm.length < 8}
                     className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 text-sm font-medium text-white transition hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
                   >
                     {resetLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
                     Salvar nova senha
                   </button>
-                  <button onClick={() => setAuthMode('login')} className="w-full text-center text-sm text-neutral-500 transition hover:text-white">
+                  <button onClick={() => navigateAuthMode('forgot')} className="w-full text-center text-sm text-neutral-500 transition hover:text-white">
+                    Solicitar novo link
+                  </button>
+                  <button onClick={() => navigateAuthMode('login')} className="w-full text-center text-sm text-neutral-500 transition hover:text-white">
                     Voltar para entrada
                   </button>
                 </div>
@@ -575,42 +673,99 @@ function AccountPageContent() {
                     </div>
                   ) : null}
 
+                  {authMode === 'login' ? (
+                    <div className="grid grid-cols-2 gap-2 rounded-2xl border border-neutral-800 bg-neutral-950/70 p-1.5 text-xs font-medium text-neutral-400">
+                      <button onClick={() => { setLoginMethod('password'); setCodeSent(false); setCodeInput(''); setDebugCode(''); }} className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 transition ${loginMethod === 'password' ? 'bg-white text-neutral-950' : 'hover:bg-neutral-900 hover:text-white'}`}>
+                        <Lock className="h-3 w-3" /> Email e senha
+                      </button>
+                      <button onClick={() => { setLoginMethod('code'); setAuthPassword(''); }} className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 transition ${loginMethod === 'code' ? 'bg-emerald-600 text-white' : 'hover:bg-neutral-900 hover:text-white'}`}>
+                        <KeyRound className="h-3 w-3" /> Código por email
+                      </button>
+                    </div>
+                  ) : null}
+
                   <input
                     type="email"
                     autoComplete="email"
                     name="email"
                     value={authEmail}
-                    onChange={(event) => setAuthEmail(event.target.value)}
+                    onChange={(event) => { setAuthEmail(event.target.value); if (codeSent) { setCodeSent(false); setCodeInput(''); setDebugCode(''); } }}
                     placeholder="Seu email institucional ou pessoal"
                     className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-950/80 px-4 text-sm text-white outline-none transition focus:border-blue-700"
                   />
 
-                  {authMode !== 'forgot' ? (
-                    <input
-                      type="password"
-                      autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
-                      name="password"
-                      value={authPassword}
-                      onChange={(event) => setAuthPassword(event.target.value)}
-                      placeholder="Sua senha"
-                      className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-950/80 px-4 text-sm text-white outline-none transition focus:border-blue-700"
-                    />
-                  ) : null}
+                  {authMode === 'login' && loginMethod === 'code' ? (
+                    codeSent ? (
+                      <div className="space-y-3">
+                        <p className="text-xs text-neutral-400">Digite o código de 6 dígitos enviado para <span className="font-medium text-white">{authEmail}</span></p>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          autoComplete="one-time-code"
+                          value={codeInput}
+                          onChange={(event) => setCodeInput(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                          placeholder="000000"
+                          className="h-14 w-full rounded-2xl border border-neutral-800 bg-neutral-950/80 px-4 text-center text-2xl font-mono tracking-[0.4em] text-white outline-none transition focus:border-emerald-600"
+                          onKeyDown={(e) => e.key === 'Enter' && codeInput.length === 6 && handleVerifyCode()}
+                        />
+                        {debugCode ? (
+                          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/70 px-4 py-3 text-xs text-neutral-400">
+                            <span className="uppercase tracking-[0.18em] text-neutral-500">Dev:</span> <span className="font-mono text-emerald-400">{debugCode}</span>
+                          </div>
+                        ) : null}
+                        <button
+                          onClick={handleVerifyCode}
+                          disabled={codeLoading || codeInput.length !== 6}
+                          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:bg-neutral-800 disabled:text-neutral-500"
+                        >
+                          {codeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                          Verificar código
+                        </button>
+                        <button onClick={() => { setCodeSent(false); setCodeInput(''); setDebugCode(''); setAuthNotice(''); }} className="w-full text-center text-sm text-neutral-500 transition hover:text-white">
+                          Reenviar código
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleSendCode}
+                        disabled={codeLoading || !authEmail}
+                        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:bg-neutral-800 disabled:text-neutral-500"
+                      >
+                        {codeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                        Enviar código para meu email
+                      </button>
+                    )
+                  ) : (
+                    <>
+                      {authMode !== 'forgot' ? (
+                        <input
+                          type="password"
+                          autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
+                          name="password"
+                          value={authPassword}
+                          onChange={(event) => setAuthPassword(event.target.value)}
+                          placeholder="Sua senha"
+                          className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-950/80 px-4 text-sm text-white outline-none transition focus:border-blue-700"
+                        />
+                      ) : null}
 
-                  <button
-                    onClick={authMode === 'forgot' ? handleForgotPassword : handleAuth}
-                    disabled={authLoading || !authEmail || (authMode !== 'forgot' && !authPassword) || (authMode === 'register' && !registerNickname.trim())}
-                    className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 text-sm font-medium text-white transition hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
-                  >
-                    {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-                    {authMode === 'register' ? 'Criar conta' : authMode === 'forgot' ? 'Enviar link de recuperação' : 'Entrar com email'}
-                  </button>
+                      <button
+                        onClick={authMode === 'forgot' ? handleForgotPassword : handleAuth}
+                        disabled={authLoading || !authEmail || (authMode !== 'forgot' && !authPassword) || (authMode === 'register' && !registerNickname.trim())}
+                        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 text-sm font-medium text-white transition hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
+                      >
+                        {authLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                        {authMode === 'register' ? 'Criar conta' : authMode === 'forgot' ? 'Enviar link de recuperação' : 'Entrar com email'}
+                      </button>
+                    </>
+                  )}
 
                   <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-neutral-500">
-                    <button onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')} className="transition hover:text-white">
+                    <button onClick={() => navigateAuthMode(authMode === 'login' ? 'register' : 'login')} className="transition hover:text-white">
                       {authMode === 'login' ? 'Ainda não tem conta? Criar agora' : 'Já tem conta? Entrar'}
                     </button>
-                    {authMode === 'login' ? <button onClick={() => setAuthMode('forgot')} className="transition hover:text-white">Esqueci minha senha</button> : null}
+                    {authMode === 'login' && loginMethod === 'password' ? <button onClick={() => navigateAuthMode('forgot')} className="transition hover:text-white">Esqueci minha senha</button> : null}
                   </div>
                 </>
               )}

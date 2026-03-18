@@ -42,13 +42,21 @@ function getGoogleClientSecret() {
   return process.env.GOOGLE_CLIENT_SECRET || process.env.AUTH_GOOGLE_SECRET || '';
 }
 
-function getBaseUrl() {
+function normalizeBaseUrl(baseUrl?: string | null) {
+  const trimmed = baseUrl?.trim() || '';
+  if (!trimmed || !/^https?:\/\//i.test(trimmed)) return '';
+  return trimmed.replace(/\/$/, '');
+}
+
+function getBaseUrl(baseUrl?: string | null) {
+  const runtimeBaseUrl = normalizeBaseUrl(baseUrl);
+  if (runtimeBaseUrl) return runtimeBaseUrl;
   if (process.env.PUBLIC_BASE_URL) return process.env.PUBLIC_BASE_URL.replace(/\/$/, '');
   return process.env.NODE_ENV === 'production' ? 'https://852.egos.ia.br' : 'http://localhost:3000';
 }
 
-function getRedirectUri() {
-  return `${getBaseUrl()}/api/auth/google/callback`;
+function getRedirectUri(baseUrl?: string | null) {
+  return `${getBaseUrl(baseUrl)}/api/auth/google/callback`;
 }
 
 function toBase64Url(buffer: Uint8Array) {
@@ -107,7 +115,7 @@ export async function verifyGoogleIdToken(idToken: string): Promise<GoogleUserPr
   };
 }
 
-export async function createGoogleAuthUrl(input?: { nextPath?: string | null; mode?: 'login' | 'register' }) {
+export async function createGoogleAuthUrl(input?: { nextPath?: string | null; mode?: 'login' | 'register'; baseUrl?: string | null }) {
   const clientId = getGoogleClientId();
   if (!clientId) throw new Error('Google OAuth não configurado. Defina GOOGLE_CLIENT_ID.');
 
@@ -133,7 +141,7 @@ export async function createGoogleAuthUrl(input?: { nextPath?: string | null; mo
 
   const url = new URL(GOOGLE_AUTH_BASE);
   url.searchParams.set('client_id', clientId);
-  url.searchParams.set('redirect_uri', getRedirectUri());
+  url.searchParams.set('redirect_uri', getRedirectUri(input?.baseUrl));
   url.searchParams.set('response_type', 'code');
   url.searchParams.set('scope', 'openid email profile');
   url.searchParams.set('state', state);
@@ -170,7 +178,7 @@ export async function consumeGoogleOAuthState(expectedState: string) {
   return parsed;
 }
 
-export async function exchangeGoogleCode(code: string, codeVerifier: string) {
+export async function exchangeGoogleCode(code: string, codeVerifier: string, baseUrl?: string | null) {
   const clientId = getGoogleClientId();
   const clientSecret = getGoogleClientSecret();
   if (!clientId || !clientSecret) {
@@ -184,7 +192,7 @@ export async function exchangeGoogleCode(code: string, codeVerifier: string) {
       code,
       client_id: clientId,
       client_secret: clientSecret,
-      redirect_uri: getRedirectUri(),
+      redirect_uri: getRedirectUri(baseUrl),
       grant_type: 'authorization_code',
       code_verifier: codeVerifier,
     }).toString(),
