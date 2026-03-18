@@ -63,6 +63,37 @@ export function replaceConversations(conversations: Conversation[], scope?: stri
   saveAll(conversations, scope);
 }
 
+export function migrateConversationScope(fromScope: string, toScope: string) {
+  if (!fromScope || !toScope || fromScope === toScope || typeof window === 'undefined') return;
+
+  const fromConversations = getAll(fromScope);
+  if (fromConversations.length === 0) return;
+
+  const targetConversations = getAll(toScope);
+  const merged = [...targetConversations];
+
+  fromConversations.forEach((conversation) => {
+    const existingIndex = merged.findIndex((item) => item.id === conversation.id);
+    if (existingIndex === -1) {
+      merged.push(conversation);
+      return;
+    }
+
+    const existing = merged[existingIndex];
+    merged[existingIndex] = {
+      ...existing,
+      ...conversation,
+      serverId: conversation.serverId || existing.serverId,
+      updatedAt: Math.max(existing.updatedAt, conversation.updatedAt),
+      createdAt: Math.min(existing.createdAt, conversation.createdAt),
+      messages: conversation.messages.length > 0 ? conversation.messages : existing.messages,
+    };
+  });
+
+  saveAll(merged.sort((a, b) => b.updatedAt - a.updatedAt), toScope);
+  window.localStorage.removeItem(getStorageKey(fromScope));
+}
+
 export function upsertConversation(conversation: Conversation, scope?: string) {
   const all = getAll(scope);
   const idx = all.findIndex(c => c.id === conversation.id);

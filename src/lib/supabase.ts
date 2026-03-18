@@ -6,6 +6,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { getIdentityKey } from '@/lib/session';
 
 let _sb: SupabaseClient | null = null;
 
@@ -182,6 +183,75 @@ export async function deleteReportServer(id: string): Promise<boolean> {
     .eq('id', id);
 
   return !error;
+}
+
+export async function claimLegacyIdentity(sessionHash: string, userId: string): Promise<{
+  claimedConversations: number;
+  claimedReports: number;
+  claimedVotes: number;
+  dedupedVotes: number;
+}> {
+  const sb = getSupabase();
+  if (!sb || !sessionHash || !userId) {
+    return { claimedConversations: 0, claimedReports: 0, claimedVotes: 0, dedupedVotes: 0 };
+  }
+
+  const anonymousIdentity = getIdentityKey(sessionHash, null);
+  const userIdentity = getIdentityKey(null, userId);
+  if (!anonymousIdentity || !userIdentity || anonymousIdentity === userIdentity) {
+    return { claimedConversations: 0, claimedReports: 0, claimedVotes: 0, dedupedVotes: 0 };
+  }
+
+  const now = new Date().toISOString();
+
+  const { data: claimedConversationRows } = await sb
+    .from('conversations_852')
+    .update({ session_hash: userIdentity, updated_at: now })
+    .eq('session_hash', anonymousIdentity)
+    .select('id');
+
+  const { data: claimedReportRows } = await sb
+    .from('reports_852')
+    .update({ session_hash: userIdentity, updated_at: now })
+    .eq('session_hash', anonymousIdentity)
+    .select('id');
+
+  const { data: legacyVotes } = await sb
+    .from('issue_votes_852')
+    .select('id, issue_id')
+    .eq('session_hash', anonymousIdentity);
+
+  let claimedVotes = 0;
+  let dedupedVotes = 0;
+
+  for (const vote of legacyVotes || []) {
+    const { data: existingUserVote } = await sb
+      .from('issue_votes_852')
+      .select('id')
+      .eq('issue_id', vote.issue_id)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existingUserVote?.id) {
+      await sb.from('issue_votes_852').delete().eq('id', vote.id);
+      dedupedVotes += 1;
+      continue;
+    }
+
+    const { error } = await sb
+      .from('issue_votes_852')
+      .update({ user_id: userId, session_hash: userIdentity })
+      .eq('id', vote.id);
+
+    if (!error) claimedVotes += 1;
+  }
+
+  return {
+    claimedConversations: claimedConversationRows?.length || 0,
+    claimedReports: claimedReportRows?.length || 0,
+    claimedVotes,
+    dedupedVotes,
+  };
 }
 
 // ── Issues (GitHub-like anonymous) ───────────────────────

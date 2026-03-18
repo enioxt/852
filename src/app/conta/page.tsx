@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { ArrowRight, BadgeCheck, Flame, KeyRound, Loader2, Lock, LogOut, Mail, RefreshCw, Shield, Trash2, Trophy, User, Waypoints } from 'lucide-react';
 import GoogleIdentityButton from '@/components/auth/GoogleIdentityButton';
+import { migrateConversationScope } from '@/lib/chat-store';
+import { getIdentityKey, getOrCreateSessionHash } from '@/lib/session';
 
 type CurrentUser = {
   id: string;
@@ -108,6 +110,7 @@ function AccountPageContent() {
   const [codeInput, setCodeInput] = useState('');
   const [codeLoading, setCodeLoading] = useState(false);
   const [debugCode, setDebugCode] = useState('');
+  const [sessionHash] = useState<string>(() => (typeof window === 'undefined' ? '' : getOrCreateSessionHash()));
   const [confirmDeleteConvos, setConfirmDeleteConvos] = useState(false);
   const [confirmDeleteAccount, setConfirmDeleteAccount] = useState(false);
   const [deletingConvos, setDeletingConvos] = useState(false);
@@ -179,6 +182,29 @@ function AccountPageContent() {
     if (targetPath !== '/conta') router.push(targetPath);
     else router.replace(targetPath);
     router.refresh();
+  };
+
+  const claimLegacyData = async () => {
+    if (!sessionHash) return null;
+    try {
+      const response = await fetch('/api/auth/claim-legacy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionHash }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.error || !data.userId) return null;
+
+      const fromScope = getIdentityKey(sessionHash, null);
+      const toScope = getIdentityKey(null, data.userId);
+      if (fromScope && toScope) {
+        migrateConversationScope(fromScope, toScope);
+      }
+
+      return data;
+    } catch {
+      return null;
+    }
   };
 
   const navigateAuthMode = (mode: 'login' | 'register' | 'forgot' | 'reset', options?: { token?: string | null; preserveFeedback?: boolean }) => {
@@ -253,6 +279,7 @@ function AccountPageContent() {
       }
 
       setCurrentUser(data.user);
+      await claimLegacyData();
       finishAuthenticatedRedirect(nextPath);
     } catch {
       setAuthError('Erro de conexão');
@@ -261,9 +288,10 @@ function AccountPageContent() {
     }
   };
 
-  const handleGoogleSuccess = (payload: { nextPath: string }) => {
+  const handleGoogleSuccess = async (payload: { nextPath: string; onboarding?: boolean }) => {
+    await claimLegacyData();
     void syncAuth();
-    finishAuthenticatedRedirect(payload.nextPath);
+    finishAuthenticatedRedirect(payload.onboarding ? '/conta?onboarding=1' : payload.nextPath);
   };
 
   const handleResendVerification = async () => {
@@ -346,6 +374,7 @@ function AccountPageContent() {
       if (data.user) {
         setCurrentUser(data.user);
       }
+      await claimLegacyData();
       setAuthNotice('Senha redefinida com sucesso.');
       finishAuthenticatedRedirect('/conta');
     } catch {
@@ -496,6 +525,7 @@ function AccountPageContent() {
         return;
       }
       setCurrentUser(data.user);
+      await claimLegacyData();
       if (data.isNewUser) {
         finishAuthenticatedRedirect('/conta?onboarding=1');
       } else {

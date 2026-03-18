@@ -156,7 +156,7 @@ export default function Home() {
               o radar da base
             </p>
             <p className="mt-4 text-lg sm:text-xl text-neutral-300 max-w-lg text-center leading-relaxed">
-              Canal seguro e anonimo para policiais civis de Minas Gerais. Sua voz ja existe, e aqui ela chega onde precisa chegar.
+              Canal protegido para relatar, organizar e transformar dores reais da base em pauta coletiva.
             </p>
           </div>
 
@@ -169,16 +169,33 @@ export default function Home() {
             className="mt-5 flex items-center gap-3 px-5 py-3 rounded-full bg-green-900/30 text-green-400 border border-green-800/40 text-base font-medium hover:bg-green-900/50 transition touch-target cursor-pointer active:scale-95"
           >
             <Lock className="w-5 h-5" />
-            100% Anonimo: toque para entender
+            Anonimato protegido: toque para entender
           </button>
+
+          <div className="mt-5 grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+            <Link
+              href="/chat"
+              className="group flex items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-base font-semibold text-black transition hover:bg-neutral-200 active:scale-[0.98]"
+            >
+              Conversar agora
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <Link
+              href="/sugestao"
+              className="group flex items-center justify-center gap-3 rounded-2xl border border-neutral-800 bg-neutral-900/70 px-6 py-4 text-base font-semibold text-white transition hover:border-neutral-700 hover:bg-neutral-800/70 active:scale-[0.98]"
+            >
+              Enviar texto direto
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
 
           {/* ═══════════ DUAS FORMAS DE PARTICIPAR (lado a lado) ═══════════ */}
           <div className="mt-10 w-full">
             <h2 className="text-xl font-bold text-white text-center mb-2">
-              Duas formas de participar
+              Escolha como participar
             </h2>
             <p className="text-sm text-neutral-500 text-center mb-6">
-              Escolha a que faz mais sentido pra voce. Ambas sao anonimas e seguras.
+              Um caminho assistido por IA. Outro totalmente direto. Os dois com proteção de identidade.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Opcao 1: Chatbot IA */}
@@ -191,12 +208,12 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">Conversar com a IA</h3>
                 <p className="text-sm text-neutral-400 leading-relaxed flex-1">
-                  Fale com o Tira-Voz como se fosse um colega. Descreva o problema, tire duvidas, peça orientacao. A IA organiza, cruza seu relato com outros e sugere aprofundamentos.
+                  Relate o problema, peça ajuda para estruturar a narrativa e deixe a IA cruzar padrões com o que já apareceu na base.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <span className="text-[11px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400/80">Chat interativo</span>
-                  <span className="text-[11px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400/80">Exportar PDF</span>
-                  <span className="text-[11px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400/80">Historico salvo</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400/80">Correlação de padrões</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-400/80">Exportação</span>
                 </div>
                 <div className="mt-4 flex items-center gap-2 text-amber-400 group-hover:text-amber-300 font-medium text-sm">
                   Iniciar conversa <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -213,12 +230,12 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">Escrever direto</h3>
                 <p className="text-sm text-neutral-400 leading-relaxed flex-1">
-                  Prefere nao conversar com a IA? Sem problema. Escreva sua sugestao em texto livre, anexe arquivos, revise o que for preciso e publique no forum quando estiver pronto.
+                  Escreva no seu ritmo, anexe arquivos e revise antes de publicar. Sem conversa, sem fricção, sem depender da IA.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Texto livre</span>
                   <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Upload de anexos</span>
-                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Preview sanitizado</span>
+                  <span className="text-[11px] px-2 py-1 rounded-full bg-green-500/10 text-green-400/80">Revisão antes da publicação</span>
                 </div>
                 <div className="mt-4 flex items-center gap-2 text-green-400 group-hover:text-green-300 font-medium text-sm">
                   Abrir sugestao <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -250,37 +267,37 @@ export default function Home() {
           {/* ═══════════ COMO A INFORMACAO FLUI ═══════════ */}
           <div id="como-funciona" className="mt-10 w-full space-y-3">
             <h2 className="text-xl font-bold text-white text-center mb-4">
-              Como a informacao flui dentro da ferramenta
+              Como isso vira pauta coletiva
             </h2>
             <ExpandableCard icon={Shield} title="O que e o Tira-Voz?" defaultOpen>
               <p>
-                E um canal onde voce, policial civil (investigador, escrivao, delegado, perito), pode relatar problemas do dia a dia, sugerir melhorias e ajudar a construir pautas reais para a categoria.
+                E um canal protegido para registrar problemas recorrentes, gargalos operacionais e sugestões concretas da rotina policial.
               </p>
               <p className="mt-2">
-                Sem nome, sem CPF, sem MASP obrigatorio. O que importa e o que voce tem a dizer.
+                O foco aqui não é sua identidade. É o conteúdo do que precisa mudar.
               </p>
             </ExpandableCard>
             <ExpandableCard icon={Mic} title="Passo 1: Voce fala">
               <p>
-                Pode ser pelo chatbot, conversando com a IA, ou pela sugestao direta, escrevendo texto livre com anexos e preview sanitizado antes da publicacao. Conte o que acontece: falta de viatura, sistema fora do ar, sobrecarga, ideias que nunca chegam a chefia.
+                Você pode conversar com a IA ou escrever direto. O importante é registrar o problema com contexto suficiente para virar sinal útil.
               </p>
             </ExpandableCard>
             <ExpandableCard icon={Brain} title="Passo 2: A IA le, organiza e cruza">
               <p>
-                Uma inteligencia artificial analisa seu relato e compara com o que outros colegas de todo o estado ja relataram. Ela identifica padroes: se muita gente reclama da mesma coisa, isso vira destaque.
+                A IA ajuda a organizar o relato, detectar padrões e aproximar temas que estão aparecendo em pontos diferentes da rede.
               </p>
               <p className="mt-2 text-neutral-400">
-                Nenhum dado pessoal e armazenado. A IA nao sabe quem voce e.
+                Sem identidade pública. Sem exposição pessoal desnecessária.
               </p>
             </ExpandableCard>
             <ExpandableCard icon={ClipboardList} title="Passo 3: Vira pauta coletiva">
               <p>
-                A cada 5 relatos compartilhados, um relatorio de inteligencia e gerado automaticamente. Os problemas mais citados viram topicos publicos. A categoria pode votar e comentar.
+                Relatos recorrentes viram relatório, tema público e espaço de voto. O que se repete deixa de parecer caso isolado.
               </p>
             </ExpandableCard>
             <ExpandableCard icon={Eye} title="Passo 4: Tudo transparente">
               <p>
-                Voce pode ver os relatorios de inteligencia, acompanhar os topicos mais votados e exportar conversas em PDF. Nada fica escondido.
+                Você acompanha relatórios, tópicos e sinais de recorrência sem depender de bastidor ou promessa vaga.
               </p>
             </ExpandableCard>
           </div>
@@ -395,7 +412,7 @@ export default function Home() {
               </div>
             </div>
             <p className="text-base text-neutral-300 leading-relaxed mb-4">
-              O Tira-Voz e um projeto de codigo livre. Todo o codigo fonte, incluindo a logica da IA, as regras de privacidade e o tratamento dos dados, esta publicado no GitHub. Qualquer pessoa pode verificar que nenhum dado pessoal e coletado ou armazenado.
+              O código da plataforma, a lógica de autenticação e as regras de privacidade estão abertos para auditoria pública no GitHub.
             </p>
             <a
               href="https://github.com/enioxt/852"
@@ -492,7 +509,7 @@ export default function Home() {
             href="/chat"
             className="mt-10 mb-4 w-full sm:w-auto group flex items-center justify-center gap-3 bg-white text-black px-8 py-5 rounded-2xl font-bold text-xl hover:bg-neutral-200 transition-all shadow-lg active:scale-95 touch-target"
           >
-            Comecar agora
+            Abrir chat protegido
             <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
