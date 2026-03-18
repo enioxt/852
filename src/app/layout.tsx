@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClarityAnalytics from "@/components/ClarityAnalytics";
 import HotTopicsMarquee from "@/components/HotTopicsMarquee";
+import LgpdBanner from "@/components/LgpdBanner";
 import MobileNav from "@/components/MobileNav";
 import SiteHeader from "@/components/SiteHeader";
 import "./globals.css";
@@ -69,6 +70,7 @@ export default function RootLayout({
         <div className="flex flex-1 flex-col min-h-0">
           {children}
         </div>
+        <LgpdBanner />
         <MobileNav />
       </body>
     </html>

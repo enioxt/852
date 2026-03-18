@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, BadgeCheck, Flame, KeyRound, Loader2, Lock, LogOut, Mail, RefreshCw, Shield, Trophy, User, Waypoints } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Flame, KeyRound, Loader2, Lock, LogOut, Mail, RefreshCw, Shield, Trash2, Trophy, User, Waypoints } from 'lucide-react';
 import GoogleIdentityButton from '@/components/auth/GoogleIdentityButton';
 
 type CurrentUser = {
@@ -108,6 +108,12 @@ function AccountPageContent() {
   const [codeInput, setCodeInput] = useState('');
   const [codeLoading, setCodeLoading] = useState(false);
   const [debugCode, setDebugCode] = useState('');
+  const [confirmDeleteConvos, setConfirmDeleteConvos] = useState(false);
+  const [confirmDeleteAccount, setConfirmDeleteAccount] = useState(false);
+  const [deletingConvos, setDeletingConvos] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteNotice, setDeleteNotice] = useState('');
+  const [deleteError, setDeleteError] = useState('');
 
   const syncAuth = async () => {
     try {
@@ -405,6 +411,46 @@ function AccountPageContent() {
       setPasswordError('Erro de conexão');
     } finally {
       setSavingPassword(false);
+    }
+  };
+
+  const handleDeleteConversations = async () => {
+    setDeletingConvos(true);
+    setDeleteError('');
+    setDeleteNotice('');
+    try {
+      const response = await fetch('/api/auth/delete-conversations', { method: 'DELETE' });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setDeleteError(data.error || 'Falha ao apagar conversas.');
+        return;
+      }
+      setDeleteNotice(`${data.deletedConversations || 0} conversa(s) e ${data.deletedReports || 0} relatório(s) removidos do servidor.`);
+      setConfirmDeleteConvos(false);
+    } catch {
+      setDeleteError('Erro de conexão');
+    } finally {
+      setDeletingConvos(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    setDeleteError('');
+    try {
+      const response = await fetch('/api/auth/delete-account', { method: 'DELETE' });
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        setDeleteError(data.error || 'Falha ao excluir conta.');
+        setDeletingAccount(false);
+        return;
+      }
+      window.dispatchEvent(new Event('852-auth-changed'));
+      router.push('/');
+      router.refresh();
+    } catch {
+      setDeleteError('Erro de conexão');
+      setDeletingAccount(false);
     }
   };
 
@@ -942,6 +988,67 @@ function AccountPageContent() {
                 {savingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
                 {currentUser.has_password ? 'Atualizar senha' : 'Definir senha'}
               </button>
+            </div>
+
+            <div id="dados" className="rounded-2xl border border-red-900/30 bg-red-950/10 p-4 space-y-3">
+              <div className="flex items-center gap-2 text-neutral-300">
+                <Trash2 className="h-4 w-4 text-red-400" />
+                <span className="text-sm font-medium">Meus dados (LGPD)</span>
+              </div>
+              <p className="text-xs leading-relaxed text-neutral-500">
+                Você tem o direito de apagar suas conversas armazenadas no servidor ou excluir sua conta inteira. Dados locais (localStorage) não são afetados pela exclusão remota.
+              </p>
+
+              {deleteError ? <p className="text-sm text-red-300">{deleteError}</p> : null}
+              {deleteNotice ? <p className="text-sm text-emerald-300">{deleteNotice}</p> : null}
+
+              {!confirmDeleteConvos ? (
+                <button
+                  onClick={() => setConfirmDeleteConvos(true)}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-neutral-700 px-4 text-xs font-medium text-neutral-300 transition hover:border-red-700 hover:text-red-300"
+                >
+                  Apagar conversas do servidor
+                </button>
+              ) : (
+                <div className="rounded-xl border border-red-900/50 bg-red-950/20 p-3 space-y-2">
+                  <p className="text-xs text-red-200">Isso remove todas as suas conversas e relatórios salvos no servidor. A ação é irreversível.</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleDeleteConversations}
+                      disabled={deletingConvos}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-red-700 px-3 text-xs font-medium text-white transition hover:bg-red-600 disabled:opacity-60"
+                    >
+                      {deletingConvos ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                      Confirmar exclusão
+                    </button>
+                    <button onClick={() => setConfirmDeleteConvos(false)} className="rounded-lg px-3 text-xs text-neutral-400 hover:text-white">Cancelar</button>
+                  </div>
+                </div>
+              )}
+
+              {!confirmDeleteAccount ? (
+                <button
+                  onClick={() => setConfirmDeleteAccount(true)}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-neutral-700 px-4 text-xs font-medium text-neutral-300 transition hover:border-red-700 hover:text-red-300"
+                >
+                  Excluir minha conta
+                </button>
+              ) : (
+                <div className="rounded-xl border border-red-900/50 bg-red-950/20 p-3 space-y-2">
+                  <p className="text-xs text-red-200">Isso exclui sua conta, conversas, relatórios, votos e todos os dados associados. A ação é irreversível e você será deslogado.</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deletingAccount}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-red-700 px-3 text-xs font-medium text-white transition hover:bg-red-600 disabled:opacity-60"
+                    >
+                      {deletingAccount ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                      Excluir conta permanentemente
+                    </button>
+                    <button onClick={() => setConfirmDeleteAccount(false)} className="rounded-lg px-3 text-xs text-neutral-400 hover:text-white">Cancelar</button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-4 text-sm text-neutral-400">

@@ -1121,6 +1121,70 @@ export async function verifyEmailCode(
   };
 }
 
+// ── Self-service Data Deletion (LGPD Art. 18) ──────────────
+
+export async function deleteUserConversations() {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado', status: 503 };
+
+  const currentUser = await getCurrentUser();
+  if (!currentUser) return { error: 'Sessão inválida', status: 401 };
+
+  const identityKey = `user:${currentUser.id}`;
+  let deletedConversations = 0;
+  let deletedReports = 0;
+
+  const { count: convCount } = await sb
+    .from('conversations_852')
+    .delete({ count: 'exact' })
+    .eq('session_hash', identityKey);
+  deletedConversations = convCount ?? 0;
+
+  const { count: repCount } = await sb
+    .from('reports_852')
+    .delete({ count: 'exact' })
+    .eq('session_hash', identityKey);
+  deletedReports = repCount ?? 0;
+
+  await recordEvent({
+    event_type: 'user_login',
+    metadata: { userId: currentUser.id, action: 'delete_conversations', deletedConversations, deletedReports },
+  });
+
+  return { success: true, deletedConversations, deletedReports };
+}
+
+export async function deleteUserAccount() {
+  const sb = getSupabase();
+  if (!sb) return { error: 'Supabase não configurado', status: 503 };
+
+  const currentUser = await getCurrentUser();
+  if (!currentUser) return { error: 'Sessão inválida', status: 401 };
+
+  const identityKey = `user:${currentUser.id}`;
+
+  // 1. Delete conversations and reports (linked by identity key)
+  await sb.from('conversations_852').delete().eq('session_hash', identityKey);
+  await sb.from('reports_852').delete().eq('session_hash', identityKey);
+
+  // 2. Delete OTP codes (linked by email)
+  await sb.from('auth_codes_852').delete().eq('email', currentUser.email);
+
+  // 3. Delete the user account (cascades: sessions, votes; nullifies: comments)
+  await sb.from('user_accounts_852').delete().eq('id', currentUser.id);
+
+  // 4. Clear session cookie
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE, '', { maxAge: 0, path: '/' });
+
+  await recordEvent({
+    event_type: 'user_login',
+    metadata: { userId: currentUser.id, action: 'delete_account' },
+  });
+
+  return { success: true };
+}
+
 export async function logoutUser() {
   const sb = getSupabase();
   const cookieStore = await cookies();

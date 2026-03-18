@@ -148,6 +148,22 @@
 ### Roadmap Institucional
 - [x] **Roadmap integrado**: documento `docs/ROADMAP_INTELIGENCIA_POLICIAL_INTEGRADA.md` conectando `852`, `policia`, `Intelink`, EGOS Intelligence e IPED
 
+## 🏃 P1 - Sprint v8 (Auth SSOT + Email Code Login + LGPD)
+
+- [x] **Auth SSOT consolidation**: `/conta` é agora o ponto único de autenticação; modal de auth removido do Sidebar (~350 linhas)
+- [x] **Dynamic base URL**: email verification, password reset e Google OAuth usam `request.origin` em vez de `PUBLIC_BASE_URL` hardcoded
+- [x] **Improved error propagation**: rotas de auth retornam status HTTP corretos (401/403/409/503) em vez de genérico 401
+- [x] **Password reset UX**: token inválido detectado, URL sincronizada com estado, feedback preservado após registro
+- [x] **Email code login (OTP)**: código de 6 dígitos via Resend, SHA-256 hash, 10-min expiry, rate limited (3 códigos/janela)
+- [x] **Auto-create on code login**: novo usuário criado automaticamente, redirecionado para onboarding de nickname
+- [x] **Login method toggle**: `/conta` oferece "Email e senha" vs "Código por email" no modo login
+- [x] **Migration v9**: `auth_codes_852` + `auth_invites_852` com RLS (service_role only)
+- [x] **Admin invites API**: GET/POST/DELETE `/api/admin/invites` protegido por admin-auth
+- [x] **Admin invites dashboard**: `/admin/invites` com KPI cards, formulário de adição, lista com delete
+- [x] **Telemetry events**: `email_code_sent`, `email_code_verified` adicionados
+- [x] **Self-service data deletion**: DELETE /api/auth/delete-conversations e /api/auth/delete-account com confirmação dupla no /conta
+- [x] **LGPD consent banner**: LgpdBanner no root layout + página /privacidade com política completa (12 seções, Art. 7/18)
+
 ## ✅ P1 - Sprint v7 (Smart Correlation + Hot Topics, 2026-03-13)
 
 - [x] **Smart Correlation Engine**: API `/api/correlate` com AI tag extraction (qwen-plus/Gemini) + busca ilike em issues e reports do Supabase
