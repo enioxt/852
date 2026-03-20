@@ -75,3 +75,21 @@ TASKS.md (root)     ← ÚNICO local para tasks
 ├── P2 = Backlog
 └── MÁX 500 linhas
 ```
+
+## 📋 DOCUMENTATION DISCIPLINE (MANDATORY)
+
+### Anti-Proliferation Rules
+
+1. **NO TIMESTAMPED DOCS** — NEVER create `*_2026-03-*.md`, `*AUDIT_2026*.md`, `*REPORT_2026*.md`
+2. **UPDATE SSOT, DON'T CREATE** — Audits/diagnostics MUST update `AGENTS.md`, `TASKS.md`, `docs/SYSTEM_MAP.md`
+3. **HANDOFFS ARE EPHEMERAL** — Consolidate in `docs/knowledge/HARVEST.md`, archive >30 days
+4. **ONE SSOT PER CONCERN** — `AGENTS.md` = capabilities, `TASKS.md` = backlog, `SYSTEM_MAP.md` = architecture
+5. **KERNEL CANONICAL ONLY** — `SSOT_REGISTRY.md`, `CAPABILITY_REGISTRY.md`, `CHATBOT_SSOT.md` live in `/home/enio/egos/docs/`
+
+### Allowed Docs
+
+- `AGENTS.md`, `TASKS.md`, `README.md`, `docs/SYSTEM_MAP.md`, `docs/_generated/*`, `docs/_archived_handoffs/YYYY-MM/*` ✅
+
+### Prohibited
+
+- ❌ `docs/*AUDIT*.md`, `docs/*DIAGNOSTIC*.md`, `docs/*REPORT*.md` with date stamps (except `_archived/`)
