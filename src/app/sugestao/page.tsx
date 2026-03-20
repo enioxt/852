@@ -33,6 +33,8 @@ import {
 } from '@/lib/suggestion-store';
 import CorrelationPanel from '@/components/CorrelationPanel';
 import HotTopicsTicker from '@/components/HotTopicsTicker';
+import GuidedWizardModal from '@/components/GuidedWizardModal';
+import { Compass } from 'lucide-react';
 
 type ParsedAttachment = {
   name: string;
@@ -97,6 +99,7 @@ export default function SugestaoPage() {
   const [history, setHistory] = useState<SuggestionHistoryItem[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const [isRecording, setIsRecording] = useState(false);
   const [hasSpeechSupport, setHasSpeechSupport] = useState(true);
@@ -461,8 +464,12 @@ export default function SugestaoPage() {
                 </div>
                 
                 <div className="mb-4">
-                  <p className="text-xs text-neutral-500 mb-2">Modelos Rápidos (opcional):</p>
+                  <p className="text-xs text-neutral-500 mb-2">Bússola e Modelos (opcional):</p>
                   <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => setWizardOpen(true)} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-blue-900 bg-blue-950/40 text-blue-300 hover:bg-blue-900 transition flex items-center gap-1.5">
+                      <Compass className="w-3.5 h-3.5" />
+                      Modo Guiado (Passo-a-passo)
+                    </button>
                     <button onClick={() => applyTemplate('viatura')} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-700 bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition">
                       🚔 Viatura Quebrada
                     </button>
@@ -656,6 +663,16 @@ export default function SugestaoPage() {
           </div>
         </aside>
       </main>
+
+      <GuidedWizardModal 
+        isOpen={wizardOpen} 
+        onClose={() => setWizardOpen(false)} 
+        onComplete={(data) => {
+          setCategory(data.category as any);
+          setTitle(data.title);
+          setBody(data.body);
+        }} 
+      />
     </div>
   );
 }

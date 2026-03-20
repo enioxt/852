@@ -186,10 +186,10 @@
 - [x] **QR Code para delegacias**: gerar QR imprimível que leva ao Tira-Voz, para mural da delegacia
 - [x] **Templates de relato**: modelos prontos para problemas comuns (falta de viatura, efetivo, sistema)
 - [x] **Redirect canais formais**: botão visível "Denúncia formal" → Corregedoria/Ouvidoria/MP
-- [ ] **PWA/Offline**: instalar como app no celular, funcionar offline com sync posterior
-- [ ] **Acessibilidade**: tamanho de fonte ajustável, alto contraste, suporte a leitor de tela
+- [x] **PWA/Offline**: instalar como app no celular, funcionar offline com sync posterior
+- [x] **Acessibilidade**: tamanho de fonte ajustável, alto contraste, suporte a leitor de tela
 - [ ] **Notificação por email**: quando tópico que você votou recebe atividade
-- [ ] **Modo guiado "Não sei o que falar"**: wizard com perguntas guiadas para quem não sabe por onde começar
+- [x] **Modo guiado "Não sei o que falar"**: wizard com perguntas guiadas para quem não sabe por onde começar
 - [x] **Document Pipeline (Mensagens Longas & Anexos)**: Colapso UX visual no front, parsing 100% no backend com chunking e Atrian estruturado (`[NOME_REDACTED]`).
 - [x] **Verdade Versionada (The EGOS Principle)**: Histórico editável em *múltiplas versões* no `/issues` garantindo autoria em edições (cada contestação vira uma Branch identificável).
 
