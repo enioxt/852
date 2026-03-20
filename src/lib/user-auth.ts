@@ -72,14 +72,21 @@ function normalizeBaseUrl(baseUrl?: string | null) {
 }
 
 function getPublicBaseUrl(baseUrl?: string | null) {
-  const runtimeBaseUrl = normalizeBaseUrl(baseUrl);
-  if (runtimeBaseUrl) {
-    return runtimeBaseUrl;
+  const isProd = process.env.NODE_ENV === 'production';
+  const prodFallback = process.env.PUBLIC_BASE_URL
+    ? process.env.PUBLIC_BASE_URL.replace(/\/$/, '')
+    : 'https://852.egos.ia.br';
+    
+  const runtime = normalizeBaseUrl(baseUrl);
+  
+  if (runtime) {
+    if (isProd && (runtime.includes('0.0.0.0') || runtime.includes('localhost'))) {
+      return prodFallback;
+    }
+    return runtime.replace(/0\.0\.0\.0/g, 'localhost');
   }
-  if (process.env.PUBLIC_BASE_URL) {
-    return process.env.PUBLIC_BASE_URL.replace(/\/$/, '');
-  }
-  return process.env.NODE_ENV === 'production' ? 'https://852.egos.ia.br' : 'http://localhost:3000';
+  
+  return isProd ? prodFallback : 'http://localhost:3000';
 }
 
 function buildPublicUser(user: AuthUserRow): CurrentAuthUser {
@@ -108,7 +115,7 @@ async function sha256(value: string): Promise<string> {
   return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-async function issueEmailVerification(params: { userId: string; email: string; displayName?: string | null; baseUrl?: string | null }) {
+export async function issueEmailVerification(params: { userId: string; email: string; displayName?: string | null; baseUrl?: string | null }) {
   const sb = getSupabase();
   if (!sb) return { error: 'Supabase não configurado', status: 503 };
 

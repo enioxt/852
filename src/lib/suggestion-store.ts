@@ -68,11 +68,29 @@ export function saveSuggestionHistoryEntry(
     };
     all[existingIndex] = merged;
     saveAll(all);
+
+    if (typeof window !== 'undefined') {
+      fetch('/api/suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'sync', item: merged })
+      }).catch(console.error);
+    }
+
     return merged;
   }
 
   all.push(nextItem);
   saveAll(all);
+
+  if (typeof window !== 'undefined') {
+    fetch('/api/suggestions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'sync', item: nextItem })
+    }).catch(console.error);
+  }
+
   return nextItem;
 }
 
@@ -81,5 +99,42 @@ export function deleteSuggestionHistoryEntry(id: string): boolean {
   const filtered = all.filter((entry) => entry.id !== id);
   if (filtered.length === all.length) return false;
   saveAll(filtered);
+
+  if (typeof window !== 'undefined') {
+    fetch('/api/suggestions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', id })
+    }).catch(console.error);
+  }
+
   return true;
+}
+
+export async function syncRemoteSuggestions(): Promise<void> {
+  if (typeof window === 'undefined') return;
+  try {
+    const res = await fetch('/api/suggestions');
+    if (!res.ok) return;
+    const { suggestions } = await res.json();
+    if (suggestions && Array.isArray(suggestions)) {
+      const dbItems = suggestions as SuggestionHistoryItem[];
+      const localItems = getAll();
+      const localMap = new Map(localItems.map(i => [i.id, i]));
+      
+      let changed = false;
+      for (const remote of dbItems) {
+        const local = localMap.get(remote.id);
+        if (!local || remote.updatedAt > local.updatedAt) {
+          localMap.set(remote.id, remote);
+          changed = true;
+        }
+      }
+      if (changed) {
+        saveAll(Array.from(localMap.values()).sort((a,b) => b.updatedAt - a.updatedAt));
+      }
+    }
+  } catch (err) {
+    console.error('Failed to sync remote suggestions', err);
+  }
 }

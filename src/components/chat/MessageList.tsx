@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Copy, Check, AlertTriangle } from 'lucide-react';
 import MarkdownMessage from '@/components/chat/MarkdownMessage';
 import CollapsibleMessage from '@/components/chat/CollapsibleMessage';
+import InlineCorrelation, { CorrelationData } from '@/components/chat/InlineCorrelation';
 
 export function getMessageText(message: { content?: string; parts?: Array<{ type?: string; text?: string }> }): string {
   if (typeof message.content === 'string' && message.content) return message.content;
@@ -20,9 +21,10 @@ interface MessageListProps {
   copiedId: string | null;
   onCopy: (text: string, id: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  correlations?: Record<string, CorrelationData>;
 }
 
-export default function MessageList({ messages, isLoading, error, copiedId, onCopy, messagesEndRef }: MessageListProps) {
+export default function MessageList({ messages, isLoading, error, copiedId, onCopy, messagesEndRef, correlations = {} }: MessageListProps) {
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       {messages.map((m) => {
@@ -48,7 +50,7 @@ export default function MessageList({ messages, isLoading, error, copiedId, onCo
                     ? 'bg-blue-600 text-white rounded-2xl rounded-tr-md px-4 py-3'
                     : 'text-neutral-200'
                 }`}>
-                  <CollapsibleMessage maxHeight={isUser ? 160 : 360}>
+                  <CollapsibleMessage maxHeight={isUser ? 160 : 360} fadeClass={isUser ? 'from-[#1c4ed8]' : 'from-neutral-950'}>
                     {isUser ? (
                       <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">{text}</div>
                     ) : (
@@ -69,6 +71,11 @@ export default function MessageList({ messages, isLoading, error, copiedId, onCo
                       {copiedId === m.id ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                   </div>
+                )}
+                
+                {/* Visual Corridor Match */}
+                {!isUser && correlations[m.id] && (
+                  <InlineCorrelation data={correlations[m.id]} />
                 )}
               </div>
             </div>

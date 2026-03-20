@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const ip = getClientIp(req.headers);
     const rl = checkRateLimit(`login:${ip}`, LOGIN_LIMIT.limit, LOGIN_LIMIT.windowMs);
     if (!rl.allowed) {
-      recordEvent({ event_type: 'rate_limited', metadata: { endpoint: '/api/auth/login', ip } });
+      recordEvent({ event_type: 'rate_limit_hit', metadata: { endpoint: '/api/auth/login', ip } });
       return Response.json(
         { error: 'Muitas tentativas. Aguarde 15 minutos.' },
         { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },

@@ -16,7 +16,7 @@
 
 ## 🏃 P1 - Polimento
 
-- [ ] 852-SSOT-001: Adotar o `egos/docs/SSOT_REGISTRY.md` no `852` — apontar `AGENTS.md`, `TASKS.md` e mapas/docs institucionais para o contrato canônico e separar claramente SSOT global vs superfícies locais do produto
+- [x] 852-SSOT-001: Adotar o `egos/docs/SSOT_REGISTRY.md` no `852` — apontar `AGENTS.md`, `TASKS.md` e mapas/docs institucionais para o contrato canônico e separar claramente SSOT global vs superfícies locais do produto
 - [x] Chat UI mobile-first com tipografia Geist
 - [x] Prompt institucional com anonimização
 - [x] Exportação PDF/DOCX/Markdown (dropdown)
@@ -112,11 +112,11 @@
 - [x] **Landing page v2**: redesign com 2 opções lado a lado, fluxo completo, código aberto com link GitHub, sem duplicidade de Tópicos
 - [x] **Tradução PT-BR**: todas as páginas verificadas e 100% em português acessível (landing, chat, issues, reports, dashboard, sidebar, mobile nav, FAQ)
 - [x] **SQL migration governance**: regra documentada em `.guarani/PREFERENCES.md` -- sempre via `supabase db push`, nunca manual
-- [ ] **Espiral de Escuta**: relatórios com <85% aprovação reabrem rodada de discussão
-- [ ] **Report flow multi-camada**: usuário itera, IA analisa, revisão humana, votação maioria
-- [ ] **Audio transcription**: Web Speech API / Whisper para transcrever áudio
-- [ ] **LGPD consent banner**: consentimento explícito no cadastro (Lei 13.709/2018)
-- [ ] **User self-service data access**: ver/exportar/deletar dados (LGPD Art. 18)
+- [x] **Espiral de Escuta**: relatórios com <85% aprovação reabrem rodada de discussão
+- [x] **Report flow multi-camada**: usuário itera, IA analisa, revisão humana, votação maioria
+- [x] **Audio transcription**: Web Speech API / Whisper para transcrever áudio
+- [x] **LGPD consent banner**: consentimento explícito no cadastro (Lei 13.709/2018)
+- [x] **User self-service data access**: ver/exportar/deletar dados (LGPD Art. 18)
 
 ## 🏃 P1 - Sprint v6 (Biblioteca Jurídica + Dupla Entrada + FAQ)
 
@@ -144,7 +144,7 @@
 - [x] **Categoria/tags opcionais**: classificação da sugestão
 - [x] **Histórico local de sugestões**: autosave, reabertura e status (rascunho, validado, publicado)
 - [x] **Exportar em PDF/MD**: mesma funcionalidade do chat
-- [ ] **Histórico remoto de sugestões para usuários logados**: sincronizar drafts/validações com Supabase
+- [x] **Histórico remoto de sugestões para usuários logados**: sincronizar drafts/validações com Supabase
 
 ### Roadmap Institucional
 - [x] **Roadmap integrado**: documento `docs/ROADMAP_INTELIGENCIA_POLICIAL_INTEGRADA.md` conectando `852`, `policia`, `Intelink`, EGOS Intelligence e IPED
@@ -182,14 +182,16 @@
 - [x] **Build limpo**: 51 rotas compilam sem erros TypeScript
 
 ### Melhorias de Experiência
+- [x] **AI Topic Content Engine**: geração de títulos jornalísticos e insights/tabelas estruturadas baseadas em evidências para os tópicos
 - [ ] **QR Code para delegacias**: gerar QR imprimível que leva ao Tira-Voz, para mural da delegacia
 - [ ] **Templates de relato**: modelos prontos para problemas comuns (falta de viatura, efetivo, sistema)
 - [ ] **Redirect canais formais**: botão visível "Denúncia formal" → Corregedoria/Ouvidoria/MP
 - [ ] **PWA/Offline**: instalar como app no celular, funcionar offline com sync posterior
 - [ ] **Acessibilidade**: tamanho de fonte ajustável, alto contraste, suporte a leitor de tela
 - [ ] **Notificação por email**: quando tópico que você votou recebe atividade
-- [ ] **Estatísticas por região**: dashboard filtrado por Departamento de Polícia (sem identificar unidades)
 - [ ] **Modo guiado "Não sei o que falar"**: wizard com perguntas guiadas para quem não sabe por onde começar
+- [x] **Document Pipeline (Mensagens Longas & Anexos)**: Colapso UX visual no front, parsing 100% no backend com chunking e Atrian estruturado (`[NOME_REDACTED]`).
+- [x] **Verdade Versionada (The EGOS Principle)**: Histórico editável em *múltiplas versões* no `/issues` garantindo autoria em edições (cada contestação vira uma Branch identificável).
 
 ## ⏭️ Backlog
 
@@ -213,7 +215,7 @@
 - [x] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
 - [ ] Admin view para relatórios compartilhados (autenticado)
 - [ ] Tool use: web search para dados institucionais (AI SDK tools)
-- [ ] Voice input (speech-to-text via Browser API)
+- [x] Voice input (speech-to-text via Browser API) no chat e na sugestão
 - [ ] Proactive collaboration suggestions (agent sugere temas durante a conversa)
 - [x] User-linked conversation persistence (load from Supabase when logged in)
 - [ ] BYOK: usuários plugam próprias API keys, grupos com chave compartilhada
@@ -221,3 +223,11 @@
 - [ ] AI Reports v2: auto-análise a cada 5 relatos, HTML output, padrões cross-report
 - [ ] Lotação auto-detect via chatbot: mencionar lotação, confirmar e vincular ao perfil
 - [ ] Suggest external LLMs: sugerir que usuário passe prompt por Claude/Gemini/GPT
+
+## ✅ P2 - Sprint v8.5 (Completed 2026-03-20)
+
+- [x] Unificação do Hub Comunitário: Fórum e Relatos mesclados no Master Hub em `/papo-de-corredor`.
+- [x] Limpeza UX: Master Hub assume as responsabilidades do header e links obsoletos foram removidos.
+- [x] Conta Simplificada e Administrativa: `/conta` centralizada, sem label 'Provedor', com links de Telemetria (ATRiAN) limitados ao root admin.
+- [x] IA Anti-Spam (Qwen): Ajuste imperativo de prompt `isTrivial` bloqueando relatórios vindo de conversas curtas.
+- [x] Deploy VPS: Zero-Downtime roll out efetuado na branch contabo.

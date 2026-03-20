@@ -18,6 +18,7 @@ import {
   getConversationServerId, setConversationServerId, upsertConversation
 } from '@/lib/chat-store';
 import { getClientConversationId, getIdentityKey, getOrCreateSessionHash } from '@/lib/session';
+import type { CorrelationData } from '@/components/chat/InlineCorrelation';
 
 function toChatMessages(storedMessages: StoredMessage[]) {
   return storedMessages.map((message) => ({
@@ -59,6 +60,7 @@ function ChatPageClient() {
   const [sessionHash] = useState<string>(() => (typeof window === 'undefined' ? '' : getOrCreateSessionHash()));
   const [serverConversationId, setServerConversationId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [correlations, setCorrelations] = useState<Record<string, CorrelationData>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const supabaseIdRef = useRef<string | null>(null);
@@ -72,8 +74,23 @@ function ChatPageClient() {
     onError: (err) => {
       console.error('[852-chat] useChat error:', err.message, err);
     },
-    onFinish: () => {
-      // persist after AI responds
+    onFinish: async (message) => {
+      try {
+        const res = await fetch('/api/correlate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: message.content, context: 'chat' })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const hasResults = data.suggestedTags?.length > 0 || data.relatedIssues?.length > 0 || data.relatedReports?.length > 0;
+          if (hasResults) {
+            setCorrelations(prev => ({ ...prev, [message.id]: data }));
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch chat correlation', e);
+      }
     },
   });
 
@@ -376,6 +393,7 @@ function ChatPageClient() {
               copiedId={copiedId}
               onCopy={copyMessage}
               messagesEndRef={messagesEndRef}
+              correlations={correlations}
             />
           )}
         </main>
@@ -387,6 +405,7 @@ function ChatPageClient() {
           onSubmit={handleFormSubmit}
           isLoading={isLoading}
           inputRef={inputRef}
+          setInput={setInput}
         />
       </div>
 

@@ -9,8 +9,6 @@ const NAV_ITEMS = [
   { href: '/chat', label: 'Chat', icon: MessageSquare },
   { href: '/sugestao', label: 'Sugestão', icon: PenLine },
   { href: '/papo-de-corredor', label: 'Corredor', icon: Radio },
-  { href: '/issues', label: 'Fórum', icon: AlertCircle },
-  { href: '/reports', label: 'Relatos', icon: FileText },
 ];
 
 export default function MobileNav() {
@@ -21,7 +19,7 @@ export default function MobileNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-neutral-950 border-t border-neutral-800/60 safe-area-bottom">
-      <div className="grid h-16 grid-cols-6 px-1">
+      <div className="grid h-16 grid-cols-4 px-1">
         {NAV_ITEMS.map(item => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
           const Icon = item.icon;

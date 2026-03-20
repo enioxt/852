@@ -13,7 +13,7 @@ export interface ReportMessage {
   content: string;
 }
 
-export type ReportStatus = 'draft' | 'reviewed' | 'shared' | 'deleted';
+export type ReportStatus = 'draft' | 'reviewed' | 'shared' | 'pending_human' | 'published' | 'deleted';
 
 export interface Report {
   id: string;
@@ -65,7 +65,7 @@ export function listReports(): Report[] {
 
 export function listSharedReports(): Report[] {
   return getAll()
-    .filter(r => r.status === 'shared')
+    .filter(r => r.status === 'shared' || r.status === 'pending_human' || r.status === 'published')
     .sort((a, b) => (b.sharedAt || b.updatedAt) - (a.sharedAt || a.updatedAt));
 }
 
@@ -117,7 +117,7 @@ export function shareReport(id: string, serverId?: string): Report | undefined {
   const all = getAll();
   const idx = all.findIndex(r => r.id === id);
   if (idx === -1) return undefined;
-  all[idx].status = 'shared';
+  all[idx].status = 'pending_human';
   if (serverId) all[idx].serverId = serverId;
   all[idx].sharedAt = Date.now();
   all[idx].updatedAt = Date.now();
@@ -151,6 +151,7 @@ type ServerReportPayload = {
   id: string;
   conversation_id: string;
   created_at: string;
+  status: string;
   messages: ReportMessage[];
   review_data?: Record<string, unknown> | null;
   metadata?: Record<string, unknown> | null;
@@ -176,7 +177,7 @@ function normalizeServerReport(report: ServerReportPayload): Report {
     conversationId: clientConversationId,
     messages: report.messages,
     sanitizedMessages,
-    status: 'shared',
+    status: (report.status as ReportStatus) || 'shared',
     piiRemoved,
     aiSuggestions,
     reviewData: (report.review_data as ReviewData | null) || null,

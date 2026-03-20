@@ -7,9 +7,10 @@ interface CollapsibleMessageProps {
   children: React.ReactNode;
   maxHeight?: number; // Maximum height in pixels before clamping
   isEnabled?: boolean; // Whether the feature is turned on
+  fadeClass?: string; // Tailwind class for the from-* gradient
 }
 
-export default function CollapsibleMessage({ children, maxHeight = 320, isEnabled = true }: CollapsibleMessageProps) {
+export default function CollapsibleMessage({ children, maxHeight = 320, isEnabled = true, fadeClass = 'from-neutral-950' }: CollapsibleMessageProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsClamping, setNeedsClamping] = useState(false);
 
@@ -41,7 +42,7 @@ export default function CollapsibleMessage({ children, maxHeight = 320, isEnable
       </div>
 
       {needsClamping && !isExpanded && (
-        <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-[#1c4ed8] to-transparent pointer-events-none rounded-b-lg" />
+        <div className={`absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t ${fadeClass} to-transparent pointer-events-none rounded-b-lg`} />
       )}
 
       {needsClamping && (

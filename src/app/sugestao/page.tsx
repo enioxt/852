@@ -12,6 +12,7 @@ import {
   Download,
   FileText,
   Loader2,
+  Mic,
   Paperclip,
   PenLine,
   Shield,
@@ -27,6 +28,7 @@ import {
   deleteSuggestionHistoryEntry,
   listSuggestions,
   saveSuggestionHistoryEntry,
+  syncRemoteSuggestions,
   type SuggestionHistoryItem,
 } from '@/lib/suggestion-store';
 import CorrelationPanel from '@/components/CorrelationPanel';
@@ -61,6 +63,27 @@ export default function SugestaoPage() {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]['value']>('outro');
+
+  const applyTemplate = (type: 'viatura' | 'efetivo' | 'sistema') => {
+    switch (type) {
+      case 'viatura':
+        setTitle('Manutenção de Viatura Atrasada / Inoperante');
+        setCategory('infraestrutura');
+        setBody('Placa da viatura:\n\nProblema principal:\n\nImpacto na operação:\n\nObservações:');
+        break;
+      case 'efetivo':
+        setTitle('Sobrecarga de Efetivo no Plantão');
+        setCategory('efetivo');
+        setBody('Delegacia/Plantão:\n\nSituação (quais funções estão desfalcadas):\n\nRiscos à segurança ou ao atendimento público:\n\nSugestão paliativa:');
+        break;
+      case 'sistema':
+        setTitle('Instabilidade Recorrente no Sistema (PCNET/BOP)');
+        setCategory('tecnologia');
+        setBody('Sistema Afetado:\n\nData inicial e frequência da falha:\n\nMensagem de erro:\n\nImpacto no registro de ocorrências:');
+        break;
+    }
+  };
+
   const [tagsInput, setTagsInput] = useState('');
   const [attachments, setAttachments] = useState<ParsedAttachment[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -75,8 +98,74 @@ export default function SugestaoPage() {
   const [dragActive, setDragActive] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
 
+  const [isRecording, setIsRecording] = useState(false);
+  const [hasSpeechSupport, setHasSpeechSupport] = useState(true);
+  const recognitionRef = useRef<any>(null);
+  
+  const currentBodyRef = useRef(body);
+  useEffect(() => {
+    currentBodyRef.current = body;
+  }, [body]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        setHasSpeechSupport(false);
+        return;
+      }
+      
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'pt-BR';
+
+      recognition.onresult = (event: any) => {
+        let newTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            newTranscript += event.results[i][0].transcript;
+          }
+        }
+        
+        if (newTranscript) {
+          const current = currentBodyRef.current.trim();
+          const nextVal = current ? current + ' ' + newTranscript.trim() : newTranscript.trim();
+          setBody(nextVal);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error('[852-speech] erro:', event.error);
+        setIsRecording(false);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+    } else {
+      try {
+        recognitionRef.current?.start();
+        setIsRecording(true);
+      } catch (err) {
+        console.error('Falha ao iniciar speech:', err);
+      }
+    }
+  };
+
   useEffect(() => {
     setHistory(listSuggestions());
+    syncRemoteSuggestions().then(() => {
+      setHistory(listSuggestions());
+    });
   }, []);
 
   const tags = useMemo(
@@ -214,10 +303,12 @@ export default function SugestaoPage() {
       }
 
       setReviewData({
+        titulo: data.title || '',
         completude: data.completude || 0,
         impacto: data.impacto || 'Médio',
         resumo: data.resumo || '',
-        sugestoes: data.sugestoes || []
+        sugestoes: data.sugestoes || [],
+        insights_estruturais: data.insights_estruturais || []
       } as ReviewData);
     } catch (error) {
       setReviewError(error instanceof Error ? error.message : 'Falha na revisão.');
@@ -355,7 +446,35 @@ export default function SugestaoPage() {
                 <input value={tagsInput} onChange={(event) => setTagsInput(event.target.value)} placeholder="lavagem de dinheiro, OCR, portaria" className="h-12 w-full rounded-2xl border border-neutral-800 bg-neutral-950 px-4 text-sm text-white outline-none transition focus:border-amber-700" />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-neutral-300">Sugestão, relato ou proposta</label>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                  <label className="text-sm font-medium text-neutral-300">Sugestão, relato ou proposta</label>
+                  {hasSpeechSupport && (
+                    <button
+                      type="button"
+                      onClick={toggleRecording}
+                      className={`flex items-center self-start sm:self-auto gap-1.5 px-3 py-1 text-[11px] font-medium rounded-full transition ${isRecording ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 'bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700'}`}
+                    >
+                      <Mic className={`w-3.5 h-3.5 ${isRecording ? 'animate-pulse' : ''}`} />
+                      {isRecording ? 'Ouvindo (toque para parar)' : 'Ditar assunto'}
+                    </button>
+                  )}
+                </div>
+                
+                <div className="mb-4">
+                  <p className="text-xs text-neutral-500 mb-2">Modelos Rápidos (opcional):</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => applyTemplate('viatura')} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-700 bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition">
+                      🚔 Viatura Quebrada
+                    </button>
+                    <button onClick={() => applyTemplate('efetivo')} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-700 bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition">
+                      👥 Falta de Efetivo
+                    </button>
+                    <button onClick={() => applyTemplate('sistema')} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-700 bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition">
+                      💻 Problema PCNET/BOP
+                    </button>
+                  </div>
+                </div>
+
                 <textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="Descreva o problema, a oportunidade ou a solução. Exemplo: integrar a portaria ao banco local para cruzar visitantes, fotos, veículos e eventos relevantes..." className="min-h-[240px] w-full rounded-3xl border border-neutral-800 bg-neutral-950 p-4 text-sm leading-relaxed text-white outline-none transition focus:border-amber-700" />
               </div>
             </div>
@@ -513,6 +632,26 @@ export default function SugestaoPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-rose-900/40 bg-rose-950/10 p-5 mt-4">
+            <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-rose-400">
+              <AlertTriangle className="h-4 w-4" /> 
+              Vias Institucionais
+            </div>
+            <p className="text-xs text-neutral-400 mb-4 leading-relaxed">
+              O Tira-Voz <strong>NÃO</strong> substitui os canais oficiais. Crimes ou transgressões disciplinares graves devem ser relatados à Corregedoria.
+            </p>
+            <div className="space-y-2">
+              <a href="https://www.policiacivil.mg.gov.br/pagina/corregedoria" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-3 rounded-2xl bg-rose-950/40 hover:bg-rose-900/40 border border-rose-900/60 px-4 py-3 transition">
+                <span className="text-xs font-medium text-rose-200">Denúncia Corregedoria-Geral</span>
+                <ArrowRight className="h-3 w-3 text-rose-400" />
+              </a>
+              <a href="https://www.ouvidoriageral.mg.gov.br/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-3 rounded-2xl bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-700 px-4 py-3 transition">
+                <span className="text-xs font-medium text-neutral-300">Sistemas OGE/MG</span>
+                <ArrowRight className="h-3 w-3 text-neutral-400" />
+              </a>
             </div>
           </div>
         </aside>

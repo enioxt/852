@@ -1,4 +1,4 @@
-type PromptContext = 'chat' | 'review' | 'html_report' | 'intelligence_report' | 'conversation_summary' | 'name_validation';
+type PromptContext = 'chat' | 'review' | 'html_report' | 'intelligence_report' | 'conversation_summary' | 'name_validation' | 'espiral_de_escuta';
 
 const EGOS_FOUNDATION = `Você opera dentro do ecossistema EGOS aplicado ao Tira-Voz.
 Use disciplina EGOS em toda resposta: verdade verificável, foco sistêmico, privacidade absoluta, rastreabilidade, concisão e transparência sobre limites.
@@ -71,11 +71,22 @@ Responda em texto simples, sem markdown extra além dos bullets.`,
 Classifique se o texto parece nome real de pessoa brasileira.
 Se houver risco razoável de ser nome real, marque como inválido para proteger o anonimato.
 Responda APENAS com JSON válido no formato solicitado.`,
+  espiral_de_escuta: `## FOCO ESPECÍFICO — ESPIRAL DE ESCUTA (REAVALIAÇÃO DE TÓPICO)
+O tópico analisado sofreu alta rejeição da comunidade na forma de downvotes e comentários críticos.
+Seu objetivo é gerar uma re-análise corretiva e aprofundada:
+1. Sintetize as reclamações, críticas e omissões apontadas pelos usuários.
+2. Admita que a sugestão/análise original pode ter falhado ou ignorado a realidade prática.
+3. Elabore um adendo analítico que re-estruture o problema sob a dura ótica dos comentários registrados.
+Responda DIRETAMENTE com o texto do comentário, sem jargões de IA, assumindo a voz de um analista institucional [AGENTE 852] ajustando a rota.`,
 };
 
 const OUTPUT_FORMATS: Partial<Record<PromptContext, string>> = {
-  review: `## FORMATO EXATO
-{"completude":7,"resumo":"Resumo aqui","temas":["tema1","tema2"],"pontosCegos":["ponto1"],"sugestoes":["pergunta1","pergunta2"],"impacto":"Impacto aqui"}`,
+  review: `## FORMATO EXATO E ANTI-SPAM
+Se a conversa for puramente trivial, ou seja, sem relevância institucional (ex: testes de bot, teste de nomes de ferramentas, saudações básicas sem contexto de trabalho, ou conversas vazias), você DEVE barrar a geração retornando APENAS:
+{"isTrivial": true}
+
+Caso a conversa tenha conteúdo minimamente útil, responda no formato:
+{"isTrivial": false, "titulo":"Título impactante e jornalístico em até 80 caracteres","completude":7,"resumo":"Resumo técnico estrutural em 3 linhas","temas":["tema1"],"pontosCegos":["ponto1"],"sugestoes":["pergunta1"],"impacto":"Impacto aqui","insights_estruturais":["1. Relacione com déficit, estudos do Gem Hunter ou literatura de saúde PCMG.", "2. Use tabelas Markdown para 'gráficos' ou comparativos de dados estatísticos."]}`,
   intelligence_report: `## FORMATO EXATO
 {
   "titulo": "Relatório de Inteligência #N — Período",
@@ -139,6 +150,10 @@ export function buildIntelligenceReportPrompt() {
 
 export function buildConversationSummaryPrompt() {
   return buildPrompt('conversation_summary');
+}
+
+export function buildEspiralDeEscutaPrompt() {
+  return buildPrompt('espiral_de_escuta');
 }
 
 export function buildNameValidationPrompt() {

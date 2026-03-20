@@ -43,18 +43,19 @@ export async function POST(req: Request) {
       modelId = configObj.modelId;
     }
 
-    const systemPrompt = `Você é um analista de dados e classificação da Polícia Civil. 
-Sua tarefa é ler um relato bruto e extrair o título, a categoria, as tags e um resumo técnico estruturado.
+    const systemPrompt = `Você é um analista de inteligência da Polícia Civil. 
+Sua tarefa é ler um relato bruto e extrair o título, a categoria, as tags e um resumo técnico estruturado, vinculando o problema a questões estruturais, jurídicas e de saúde ocupacional.
 
 CATEGORIAS PERMITIDAS EXATAS: "tecnologia", "infraestrutura", "efetivo", "plantao", "procedimento", "integracao", "legislacao", "outro".
 
 Regras:
-1. title: Um título claro e profissional (máx 50 caracteres).
+1. title: Um título claro, inteligente e jornalístico (máx 80 caracteres). NUNCA use "Discussão Relevante".
 2. category: Escolha EXATAMENTE UMA das categorias permitidas acima. Se não tiver certeza, use "outro".
 3. tags: Escolha entre 2 a 5 palavras-chave relevantes (somente minúsculas, separadas por vírgula).
 4. completude: Nota de 0 a 10 de quão completo é o relato.
 5. resumo: Resumo conciso de até 3 linhas (sempre na terceira pessoa ou impessoal).
-6. sugestoes: Um array de 1 ou 2 sugestões para melhorar o relato ou dúvidas a serem sanadas.
+6. sugestoes: Um array de 1 ou 2 sugestões práticas de como melhorar o relato.
+7. insights_estruturais: Um array de 1 a 3 strings vinculando o relato com estudos, leis conhecidas, relatórios (ex: adoecimento civil, burnout) ou manuais práticos. Use seu conhecimento "Gem Hunter" para citar fundamentos ou estatísticas aplicáveis à PCMG.
 
 Sua resposta DEVE SER UM JSON VÁLIDO. NÃO INCLUA NADA FORA DO JSON. Formato esperado:
 {
@@ -63,7 +64,8 @@ Sua resposta DEVE SER UM JSON VÁLIDO. NÃO INCLUA NADA FORA DO JSON. Formato es
   "tags": [],
   "completude": 0,
   "resumo": "",
-  "sugestoes": [""]
+  "sugestoes": [""],
+  "insights_estruturais": [""]
 }`;
 
     const clampedContent = content.slice(0, 32000);

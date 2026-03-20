@@ -162,6 +162,9 @@
 | 44 | Papo de Corredor page (trending community topics, ranked feed) | `papo-de-corredor/page.tsx` | Active |
 | 45 | HotTopicsTicker sidebar widget (top 6 topics with live polling) | `HotTopicsTicker.tsx` | Active |
 | 46 | Autosave visual indicator (green dot + timestamp in /sugestao) | `sugestao/page.tsx` | Active |
+| 47 | AI Topic Content Engine (Journalistic Titles & Structural Insights) | `api/extract/route.ts` | Active |
+| 48 | Anti-Spam Intelligence Filter (blocks trivial chats) | `api/review/route.ts` + `prompt.ts` | Active |
+| 49 | Centralized Vibe Coding User Account + Admin Portal | `conta/page.tsx` | Active |
 
 ## Agent 852 — Roadmap
 

@@ -923,10 +923,7 @@ function AccountPageContent() {
                 <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-neutral-500">Email</label>
                 <div className="flex h-12 items-center rounded-2xl border border-neutral-800 bg-neutral-950/60 px-4 text-sm text-white">{currentUser.email}</div>
               </div>
-              <div>
-                <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-neutral-500">Provedor</label>
-                <div className="flex h-12 items-center rounded-2xl border border-neutral-800 bg-neutral-950/60 px-4 text-sm text-white">{currentUser.auth_provider || 'password'}</div>
-              </div>
+
               <div>
                 <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-neutral-500">MASP</label>
                 <input
@@ -983,7 +980,25 @@ function AccountPageContent() {
               <p className="mt-2 text-sm text-white">{currentUser.reputation_points || 0} pontos</p>
             </div>
 
-            <div id="configuracoes" className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-4 space-y-3">
+            {currentUser.email === 'enioxt@gmail.com' && (
+               <div className="rounded-2xl border border-blue-900/40 bg-blue-950/30 p-4 space-y-3">
+                 <div className="flex items-center gap-2 text-neutral-300">
+                   <Shield className="h-4 w-4 text-blue-400" />
+                   <span className="text-sm font-medium">Administração (Restrito)</span>
+                 </div>
+                 <p className="mt-2 text-xs leading-relaxed text-neutral-400">Suas permissões habilitam acesso estrutural de controle e estatística.</p>
+                 <div className="flex flex-col gap-2 mt-2">
+                   <Link href="/admin/telemetry" className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-blue-800/60 bg-blue-900/30 px-4 text-xs font-medium text-white transition hover:bg-blue-900/50">
+                     Painel de Telemetria & ATRiAN
+                   </Link>
+                   <Link href="/admin/validations" className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-blue-800/60 bg-blue-900/30 px-4 text-xs font-medium text-white transition hover:bg-blue-900/50">
+                     Validação de Cadastros (MASP)
+                   </Link>
+                 </div>
+               </div>
+            )}
+
+            <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-4 space-y-3">
               <div className="flex items-center gap-2 text-neutral-300">
                 <Waypoints className="h-4 w-4 text-emerald-400" />
                 <span className="text-sm font-medium">Senha e acesso</span>

@@ -11,11 +11,27 @@ export async function POST(req: Request) {
       return Response.json({ error: 'messages é obrigatório' }, { status: 400 });
     }
 
+    // Dual-persistence Document Pipeline: Sanitize DB entries and upstream AI pipeline
+    const { scanForPII, sanitizeText } = require('@/lib/pii-scanner');
+    const processedMessages = messages.map(msg => {
+      if (msg.role === 'user' && typeof msg.content === 'string') {
+        const findings = scanForPII(msg.content);
+        if (findings.length > 0) {
+          return {
+            ...msg,
+            rawContent: msg.content,
+            content: sanitizeText(msg.content, findings)
+          };
+        }
+      }
+      return msg;
+    });
+
     const user = await getCurrentUser();
     const identityKey = getIdentityKey(sessionHash, user?.id);
     const interactionHash = createInteractionHash();
 
-    const id = await saveConversation(messages, title, identityKey || undefined, existingId, {
+    const id = await saveConversation(processedMessages, title, identityKey || undefined, existingId, {
       clientConversationId: typeof clientConversationId === 'string' ? clientConversationId : null,
       interactionHash,
       lastSyncedAt: new Date().toISOString(),
@@ -54,7 +70,7 @@ export async function POST(req: Request) {
           const title = reviewData.title || 'Relato Operacional';
           const body = reviewData.resumo || 'Resumo automático processado pela Inteligência.';
           const category = reviewData.categoria || reviewData.category || 'Outros';
-          await createIssue(title, body, category, 'ai_auto');
+          await createIssue(title, body, category, 'ai_report');
         }
       }
     }

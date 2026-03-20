@@ -138,8 +138,11 @@ export default function ReportReview({ messages, conversationId, serverConversat
       const msg = err instanceof Error ? err.message : 'Erro desconhecido';
       setReviewError(msg);
       setHasReviewed(true);
-      // Still allow sharing even if review fails
-      setStep('ready');
+      
+      if (!msg.includes('contexto tático ou operacional')) {
+        // Still allow sharing even if review API fails (timeout, 5xx), but block if trivial
+        setStep('ready');
+      }
     } finally {
       setReviewLoading(false);
     }
@@ -393,7 +396,9 @@ export default function ReportReview({ messages, conversationId, serverConversat
                   {reviewError && (
                     <div className="p-3 rounded-xl bg-red-900/20 border border-red-800/30 text-xs text-red-400">
                       {reviewError}
-                      <button onClick={runAIReview} className="ml-2 underline hover:text-red-300">Tentar novamente</button>
+                      {!reviewError.includes('contexto tático ou operacional') && (
+                        <button onClick={runAIReview} className="ml-2 underline hover:text-red-300">Tentar novamente</button>
+                      )}
                     </div>
                   )}
 

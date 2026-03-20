@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const ip = getClientIp(req.headers);
     const rl = checkRateLimit(`verify-code:${ip}`, VERIFY_CODE_LIMIT.limit, VERIFY_CODE_LIMIT.windowMs);
     if (!rl.allowed) {
-      recordEvent({ event_type: 'rate_limited', metadata: { endpoint: '/api/auth/verify-code', ip } });
+      recordEvent({ event_type: 'rate_limit_hit', metadata: { endpoint: '/api/auth/verify-code', ip } });
       return Response.json(
         { error: 'Muitas tentativas. Aguarde 15 minutos.' },
         { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },

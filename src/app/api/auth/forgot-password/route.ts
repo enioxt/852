@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
     return Response.json({
       success: true,
-      message: 'Se o email existir, enviaremos um link de redefinição em instantes.',
+      message: `Enviamos um link para criar ou redefinir sua senha para ${email}. Verifique sua caixa de entrada e spam.`,
       warning: result.warning,
       debugResetUrl: result.debugResetUrl,
     });

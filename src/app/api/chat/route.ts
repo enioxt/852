@@ -43,10 +43,26 @@ function sanitizeMessages(messages: unknown) {
       const role = (message as IncomingMessage).role;
       return role === 'user' || role === 'assistant' || role === 'system';
     })
-    .map(message => ({
-      role: message.role,
-      content: getMessageText(message).slice(0, 32000), // increased from 4000 to 32000 for pasted files
-    }))
+    .map(message => {
+      const rawText = getMessageText(message).slice(0, 32000);
+      const isUser = message.role === 'user';
+      let content = rawText;
+      
+      // Early Deep Atrian Layer: Mask PII from user inputs before LLM ingests it
+      if (isUser && rawText.length > 0) {
+        // Only require pii-scanner when needed to avoid circular logic or initialization issues
+        const { scanForPII, sanitizeText } = require('@/lib/pii-scanner');
+        const findings = scanForPII(rawText);
+        if (findings.length > 0) {
+          content = sanitizeText(rawText, findings);
+        }
+      }
+
+      return {
+        role: message.role,
+        content,
+      };
+    })
     .filter(message => message.content.length > 0);
 }
 
@@ -98,16 +114,33 @@ export async function POST(req: Request) {
 
     let { provider, modelId, providerLabel, pricing, routingReason } = getModelConfig('chat');
 
-    // Dynamic Context Orchestration
+    // Dynamic Context Orchestration (Document Pipeline)
     const totalChars = messages.reduce((acc, msg) => acc + msg.content.length, 0);
-    if (totalChars > 8000) {
-      // Large Payload: force route to high-context intelligence model (e.g. qwen-max or gemini)
+    
+    if (totalChars > 12000) {
+      // Deep Tier: Huge payload (e.g. pasted long document)
       const configObj = getModelConfig('intelligence_report');
       provider = configObj.provider;
       modelId = configObj.modelId;
       providerLabel = configObj.providerLabel;
       pricing = configObj.pricing;
-      routingReason = 'Payload massivo detectado (>8000 caracteres). Roteado dinamicamente para modelo de alto contexto.';
+      routingReason = 'Tier Deep: Payload massivo detectado (>12k chars). Roteado dinamicamente para modelo de alto contexto/análise profunda.';
+    } else if (totalChars > 2500) {
+      // Balanced Tier: Normal conversation / medium context
+      const configObj = getModelConfig('chat');
+      provider = configObj.provider;
+      modelId = configObj.modelId;
+      providerLabel = configObj.providerLabel;
+      pricing = configObj.pricing;
+      routingReason = 'Tier Balanced: Contexto moderado detectado. Roteado para modelo de chat principal.';
+    } else {
+      // Fast Tier: Quick interactions, small context
+      const configObj = getModelConfig('review'); // Fast Auxiliary models like Gemini Flash
+      provider = configObj.provider;
+      modelId = configObj.modelId;
+      providerLabel = configObj.providerLabel;
+      pricing = configObj.pricing;
+      routingReason = 'Tier Fast: Mensagem curta/rápida detectada (<2500 chars). Roteado dinamicamente para modelo de fallback ultrarrápido.';
     }
 
     const result = streamText({

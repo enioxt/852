@@ -18,9 +18,7 @@ const navItems = [
   { href: '/chat', label: 'Chat' },
   { href: '/sugestao', label: 'Sugestão' },
   { href: '/papo-de-corredor', label: 'Corredor' },
-  { href: '/issues', label: 'Tópicos' },
   { href: '/legislacao', label: 'Legislação' },
-  { href: '/reports', label: 'Relatórios' },
   { href: '/dashboard', label: 'Painel' },
 ] as const;
 
@@ -108,16 +106,10 @@ export default function SiteHeader() {
               </div>
               <Link
                 href="/conta"
-                className={`rounded-full px-4 py-2 text-sm transition ${isActive(pathname, '/conta') ? 'bg-neutral-100 text-neutral-950' : 'text-neutral-400 hover:bg-neutral-800 hover:text-white'}`}
-              >
-                Conta
-              </Link>
-              <Link
-                href="/conta#configuracoes"
-                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm text-neutral-400 transition hover:bg-neutral-800 hover:text-white"
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${isActive(pathname, '/conta') ? 'bg-neutral-100 text-neutral-950' : 'text-neutral-400 hover:bg-neutral-800 hover:text-white'}`}
               >
                 <Settings className="h-4 w-4" />
-                Configurações
+                Minha Conta
               </Link>
               <button
                 onClick={handleLogout}
@@ -180,10 +172,7 @@ export default function SiteHeader() {
                   <span className="truncate">{displayName}</span>
                 </div>
                 <Link href="/conta" onClick={() => setMobileOpen(false)} className="rounded-xl bg-neutral-900 px-4 py-3 text-sm text-neutral-300">
-                  Minha conta
-                </Link>
-                <Link href="/conta#configuracoes" onClick={() => setMobileOpen(false)} className="rounded-xl bg-neutral-900 px-4 py-3 text-sm text-neutral-300">
-                  Configurações da conta
+                  Minha Conta
                 </Link>
                 <button
                   onClick={handleLogout}

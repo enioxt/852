@@ -36,6 +36,7 @@ export default function GoogleIdentityButton({
   const buttonRef = useRef<HTMLDivElement | null>(null);
   const [scriptReady, setScriptReady] = useState(false);
   const [loading, setLoading] = useState(false);
+  const initRef = useRef(false);
 
   const buttonText = useMemo(() => {
     return mode === 'register' ? 'signup_with' : 'continue_with';
@@ -43,6 +44,8 @@ export default function GoogleIdentityButton({
 
   useEffect(() => {
     if (!scriptReady || !clientId || !buttonRef.current || !window.google?.accounts?.id) return;
+    if (initRef.current) return;
+    initRef.current = true;
 
     buttonRef.current.innerHTML = '';
 

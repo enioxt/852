@@ -127,7 +127,8 @@ export async function saveReport(
   messages: Array<{ role: string; content: string }>,
   reviewData?: Record<string, unknown>,
   sessionHash?: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
+  status?: string
 ): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
@@ -136,7 +137,7 @@ export async function saveReport(
     conversation_id: conversationId,
     messages: JSON.stringify(messages),
     review_data: reviewData || null,
-    status: 'shared',
+    status: status || 'pending_human',
     session_hash: sessionHash || null,
     metadata: metadata || null,
     updated_at: new Date().toISOString(),
@@ -167,7 +168,7 @@ export async function saveReport(
   }
 }
 
-export async function getReports(limit = 50, identityKey?: string): Promise<ReportRecord[]> {
+export async function getReports(limit = 50, identityKey?: string, statusFilter?: string[]): Promise<ReportRecord[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
@@ -177,6 +178,10 @@ export async function getReports(limit = 50, identityKey?: string): Promise<Repo
     .neq('status', 'deleted')
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (statusFilter && statusFilter.length > 0) {
+    query = query.in('status', statusFilter);
+  }
 
   if (identityKey) {
     query = query.eq('session_hash', identityKey);
@@ -286,19 +291,41 @@ export interface IssueRecord {
   ai_report_id: string | null;
   votes: number;
   comment_count: number;
+  parent_id?: string | null;
+  version_author_id?: string | null;
+  version_reason?: string | null;
 }
 
 export async function createIssue(
   title: string,
-  body?: string,
-  category?: string,
-  source: string = 'user',
-  aiReportId?: string
+  body: string,
+  category: string,
+  source: 'user' | 'ai_suggestion' | 'ai_report' = 'user',
+  aiReportId?: string,
+  parentId?: string,
+  versionAuthorId?: string,
+  versionReason?: string
 ): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
 
-  if (source === 'ai_suggestion') {
+  const payload: Partial<IssueRecord> = {
+    title,
+    body,
+    category,
+    source,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    votes: 0,
+    comment_count: 0,
+    status: 'open',
+  };
+
+  if (aiReportId) {
+    payload.ai_report_id = aiReportId;
+  }
+
+  if (source === 'ai_suggestion' && !parentId) {
     const { data: existing } = await sb
       .from('issues_852')
       .select('id, status, ai_report_id')
@@ -326,9 +353,20 @@ export async function createIssue(
     }
   }
 
+  const insertPayload: any = {
+    title,
+    body: body || null,
+    category: category || null,
+    source,
+    ai_report_id: aiReportId || null,
+    parent_id: parentId || null,
+    version_author_id: versionAuthorId || null,
+    version_reason: versionReason || null,
+  };
+
   const { data, error } = await sb
     .from('issues_852')
-    .insert({ title, body: body || null, category: category || null, source, ai_report_id: aiReportId || null })
+    .insert(insertPayload)
     .select('id')
     .single();
 
@@ -340,14 +378,16 @@ export async function getIssues(
   status?: string,
   limit = 50,
   sortBy: 'votes' | 'created_at' = 'created_at',
-  aiReportId?: string
-): Promise<IssueRecord[]> {
+  aiReportId?: string,
+  includeChildren = false
+): Promise<(IssueRecord & { downvotes?: number })[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
   let query = sb.from('issues_852').select('*').limit(limit);
   if (status) query = query.eq('status', status);
   if (aiReportId) query = query.eq('ai_report_id', aiReportId);
+  if (!includeChildren) query = query.is('parent_id', null);
   query = query.order(sortBy, { ascending: false });
 
   const { data, error } = await query;
@@ -355,11 +395,26 @@ export async function getIssues(
   return data || [];
 }
 
+export async function getIssueVersions(parentId: string): Promise<IssueRecord[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  const { data, error } = await sb
+    .from('issues_852')
+    .select('*')
+    .eq('parent_id', parentId)
+    .order('created_at', { ascending: true });
+
+  if (error) return [];
+  return data || [];
+}
+
 export async function voteIssue(
   issueId: string,
   sessionHash: string,
-  userId?: string
-): Promise<{ voted: boolean; issue?: { id: string; title: string | null; votes: number } }> {
+  userId?: string,
+  voteType: 'up' | 'down' = 'up'
+): Promise<{ voted: boolean; issue?: { id: string; title: string | null; votes: number; downvotes: number } }> {
   const sb = getSupabase();
   if (!sb) return { voted: false };
 
@@ -413,26 +468,42 @@ export async function voteIssue(
       issue_id: issueId,
       session_hash: identitySessionHash,
       user_id: userId || null,
+      vote_type: voteType,
     });
 
   if (error) return { voted: false };
 
   // Increment vote count (manual since no RPC function)
-  const { data: issueData } = await sb.from('issues_852').select('title, votes').eq('id', issueId).single();
+  const { data: issueData } = await sb.from('issues_852').select('title, votes, downvotes').eq('id', issueId).single();
   if (issueData) {
-    const updatedVotes = (issueData.votes || 0) + 1;
-    await sb.from('issues_852').update({ votes: updatedVotes }).eq('id', issueId);
-    return {
-      voted: true,
-      issue: {
-        id: issueId,
-        title: issueData.title || null,
-        votes: updatedVotes,
-      },
-    };
+    if (voteType === 'up') {
+      const updatedVotes = (issueData.votes || 0) + 1;
+      await sb.from('issues_852').update({ votes: updatedVotes }).eq('id', issueId);
+      return {
+        voted: true,
+        issue: {
+          id: issueId,
+          title: issueData.title || null,
+          votes: updatedVotes,
+          downvotes: issueData.downvotes || 0,
+        },
+      };
+    } else {
+      const updatedDownvotes = (issueData.downvotes || 0) + 1;
+      await sb.from('issues_852').update({ downvotes: updatedDownvotes }).eq('id', issueId);
+      return {
+        voted: true,
+        issue: {
+          id: issueId,
+          title: issueData.title || null,
+          votes: issueData.votes || 0,
+          downvotes: updatedDownvotes,
+        },
+      };
+    }
   }
 
-  return { voted: true };
+  return { voted: false };
 }
 
 export async function addIssueComment(

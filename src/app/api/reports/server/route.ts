@@ -29,13 +29,15 @@ export async function POST(req: Request) {
     const interactionHash = createInteractionHash();
     const metadataPayload = metadata && typeof metadata === 'object' ? metadata as Record<string, unknown> : {};
 
+    const status = (metadataPayload.status as string) || 'pending_human';
+
     const id = await saveReport(conversationId, messages, reviewData, identityKey || undefined, {
       ...metadataPayload,
       interactionHash,
       userEmail: user?.email || null,
       userDisplayName: user?.display_name || null,
       savedAt: new Date().toISOString(),
-    });
+    }, status);
     if (!id) return Response.json({ error: 'Supabase não configurado' }, { status: 503 });
 
     const tags = Array.isArray(metadataPayload.tags)
@@ -44,7 +46,7 @@ export async function POST(req: Request) {
     const primaryTag = tags.length > 0 ? normalizeTag(tags[0]) : null;
     const summary = typeof metadataPayload.summary === 'string' ? metadataPayload.summary.trim() : '';
 
-    if (primaryTag) {
+    if (primaryTag && status === 'published') {
       await createIssue(
         `Tema recorrente: ${toTitleCase(primaryTag)}`,
         summary || `Relato compartilhado apontou recorrência em ${primaryTag}.`,
@@ -78,7 +80,9 @@ export async function GET(req: Request) {
   const sessionHash = searchParams.get('sessionHash');
   const ownOnly = searchParams.get('ownOnly') === 'true';
   const identityKey = ownOnly ? getIdentityKey(sessionHash, user?.id) : null;
-  const reports = await getReports(100, identityKey || undefined);
+  const statusFilter = ownOnly ? undefined : ['published', 'shared'];
+  
+  const reports = await getReports(100, identityKey || undefined, statusFilter);
   return Response.json({ reports });
 }
 

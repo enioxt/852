@@ -1,10 +1,12 @@
 export interface ReviewData {
+  titulo?: string;
   completude: number;
   resumo: string;
   temas: string[];
   pontosCegos: string[];
   sugestoes: string[];
   impacto: string;
+  insights_estruturais?: string[];
 }
 
 export interface ReportFormatMessage {
@@ -84,7 +86,11 @@ function compactText(value: string) {
   return value.replace(/\s+/g, ' ').trim();
 }
 
-function buildTitle(tags: string[], summary: string) {
+function buildTitle(tags: string[], summary: string, reviewTitle?: string) {
+  if (reviewTitle && reviewTitle.trim()) {
+    return reviewTitle.trim();
+  }
+
   if (summary) {
     const firstSentence = compactText(summary).split('.').find(Boolean)?.trim();
     if (firstSentence) {
@@ -118,7 +124,7 @@ export function buildFormattedReport(params: {
 
   const tags = Array.from(new Set((reviewTags.length > 0 ? reviewTags : inferTags(params.messages)).slice(0, 6)));
   const summary = compactText(params.reviewData?.resumo || userMessages.join(' ').slice(0, 320));
-  const title = buildTitle(tags, summary);
+  const title = buildTitle(tags, summary, params.reviewData?.titulo);
   const reporterTypeLabel = params.reporterTypeLabel || 'Relator protegido';
   const piiRemoved = params.piiRemoved || 0;
 
@@ -164,6 +170,11 @@ export function buildFormattedReport(params: {
   if (params.reviewData?.sugestoes?.length) {
     lines.push('', '## Perguntas sugeridas para follow-up', '');
     params.reviewData.sugestoes.forEach((item) => lines.push(`- ${compactText(item)}`));
+  }
+
+  if (params.reviewData?.insights_estruturais?.length) {
+    lines.push('', '## Insights Estruturais e Fundamentação', '');
+    params.reviewData.insights_estruturais.forEach((item) => lines.push(`- ${compactText(item)}`));
   }
 
   const markdown = lines.join('\n');

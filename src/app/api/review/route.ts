@@ -84,6 +84,14 @@ export async function POST(req: Request) {
 
     try {
       const parsed = JSON.parse(cleaned);
+      
+      if (parsed.isTrivial) {
+        return new Response(JSON.stringify({ error: 'A conversa não contém contexto tático ou operacional suficiente para gerar um relatório de inteligência.' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
       return new Response(JSON.stringify(parsed), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },

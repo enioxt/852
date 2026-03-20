@@ -200,15 +200,6 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
           {isOpen && <span>Página Inicial</span>}
         </Link>
         <Link
-          href="/reports"
-          className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
-            ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
-          title="Relatórios"
-        >
-          <FileText className="w-4 h-4 flex-shrink-0" />
-          {isOpen && <span>Relatórios</span>}
-        </Link>
-        <Link
           href="/sugestao"
           className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
             ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
@@ -221,19 +212,10 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
           href="/papo-de-corredor"
           className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
             ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
-          title="Papo de Corredor"
+          title="Tira-Voz Corredor"
         >
           <Radio className="w-4 h-4 flex-shrink-0" />
-          {isOpen && <span>Corredor</span>}
-        </Link>
-        <Link
-          href="/issues"
-          className={`flex items-center gap-2 w-full rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition
-            ${isOpen ? 'px-3 py-2 text-xs' : 'justify-center p-2'}`}
-          title="Tópicos em discussão"
-        >
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          {isOpen && <span>Tópicos</span>}
+          {isOpen && <span>Corredor / Hub</span>}
         </Link>
         <button
           onClick={onShowFAQ}

@@ -1,4 +1,4 @@
-import { createIssue, getIssues, voteIssue, addIssueComment, getIssueComments } from '@/lib/supabase';
+import { createIssue, getIssues, voteIssue, addIssueComment, getIssueComments, getIssueVersions } from '@/lib/supabase';
 import { recordEvent } from '@/lib/telemetry';
 import { getCurrentUser } from '@/lib/user-auth';
 import { queueIssueNotification } from '@/lib/notifications';
@@ -13,6 +13,15 @@ function hasValidatedMasp(user: Awaited<ReturnType<typeof getCurrentUser>>) {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  const action = searchParams.get('action');
+
+  if (action === 'versions') {
+    const parentId = searchParams.get('parentId');
+    if (!parentId) return Response.json({ error: 'parentId missing' }, { status: 400 });
+    const versions = await getIssueVersions(parentId);
+    return Response.json({ versions });
+  }
+
   const status = searchParams.get('status') || undefined;
   const aiReportId = searchParams.get('aiReportId') || undefined;
   const sortBy = (searchParams.get('sort') as 'votes' | 'created_at') || 'votes';
@@ -28,7 +37,7 @@ export async function POST(req: Request) {
     const { action } = body;
 
     if (action === 'vote') {
-      const { issueId, sessionHash } = body;
+      const { issueId, sessionHash, voteType = 'up' } = body;
       const user = await getCurrentUser();
       if (!isAuthenticatedParticipant(user)) {
         return Response.json({ error: 'Entre com sua conta para votar.', needsAuth: true }, { status: 403 });
@@ -39,14 +48,32 @@ export async function POST(req: Request) {
       if (!issueId || (!sessionHash && !user?.id)) {
         return Response.json({ error: 'issueId e identidade do votante obrigatórios' }, { status: 400 });
       }
-      const result = await voteIssue(issueId, sessionHash || '', user?.id);
-      if (result.voted) {
-        recordEvent({ event_type: 'issue_voted', metadata: { issueId, userId: user?.id || null } });
+      const result = await voteIssue(issueId, sessionHash || '', user?.id, voteType);
+      
+      if (result.voted && result.issue) {
+        recordEvent({ event_type: 'issue_voted', metadata: { issueId, userId: user?.id || null, voteType } });
         queueIssueNotification('issue_voted', {
           issueId,
           title: result.issue?.title,
           votes: result.issue?.votes,
         });
+
+        // Espiral de Escuta (AI Feedback Loop Trigger)
+        const totalVotes = result.issue.votes + (result.issue.downvotes || 0);
+        if (totalVotes >= 5) {
+          const approvalRating = result.issue.votes / totalVotes;
+          if (approvalRating < 0.85) {
+            recordEvent({ event_type: 'espiral_de_escuta_triggered', metadata: { issueId, totalVotes, approvalRating } });
+            // Dispatch background re-analysis without blocking the response
+            const baseUrl = req.headers.get('origin') || req.headers.get('host') || '';
+            const protocol = baseUrl.startsWith('http') ? '' : 'http://';
+            fetch(`${protocol}${baseUrl}/api/issues/reanalyze`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ issueId }),
+            }).catch((err) => console.error('[852] auto Espiral de Escuta re-analysis failed:', err.message));
+          }
+        }
       }
       return Response.json(result);
     }
@@ -73,14 +100,32 @@ export async function POST(req: Request) {
     }
 
     // Default: create issue
-    const { title, body: issueBody, category } = body;
+    const { title, body: issueBody, category, parentId, versionReason } = body;
     if (!title) return Response.json({ error: 'Título obrigatório' }, { status: 400 });
 
-    const id = await createIssue(title, issueBody, category, 'user');
+    let versionAuthorId: string | undefined = undefined;
+
+    if (parentId) {
+      const user = await getCurrentUser();
+      if (!isAuthenticatedParticipant(user)) {
+        return Response.json({ error: 'Você precisa estar logado para divergir ou evoluir um insight.', needsAuth: true }, { status: 403 });
+      }
+      if (!hasValidatedMasp(user)) {
+        return Response.json({ error: 'Seu MASP precisa estar validado para divergir.', needsValidation: true }, { status: 403 });
+      }
+      versionAuthorId = user?.id;
+      if (!versionReason) {
+        return Response.json({ error: 'O motivo da divergência é obrigatório.' }, { status: 400 });
+      }
+    }
+
+    const id = await createIssue(title, issueBody, category, 'user', undefined, parentId, versionAuthorId, versionReason);
     if (!id) return Response.json({ error: 'Falha ao criar' }, { status: 500 });
 
-    recordEvent({ event_type: 'issue_created', metadata: { issueId: id, source: 'user' } });
-    queueIssueNotification('issue_created', { issueId: id, title, category });
+    recordEvent({ event_type: 'issue_created', metadata: { issueId: id, source: 'user', isBranch: !!parentId } });
+    if (!parentId) {
+      queueIssueNotification('issue_created', { issueId: id, title, category });
+    }
     return Response.json({ id });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Erro interno';

@@ -156,11 +156,23 @@ function deduplicateFindings(findings: PIIFinding[]): PIIFinding[] {
 export function sanitizeText(text: string, findings: PIIFinding[]): string {
   if (findings.length === 0) return text;
 
+  // We need to count occurrences to generate sequential semantic tokens: [CPF_1], [NOME_1], etc.
+  // 'findings' is assumed to be sorted by start position ascending
+  const counters: Record<string, number> = {};
+  const replacements: Record<number, string> = {};
+  
+  for (const f of findings) {
+    const key = f.category;
+    counters[key] = (counters[key] || 0) + 1;
+    replacements[f.start] = `[${key.toUpperCase()}_${counters[key]}]`;
+  }
+
   // Apply replacements from end to start so indices remain valid
   const sorted = [...findings].sort((a, b) => b.start - a.start);
   let result = text;
   for (const f of sorted) {
-    result = result.slice(0, f.start) + f.suggestion + result.slice(f.end);
+    const replacement = replacements[f.start] || f.suggestion;
+    result = result.slice(0, f.start) + replacement + result.slice(f.end);
   }
   return result;
 }
