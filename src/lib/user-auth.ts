@@ -9,6 +9,7 @@ import { cookies } from 'next/headers';
 import { validateDisplayName } from './name-validator';
 import { getSupabase } from './supabase';
 import { recordEvent } from './telemetry';
+import { sendEmail } from './mailer';
 
 const SESSION_COOKIE = '852_user_session';
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
@@ -128,49 +129,34 @@ async function issueEmailVerification(params: { userId: string; email: string; d
 
   if (updateError) return { error: updateError.message, status: 500 };
 
-  const resendApiKey = process.env.RESEND_API_KEY;
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <onboarding@resend.dev>';
-  if (!resendApiKey) {
-    return {
-      sent: false,
-      warning: 'Conta criada, mas o envio de email não está configurado neste ambiente.',
-      debugVerificationUrl: process.env.NODE_ENV === 'production' ? undefined : verificationUrl,
-    };
-  }
-
   const greeting = params.displayName?.trim() ? `Olá, ${params.displayName.trim()}!` : 'Olá!';
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: resendFromEmail,
-      to: [params.email],
-      subject: 'Confirme seu email — Tira-Voz',
-      html: `
-        <div style="background:#0a0a0a;padding:32px;font-family:Inter,Arial,sans-serif;color:#e5e7eb;line-height:1.6;">
-          <div style="max-width:560px;margin:0 auto;border:1px solid #262626;border-radius:18px;padding:32px;background:#111111;">
-            <p style="margin:0 0 16px;font-size:14px;color:#93c5fd;">Tira-Voz</p>
-            <h1 style="margin:0 0 16px;font-size:24px;color:#ffffff;">Confirme seu email para ativar sua conta</h1>
-            <p style="margin:0 0 16px;font-size:15px;color:#d4d4d8;">${greeting}</p>
-            <p style="margin:0 0 24px;font-size:15px;color:#d4d4d8;">Clique no botão abaixo para verificar seu email. O link expira em 24 horas.</p>
-            <a href="${verificationUrl}" style="display:inline-block;padding:12px 18px;border-radius:12px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;">Verificar email</a>
-            <p style="margin:24px 0 8px;font-size:13px;color:#a1a1aa;">Se o botão não abrir, copie e cole este link:</p>
-            <p style="margin:0;font-size:13px;word-break:break-all;color:#93c5fd;">${verificationUrl}</p>
-          </div>
-        </div>
-      `,
-      text: `${greeting}\n\nVerifique seu email para ativar sua conta no Tira-Voz:\n${verificationUrl}\n\nEsse link expira em 24 horas.`,
-    }),
+  const htmlBody = `
+    <div style="background:#0a0a0a;padding:32px;font-family:Inter,Arial,sans-serif;color:#e5e7eb;line-height:1.6;">
+      <div style="max-width:560px;margin:0 auto;border:1px solid #262626;border-radius:18px;padding:32px;background:#111111;">
+        <p style="margin:0 0 16px;font-size:14px;color:#93c5fd;">Tira-Voz</p>
+        <h1 style="margin:0 0 16px;font-size:24px;color:#ffffff;">Confirme seu email para ativar sua conta</h1>
+        <p style="margin:0 0 16px;font-size:15px;color:#d4d4d8;">${greeting}</p>
+        <p style="margin:0 0 24px;font-size:15px;color:#d4d4d8;">Clique no botão abaixo para verificar seu email. O link expira em 24 horas.</p>
+        <a href="${verificationUrl}" style="display:inline-block;padding:12px 18px;border-radius:12px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;">Verificar email</a>
+        <p style="margin:24px 0 8px;font-size:13px;color:#a1a1aa;">Se o botão não abrir, copie e cole este link:</p>
+        <p style="margin:0;font-size:13px;word-break:break-all;color:#93c5fd;">${verificationUrl}</p>
+      </div>
+    </div>
+  `;
+  const textBody = `${greeting}\n\nVerifique seu email para ativar sua conta no Tira-Voz:\n${verificationUrl}\n\nEsse link expira em 24 horas.`;
+
+  const { success, error: mailError } = await sendEmail({
+    to: params.email,
+    subject: 'Confirme seu email — Tira-Voz',
+    html: htmlBody,
+    text: textBody,
   });
 
-  if (!response.ok) {
-    console.error('[852-auth] verification email error:', await response.text());
+  if (!success) {
+    console.warn('[852-auth] verification email error fallback:', mailError);
     return {
       sent: false,
-      warning: 'Conta criada, mas não foi possível enviar o email de verificação agora.',
+      warning: 'Conta criada, mas ocorreu um erro no servidor de email. Avise o admin para checar o SMTP.',
       debugVerificationUrl: process.env.NODE_ENV === 'production' ? undefined : verificationUrl,
     };
   }
@@ -685,49 +671,34 @@ async function issuePasswordReset(params: { userId: string; email: string; displ
   });
   const resetUrl = `${getPublicBaseUrl(params.baseUrl)}/conta?auth=reset&token=${encodeURIComponent(token)}`;
 
-  const resendApiKey = process.env.RESEND_API_KEY;
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'Tira-Voz <onboarding@resend.dev>';
-  if (!resendApiKey) {
-    return {
-      sent: false,
-      warning: 'Recuperação criada, mas o envio de email não está configurado neste ambiente.',
-      debugResetUrl: process.env.NODE_ENV === 'production' ? undefined : resetUrl,
-    };
-  }
-
   const greeting = params.displayName?.trim() ? `Olá, ${params.displayName.trim()}!` : 'Olá!';
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: resendFromEmail,
-      to: [params.email],
-      subject: 'Redefina sua senha — Tira-Voz',
-      html: `
-        <div style="background:#0a0a0a;padding:32px;font-family:Inter,Arial,sans-serif;color:#e5e7eb;line-height:1.6;">
-          <div style="max-width:560px;margin:0 auto;border:1px solid #262626;border-radius:18px;padding:32px;background:#111111;">
-            <p style="margin:0 0 16px;font-size:14px;color:#93c5fd;">Tira-Voz</p>
-            <h1 style="margin:0 0 16px;font-size:24px;color:#ffffff;">Redefina sua senha de acesso</h1>
-            <p style="margin:0 0 16px;font-size:15px;color:#d4d4d8;">${greeting}</p>
-            <p style="margin:0 0 24px;font-size:15px;color:#d4d4d8;">Use o botão abaixo para criar uma nova senha. O link expira em 24 horas e deixa de valer assim que você salvar outra senha.</p>
-            <a href="${resetUrl}" style="display:inline-block;padding:12px 18px;border-radius:12px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;">Redefinir senha</a>
-            <p style="margin:24px 0 8px;font-size:13px;color:#a1a1aa;">Se o botão não abrir, copie e cole este link:</p>
-            <p style="margin:0;font-size:13px;word-break:break-all;color:#93c5fd;">${resetUrl}</p>
-          </div>
-        </div>
-      `,
-      text: `${greeting}\n\nRedefina sua senha do Tira-Voz em:\n${resetUrl}\n\nEsse link expira em 24 horas e deixa de valer depois que você salvar uma nova senha.`,
-    }),
+  const htmlBody = `
+    <div style="background:#0a0a0a;padding:32px;font-family:Inter,Arial,sans-serif;color:#e5e7eb;line-height:1.6;">
+      <div style="max-width:560px;margin:0 auto;border:1px solid #262626;border-radius:18px;padding:32px;background:#111111;">
+        <p style="margin:0 0 16px;font-size:14px;color:#93c5fd;">Tira-Voz</p>
+        <h1 style="margin:0 0 16px;font-size:24px;color:#ffffff;">Redefina sua senha de acesso</h1>
+        <p style="margin:0 0 16px;font-size:15px;color:#d4d4d8;">${greeting}</p>
+        <p style="margin:0 0 24px;font-size:15px;color:#d4d4d8;">Use o botão abaixo para criar uma nova senha. O link expira em 24 horas e deixa de valer assim que você salvar outra senha.</p>
+        <a href="${resetUrl}" style="display:inline-block;padding:12px 18px;border-radius:12px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;">Redefinir senha</a>
+        <p style="margin:24px 0 8px;font-size:13px;color:#a1a1aa;">Se o botão não abrir, copie e cole este link:</p>
+        <p style="margin:0;font-size:13px;word-break:break-all;color:#93c5fd;">${resetUrl}</p>
+      </div>
+    </div>
+  `;
+  const textBody = `${greeting}\n\nRedefina sua senha do Tira-Voz em:\n${resetUrl}\n\nEsse link expira em 24 horas e deixa de valer depois que você salvar uma nova senha.`;
+
+  const { success, error: mailError } = await sendEmail({
+    to: params.email,
+    subject: 'Redefina sua senha — Tira-Voz',
+    html: htmlBody,
+    text: textBody,
   });
 
-  if (!response.ok) {
-    console.error('[852-auth] password reset email error:', await response.text());
+  if (!success) {
+    console.warn('[852-auth] password reset email error fallback:', mailError);
     return {
       sent: false,
-      warning: 'Não foi possível enviar o email de recuperação agora.',
+      warning: 'Pausado! O envio de email não está configurado neste ambiente (SMTP).',
       debugResetUrl: process.env.NODE_ENV === 'production' ? undefined : resetUrl,
     };
   }
