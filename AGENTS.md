@@ -27,6 +27,7 @@
 | **Path** | `/home/enio/852` |
 | **Public URL** | `https://852.egos.ia.br` |
 | **Public Repo** | `github.com/enioxt/852` |
+| **Kernel SSOT Registry** | `/home/enio/egos/docs/SSOT_REGISTRY.md` |
 | **Framework** | Next.js 16 + App Router |
 | **Runtime** | Node 20 / npm |
 | **Primary LLM** | Alibaba Qwen-plus via DashScope |

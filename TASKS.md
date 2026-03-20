@@ -16,6 +16,7 @@
 
 ## 🏃 P1 - Polimento
 
+- [ ] 852-SSOT-001: Adotar o `egos/docs/SSOT_REGISTRY.md` no `852` — apontar `AGENTS.md`, `TASKS.md` e mapas/docs institucionais para o contrato canônico e separar claramente SSOT global vs superfícies locais do produto
 - [x] Chat UI mobile-first com tipografia Geist
 - [x] Prompt institucional com anonimização
 - [x] Exportação PDF/DOCX/Markdown (dropdown)
