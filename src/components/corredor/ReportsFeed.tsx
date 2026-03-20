@@ -66,7 +66,12 @@ export function ReportsFeed() {
       try {
         const serverReports = await loadAllPublicReports(sessionHash);
         if (serverReports.length > 0) {
-          setReports(serverReports);
+          setReports(prevLocal => {
+            const serverIds = new Set(serverReports.map(r => r.id));
+            const serverRemoteIds = new Set(serverReports.map(r => r.serverId).filter(Boolean));
+            const localOnly = prevLocal.filter(r => !serverIds.has(r.id) && !serverRemoteIds.has(r.serverId));
+            return [...serverReports, ...localOnly].sort((a, b) => (b.sharedAt || b.createdAt) - (a.sharedAt || a.createdAt));
+          });
         }
       } catch (loadError) {
         console.error('[852-reports] failed to load shared reports:', loadError instanceof Error ? loadError.message : 'Unknown');
