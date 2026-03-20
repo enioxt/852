@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polo de IA - Gestão Pública</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#3b82f6',
+                        grad1: '#2563eb',
+                        grad2: '#9333ea',
+                        darkbg: '#050505',
+                        panelbg: '#111111'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #e5e5e5; overflow-x: hidden; }
+        .glass { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem; }
+        .gradient-text { background: linear-gradient(135deg, #2563eb, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glow-bg { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, #2563eb40 0%, transparent 60%); filter: blur(80px); z-index: -1; pointer-events: none; }
+        
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body class="antialiased relative">
+    <div class="glow-bg top-[-200px] left-[-200px]"></div>
+    <div class="glow-bg bottom-[-200px] right-[-200px]" style="background: radial-gradient(circle, #9333ea30 0%, transparent 60%);"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass border-b-0 rounded-none border-b border-white/10 top-0">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 font-bold text-xl tracking-tight">
+                <i class="fas fa-layer-group text-[#2563eb]"></i>
+                <span>NDIA <span class="text-gray-500 font-light">| Patos de Minas</span></span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium text-gray-400">
+                <a href="#visao" class="hover:text-white transition-colors">Visão</a>
+                <a href="#casos" class="hover:text-white transition-colors">Casos Reais</a>
+                <a href="#validacao" class="hover:text-white transition-colors">Validação</a>
+                <a href="#investimento" class="hover:text-[#2563eb] transition-colors">Investimento</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-24">
+        <!-- Hero Section -->
+        <section class="max-w-5xl mx-auto px-6 pt-12 pb-20 text-center fade-in">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs font-bold text-gray-300 mb-8 border border-[#2563eb]/30 uppercase tracking-widest">
+                <span class="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse"></span>
+                Transformação Digital Municipal
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-[1.1] tracking-tight text-white">
+                O Cérebro Digital <br/>
+                <span class="gradient-text">De Patos de Minas</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 max-w-4xl mx-auto leading-relaxed font-light">
+                Um supercomputador local para processar dados da Prefeitura, Escolas, Segurança e SEBRAE, garantindo privacidade e colocando a cidade na vanguarda do Brasil.
+            </p>
+        </section>
+
+        
+    <!-- Visão -->
+    <section id="visao" class="max-w-7xl mx-auto px-6 mb-24 fade-in delay-1">
+        <div class="glass p-10 md:p-14 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-blue-900/20 to-transparent"></div>
+            <div class="relative z-10 md:w-2/3">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white">Soberania de Dados e Gestão Preditiva</h2>
+                <p class="text-lg text-gray-300 mb-6 leading-relaxed">
+                    Hoje, os dados da cidade estão fragmentados. Com o <strong>Núcleo de Desenvolvimento e IA (NDIA)</strong>, Patos de Minas terá infraestrutura própria para cruzar informações de trânsito, saúde, segurança e educação <strong>localmente</strong>, sem pagar licenças milionárias a empresas estrangeiras ou arriscar o vazamento de dados sensíveis dos cidadãos.
+                </p>
+                <div class="flex gap-4">
+                    <div class="bg-white/5 px-4 py-3 rounded-lg border border-white/10">
+                        <span class="block text-2xl font-bold text-blue-400">100%</span>
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Processamento Local</span>
+                    </div>
+                    <div class="bg-white/5 px-4 py-3 rounded-lg border border-white/10">
+                        <span class="block text-2xl font-bold text-purple-400">Zero</span>
+                        <span class="text-xs text-gray-400 uppercase tracking-wider">Custo com Licenças SaaS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Casos Reais -->
+    <section id="casos" class="max-w-7xl mx-auto px-6 mb-24 fade-in delay-2">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4 text-white">Casos de Uso Concretos</h2>
+            <p class="text-gray-400 text-lg">O que faremos com as máquinas em Patos de Minas, validado por quem já faz no Brasil.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Prefeitura -->
+            <div class="glass p-8 border-t-4 border-t-blue-500 hover:scale-[1.02] transition-transform">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xl">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">Prefeitura Municipal</h3>
+                </div>
+                <p class="text-gray-300 mb-6">Análise inteligente de filas no SUS, otimização de rotas de coleta de lixo e análise automatizada de Diários Oficiais e Alvarás.</p>
+                <div class="bg-black/50 p-4 rounded-lg border border-white/5">
+                    <p class="text-sm text-gray-400"><span class="text-blue-400 font-bold">Caso Real (Brasil):</span> A startup <strong>Mapzer</strong> opera em cidades como Curitiba mapeando buracos e problemas urbanos com câmeras e IA, gerando economia milionária na zeladoria.</p>
+                </div>
+            </div>
+
+            <!-- Escolas -->
+            <div class="glass p-8 border-t-4 border-t-yellow-500 hover:scale-[1.02] transition-transform">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 text-xl">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">Rede Escolar</h3>
+                </div>
+                <p class="text-gray-300 mb-6">Cruzamento de faltas, histórico de notas e relatos textuais de professores para prever e alertar sobre risco iminente de evasão escolar.</p>
+                <div class="bg-black/50 p-4 rounded-lg border border-white/5">
+                    <p class="text-sm text-gray-400"><span class="text-yellow-400 font-bold">Caso Real (Brasil):</span> A <strong>Secretaria de Educação de SP</strong> utiliza algoritmos preditivos para identificar alunos com risco de abandono meses antes de acontecer.</p>
+                </div>
+            </div>
+
+            <!-- SEBRAE -->
+            <div class="glass p-8 border-t-4 border-t-green-500 hover:scale-[1.02] transition-transform">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 text-xl">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">SEBRAE e Agronegócio</h3>
+                </div>
+                <p class="text-gray-300 mb-6">Mapeamento de vocação econômica por bairro. IA analisando dados climáticos locais + abertura de CNPJs para orientar o pequeno produtor.</p>
+                <div class="bg-black/50 p-4 rounded-lg border border-white/5">
+                    <p class="text-sm text-gray-400"><span class="text-green-400 font-bold">Caso Real (Brasil):</span> A <strong>Bairros Inteligentes (Campinas)</strong> usa IA para precificação de imóveis e identificação de vocações socioeconômicas locais.</p>
+                </div>
+            </div>
+
+            <!-- Segurança Integrada -->
+            <div class="glass p-8 border-t-4 border-t-red-500 hover:scale-[1.02] transition-transform">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 text-xl">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">Segurança (PC + PM)</h3>
+                </div>
+                <p class="text-gray-300 mb-6">Processamento de décadas de REDS e integração com câmeras do Olho Vivo para criar mapas dinâmicos e preditivos de criminalidade.</p>
+                <div class="bg-black/50 p-4 rounded-lg border border-white/5">
+                    <p class="text-sm text-gray-400"><span class="text-red-400 font-bold">Caso Real (Brasil):</span> A <strong>PM de SP</strong> implementou uma Fábrica de IA própria, e o programa CIVITAS do Rio integra milhares de câmeras inteligentes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Validacao -->
+    <section id="validacao" class="max-w-5xl mx-auto px-6 mb-24 fade-in delay-3">
+        <div class="bg-gradient-to-br from-blue-900/40 to-purple-900/40 rounded-3xl p-1 relative overflow-hidden">
+            <div class="glass p-10 rounded-[22px] border-none text-center">
+                <i class="fas fa-quote-right text-4xl text-blue-400/30 mb-6"></i>
+                <p class="text-2xl md:text-3xl text-white font-light leading-snug mb-8">
+                    "Plataformas de IA de código aberto rodando localmente são essenciais para que governos mantenham a <strong>soberania sobre seus dados</strong>, sem depender de caixas-pretas de grandes corporações."
+                </p>
+                <p class="text-blue-400 font-bold tracking-wide uppercase">Yann LeCun</p>
+                <p class="text-gray-500 text-sm">Cientista Chefe de IA da Meta (Facebook) e ganhador do Prêmio Turing</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Investimento -->
+    <section id="investimento" class="max-w-5xl mx-auto px-6 fade-in delay-3">
+        <div class="glass p-10 text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">O Pedido: Patrimônio, não Mensalidade</h2>
+            <p class="text-gray-400 mb-10 max-w-2xl mx-auto">Não pedimos reformas físicas. Pedimos <strong>poder computacional bruto</strong>. Equipamentos que ficarão como patrimônio do município e da polícia.</p>
+            
+            <div class="grid md:grid-cols-2 gap-6 text-left max-w-4xl mx-auto mb-10">
+                <div class="bg-black/40 p-6 rounded-xl border border-white/5">
+                    <h4 class="text-white font-bold text-lg mb-2"><i class="fas fa-server text-blue-500 mr-2"></i> Estação IA (Supercomputador)</h4>
+                    <p class="text-gray-400 text-sm mb-4">Equipada com 2x NVIDIA RTX 5090 (64GB VRAM). Capaz de rodar e treinar os maiores modelos de IA do mundo, isolada da internet para sigilo total.</p>
+                    <p class="text-blue-400 font-mono font-bold">~R$ 85.000</p>
+                </div>
+                <div class="bg-black/40 p-6 rounded-xl border border-white/5">
+                    <h4 class="text-white font-bold text-lg mb-2"><i class="fas fa-laptop text-purple-500 mr-2"></i> MacBook Pro M5 Max</h4>
+                    <p class="text-gray-400 text-sm mb-4">A única máquina portátil capaz de rodar modelos gigantes (80B+ parâmetros) em campo, para reuniões estratégicas na prefeitura e operações policiais.</p>
+                    <p class="text-purple-400 font-mono font-bold">~R$ 38.000</p>
+                </div>
+            </div>
+            
+            <div class="inline-block bg-blue-500/20 border border-blue-500/50 text-blue-300 px-8 py-4 rounded-full text-xl font-bold shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+                Custo Total Fixo Estimado: R$ 153.000
+            </div>
+            <p class="text-gray-500 text-sm mt-6">O equivalente ao custo de poucos metros de asfaltamento, mas com impacto para as próximas décadas.</p>
+        </div>
+    </section>
+    
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 mt-20 py-12 text-center text-gray-500 text-sm">
+        <p>Projeto de Inovação Institucional — Polícia Civil de Minas Gerais (Delegacia Regional de Patos de Minas)</p>
+        <p class="mt-2">Proposta 2026 • Tecnologia Soberana e Código Aberto</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDIA Patos de Minas — Especificação Técnica</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#030712;color:#e5e7eb;margin:0}
+.glass{background:rgba(15,23,42,.65);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:1.25rem}
+.grad-text{background:linear-gradient(135deg,#10b981,#0ea5e9);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.mono{font-family:'JetBrains Mono',monospace}
+.fade{animation:fadeIn .7s ease-out both}@keyframes fadeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+section{max-width:72rem;margin:0 auto;padding:0 1.5rem}
+nav{position:fixed;top:0;width:100%;z-index:50;background:rgba(3,7,18,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
+.code-block{background:#0d1117;border:1px solid #1e293b;border-radius:.75rem;padding:1.5rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#8b949e;overflow-x:auto;white-space:pre;line-height:1.6}
+.code-block .hl{color:#7ee787}.code-block .cm{color:#8b949e}.code-block .kw{color:#ff7b72}.code-block .st{color:#a5d6ff}
+details summary{cursor:pointer;list-style:none}details summary::-webkit-details-marker{display:none}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#030712}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+.timeline-dot{width:16px;height:16px;border-radius:50%;border:3px solid;position:relative;z-index:2}
+.timeline-line{position:absolute;left:7px;top:16px;bottom:0;width:2px;background:#1e293b}
+</style>
+</head>
+<body class="antialiased">
+
+<nav>
+<div style="max-width:72rem;margin:0 auto;padding:0 1.5rem" class="flex items-center justify-between h-16">
+  <div class="flex items-center gap-2 font-bold text-lg"><i class="fas fa-terminal text-emerald-500"></i> NDIA <span class="text-gray-500 font-light">Spec Técnica</span></div>
+  <div class="hidden md:flex gap-6 text-sm font-medium text-gray-400">
+    <a href="#arch" class="hover:text-white">Arquitetura</a>
+    <a href="#stack" class="hover:text-white">Stack</a>
+    <a href="#integracao" class="hover:text-white">Integrações</a>
+    <a href="#seguranca" class="hover:text-white">Segurança</a>
+    <a href="#roadmap" class="hover:text-white">Roadmap</a>
+    <a href="#faq" class="hover:text-white">FAQ Técnico</a>
+  </div>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="pt-28 pb-20 text-center fade">
+  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs font-bold text-gray-300 mb-8 uppercase tracking-widest border border-emerald-500/30">
+    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Documento Técnico v2.0
+  </div>
+  <h1 class="text-5xl md:text-7xl font-black mb-6 leading-[1.08] text-white">
+    Especificação<br><span class="grad-text">Técnica Completa</span>
+  </h1>
+  <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-4">Arquitetura de hardware, software, integrações com sistemas PCMG, segurança da informação e roadmap operacional.</p>
+  <p class="text-gray-500 text-sm">Para: Delegados, Equipe TI, Prodemge, SESP-MG</p>
+</section>
+
+<!-- ARQUITETURA HARDWARE -->
+<section id="arch" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Arquitetura de Hardware</h2>
+  <div class="grid md:grid-cols-2 gap-8 mb-8">
+    <!-- Servidor Principal -->
+    <div class="glass p-6 border-t-4 border-emerald-500">
+      <h3 class="text-xl font-bold text-white mb-4"><i class="fas fa-server text-emerald-400 mr-2"></i> Servidor Principal (On-Premise)</h3>
+      <div class="code-block">
+<span class="cm">┌─────────────────────────────────────────────────┐</span>
+<span class="cm">│</span>  <span class="hl">SERVIDOR NDIA-PATOS</span> (Rede Segregada, sem internet pública) <span class="cm">│</span>
+<span class="cm">├─────────────────────────────────────────────────┤</span>
+<span class="cm">│</span>  <span class="kw">CPU:</span>  AMD Threadripper PRO 7985WX (64 cores)   <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">GPU:</span>  2x NVIDIA RTX 5090 (32GB VRAM cada)      <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">RAM:</span>  512GB DDR5 ECC                           <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">SSD:</span>  2x 4TB NVMe high-endurance (PCIe 4.0+)   <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">NAS:</span>  100TB RAID-6 (dados históricos REDS)     <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">NET:</span>  Rede isolada, VPN interna, mTLS           <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">UPS:</span>  3kVA (redundância de energia)             <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">PSU:</span>  Classe servidor, dimensionamento &gt; 2kW   <span class="cm">│</span>
+<span class="cm">└─────────────────────────────────────────────────┘</span></div>
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="bg-black/40 p-3 rounded-lg text-center"><span class="block text-lg font-bold text-emerald-400">64 GB</span><span class="text-xs text-gray-500">VRAM Total (GPU)</span></div>
+        <div class="bg-black/40 p-3 rounded-lg text-center"><span class="block text-lg font-bold text-emerald-400">512 GB</span><span class="text-xs text-gray-500">RAM DDR5 ECC</span></div>
+      </div>
+    </div>
+
+    <!-- MacBook + Edge -->
+    <div class="space-y-6">
+      <div class="glass p-6 border-t-4 border-blue-500">
+        <h3 class="text-xl font-bold text-white mb-4"><i class="fas fa-laptop text-blue-400 mr-2"></i> Estação Móvel (Campo)</h3>
+        <div class="code-block">
+<span class="cm">┌──────────────────────────────────────┐</span>
+<span class="cm">│</span>  <span class="hl">MacBook Pro 16" M5 Max</span>             <span class="cm">│</span>
+<span class="cm">├──────────────────────────────────────┤</span>
+<span class="cm">│</span>  <span class="kw">MEM:</span>  128GB Memória Unificada       <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">SSD:</span>  2TB NVMe                      <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">GPU:</span>  Integrada (40-core Neural)     <span class="cm">│</span>
+<span class="cm">│</span>  <span class="kw">CAP:</span>  Suporta modelos grandes sob quantização <span class="cm">│</span>
+<span class="cm">└──────────────────────────────────────┘</span></div>
+      </div>
+      <div class="glass p-6 border-t-4 border-amber-500">
+        <h3 class="text-xl font-bold text-white mb-4"><i class="fas fa-microchip text-amber-400 mr-2"></i> Edge Nodes (2x Raspberry Pi 5)</h3>
+        <p class="text-sm text-gray-400 mb-3">Agentes autônomos 24/7, monitoramento de sistemas, health checks e backup incremental.</p>
+        <div class="flex gap-4">
+          <div class="bg-black/40 p-2 rounded text-center flex-1"><span class="text-amber-400 font-bold text-sm">8GB RAM</span><br><span class="text-xs text-gray-500">+ AI HAT 40 TOPS</span></div>
+          <div class="bg-black/40 p-2 rounded text-center flex-1"><span class="text-amber-400 font-bold text-sm">~5W</span><br><span class="text-xs text-gray-500">Consumo por unidade</span></div>
+          <div class="bg-black/40 p-2 rounded text-center flex-1"><span class="text-amber-400 font-bold text-sm">~R$ 3/mês</span><br><span class="text-xs text-gray-500">Custo de energia</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consumo energético -->
+  <div class="glass p-6">
+    <h3 class="text-lg font-bold text-white mb-4"><i class="fas fa-plug text-yellow-400 mr-2"></i> Consumo Energético Detalhado</h3>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-center text-sm">
+      <div class="bg-black/30 p-3 rounded-lg"><span class="text-yellow-400 font-bold">~1.150W</span><br><span class="text-gray-500">2x RTX 5090 em pico</span></div>
+      <div class="bg-black/30 p-3 rounded-lg"><span class="text-yellow-400 font-bold">~250W</span><br><span class="text-gray-500">CPU + RAM em pico</span></div>
+      <div class="bg-black/30 p-3 rounded-lg"><span class="text-yellow-400 font-bold">~80W</span><br><span class="text-gray-500">Armazenamento + rede</span></div>
+      <div class="bg-black/30 p-3 rounded-lg"><span class="text-yellow-400 font-bold">0,9–1,3kW</span><br><span class="text-gray-500">Uso médio operacional</span></div>
+      <div class="bg-black/30 p-3 rounded-lg"><span class="text-yellow-400 font-bold">R$ 900–1.400</span><br><span class="text-gray-500">Faixa mensal estimada</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STACK SOFTWARE -->
+<section id="stack" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Stack de Software (Self-Hosted com componentes Open Source e Open-Weight)</h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-brain text-pink-400 mr-2"></i> Modelos de IA</h3>
+      <div class="space-y-4">
+        <div class="bg-black/30 p-4 rounded-lg">
+          <div class="flex justify-between items-center mb-2"><span class="font-bold text-white">Whisper Large V3</span><span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">MIT License</span></div>
+          <p class="text-sm text-gray-400">Transcrição de áudio PT-BR. Em cenários favoráveis, pode operar abaixo de 5% de WER. Fine-tuned para terminologia policial. Requisito: 8GB VRAM (RTX 5090: 32GB ✓).</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <div class="flex justify-between items-center mb-2"><span class="font-bold text-white">Llama 3.x 70B</span><span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Meta Community</span></div>
+          <p class="text-sm text-gray-400">LLM principal para análise documental, geração de relatórios e assistente jurídico. Em FP16 o modelo não cabe nesse hardware; a operação prevista é quantizada (Q4/INT4, GGUF ou EXL2), ficando na faixa de 35GB a 40GB e permitindo execução estável nas 2x RTX 5090.</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <div class="flex justify-between items-center mb-2"><span class="font-bold text-white">Mixtral 8x22B</span><span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Apache 2.0</span></div>
+          <p class="text-sm text-gray-400">LLM auxiliar para processamento paralelo de documentos. Arquitetura MoE (Mixture of Experts) para alta throughput.</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <div class="flex justify-between items-center mb-2"><span class="font-bold text-white">Qwen 2.5 72B</span><span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Open-Weight</span></div>
+          <p class="text-sm text-gray-400">Excelente em raciocínio e tarefas multilíngues. Já em uso no Tira-Voz 852 via API. No NDIA, a operação prevista é local em versões quantizadas, com governança e retenção sob controle institucional.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-layer-group text-cyan-400 mr-2"></i> Infraestrutura</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex items-center gap-3 border-b border-gray-800 pb-3">
+          <div class="w-8 text-center text-cyan-400"><i class="fas fa-database"></i></div>
+          <div><span class="font-bold text-white">Weaviate</span> (BSD 3-Clause)<br><span class="text-gray-400">Banco vetorial RAG. Busca semântica em milhões de docs em &lt;100ms.</span></div>
+        </div>
+        <div class="flex items-center gap-3 border-b border-gray-800 pb-3">
+          <div class="w-8 text-center text-cyan-400"><i class="fas fa-vector-square"></i></div>
+          <div><span class="font-bold text-white">nomic-embed-text</span> (Local)<br><span class="text-gray-400">Embeddings para vetorização de documentos sem API externa.</span></div>
+        </div>
+        <div class="flex items-center gap-3 border-b border-gray-800 pb-3">
+          <div class="w-8 text-center text-cyan-400"><i class="fas fa-cogs"></i></div>
+          <div><span class="font-bold text-white">Ollama + LangChain</span><br><span class="text-gray-400">Orquestração de modelos e pipelines de processamento.</span></div>
+        </div>
+        <div class="flex items-center gap-3 border-b border-gray-800 pb-3">
+          <div class="w-8 text-center text-cyan-400"><i class="fas fa-desktop"></i></div>
+          <div><span class="font-bold text-white">Open WebUI</span><br><span class="text-gray-400">Interface web para servidores consultarem a IA (estilo ChatGPT).</span></div>
+        </div>
+        <div class="flex items-center gap-3 border-b border-gray-800 pb-3">
+          <div class="w-8 text-center text-cyan-400"><i class="fas fa-table"></i></div>
+          <div><span class="font-bold text-white">PostgreSQL + pgvector</span><br><span class="text-gray-400">Armazenamento estruturado com suporte a busca vetorial nativa.</span></div>
+        </div>
+        <div class="flex items-center gap-3 border-b border-gray-800 pb-3">
+          <div class="w-8 text-center text-cyan-400"><i class="fas fa-chart-bar"></i></div>
+          <div><span class="font-bold text-white">Grafana + Prometheus</span><br><span class="text-gray-400">Dashboard de métricas, uso de GPU/CPU/RAM e performance em tempo real.</span></div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-8 text-center text-cyan-400"><i class="fas fa-box"></i></div>
+          <div><span class="font-bold text-white">Docker + Caddy</span><br><span class="text-gray-400">Containerização e proxy reverso para todos os serviços internos.</span></div>
+        </div>
+      </div>
+      <div class="bg-emerald-900/20 border border-emerald-500/30 p-3 rounded-lg mt-4 text-center">
+        <p class="text-sm text-emerald-300 font-bold">Custo total de licenças de software: R$ 0,00/mês</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRAÇÕES PCMG -->
+<section id="integracao" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Integração com Sistemas PCMG</h2>
+
+  <div class="glass p-8 mb-8">
+    <div class="code-block text-center" style="font-size:.75rem">
+<span class="hl">                    ┌──────────────────────┐</span>
+<span class="hl">                    │   SERVIDOR NDIA-PATOS│</span>
+<span class="hl">                    │(Segregado, On-Prem)  │</span>
+<span class="hl">                    └──────────┬───────────┘</span>
+                               <span class="kw">│</span>
+                    <span class="st">API Gateway Interno (mTLS)</span>
+                               <span class="kw">│</span>
+          <span class="kw">┌──────────┼──────────┬──────────┐</span>
+          <span class="kw">│</span>          <span class="kw">│</span>          <span class="kw">│</span>          <span class="kw">│</span>
+    <span class="st">┌─────▼─────┐ ┌──▼───┐ ┌──▼────┐ ┌──▼──────────┐</span>
+    <span class="st">│   PCnet   │ │PPJ-e │ │ REDS  │ │Plantão Dig. │</span>
+    <span class="st">│(Rede PCMG)│ │(BOs) │ │(PM+PC)│ │(67 deleg.)  │</span>
+    <span class="st">└───────────┘ └──────┘ └───────┘ └─────────────┘</span>
+
+<span class="cm">Protocolo: REST API / gRPC (rede interna isolada)</span>
+<span class="cm">Segurança: mTLS (certificado duplo), logs auditáveis</span>
+<span class="cm">LGPD: Art. 4º III — exceção para segurança pública</span>
+<span class="cm">Criptografia: AES-256 repouso, TLS 1.3 trânsito</span></div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-network-wired text-emerald-400 mr-2"></i>PCnet (Rede Interna PCMG)</h3>
+      <p class="text-sm text-gray-400">Base de comunicação segura. O servidor NDIA conecta-se à PCnet via VPN interna para tráfego de dados entre delegacias sem expor à internet pública.</p>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-file-alt text-blue-400 mr-2"></i>PPJ-e (Procedimento Policial Eletrônico)</h3>
+      <p class="text-sm text-gray-400">100% de tramitação eletrônica em MG. O NDIA exporta transcrições e relatórios formatados diretamente para o PPJ-e, eliminando digitação manual.</p>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-clipboard-list text-amber-400 mr-2"></i>REDS (Registro de Eventos)</h3>
+      <p class="text-sm text-gray-400">Boletins de ocorrência da PM e PC. O pipeline RAG ingere anos de REDS para análise de padrões criminais, correlações e predição de hotspots.</p>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-headset text-purple-400 mr-2"></i>Plantão Digital (67 delegacias)</h3>
+      <p class="text-sm text-gray-400">Sistema de atendimento digital já implantado. O NDIA pode enviar alertas inteligentes para delegacias conectadas baseados em padrões detectados.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SEGURANÇA -->
+<section id="seguranca" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Segurança da Informação</h2>
+  <div class="grid md:grid-cols-3 gap-6 mb-8">
+    <div class="glass p-6 text-center border-t-4 border-red-500">
+      <i class="fas fa-shield-alt text-4xl text-red-400 mb-4"></i>
+      <h4 class="font-bold text-white mb-2">Rede Segregada</h4>
+      <p class="text-sm text-gray-400">Servidor sem internet pública, operando como nó seguro dentro da intranet institucional da PCMG.</p>
+    </div>
+    <div class="glass p-6 text-center border-t-4 border-amber-500">
+      <i class="fas fa-key text-4xl text-amber-400 mb-4"></i>
+      <h4 class="font-bold text-white mb-2">Criptografia Total</h4>
+      <p class="text-sm text-gray-400">AES-256 em repouso. TLS 1.3 em trânsito. Certificados mTLS entre serviços.</p>
+    </div>
+    <div class="glass p-6 text-center border-t-4 border-emerald-500">
+      <i class="fas fa-user-lock text-4xl text-emerald-400 mb-4"></i>
+      <h4 class="font-bold text-white mb-2">RBAC + Auditoria</h4>
+      <p class="text-sm text-gray-400">Controle por perfil (Delegado, Escrivão, TI). Logs imutáveis de toda consulta.</p>
+    </div>
+  </div>
+  <div class="glass p-6">
+    <h3 class="font-bold text-white mb-4">Política de Backup e Disaster Recovery</h3>
+    <div class="grid md:grid-cols-3 gap-4 text-sm text-center">
+      <div class="bg-black/30 p-4 rounded-lg"><span class="text-xl font-bold text-blue-400">3-2-1</span><br><span class="text-gray-400">3 cópias, 2 mídias, 1 offsite criptografada</span></div>
+      <div class="bg-black/30 p-4 rounded-lg"><span class="text-xl font-bold text-blue-400">RTO &lt; 4h</span><br><span class="text-gray-400">Recovery Time Objective</span></div>
+      <div class="bg-black/30 p-4 rounded-lg"><span class="text-xl font-bold text-blue-400">RPO &lt; 1h</span><br><span class="text-gray-400">Recovery Point Objective</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Dependências Institucionais para Go-Live</h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6"><h3 class="font-bold text-white mb-3"><i class="fas fa-network-wired text-blue-400 mr-2"></i>Acesso e integração</h3><p class="text-sm text-gray-400">Validação de acesso técnico ao PPJ-e, REDS, Plantão Digital e à rede institucional da PCMG, com homologação da equipe de TI responsável.</p></div>
+    <div class="glass p-6"><h3 class="font-bold text-white mb-3"><i class="fas fa-scale-balanced text-purple-400 mr-2"></i>Governança jurídica</h3><p class="text-sm text-gray-400">Parecer jurídico sobre bases legais, RIPD quando aplicável, definição de papéis de controlador, operador e revisão humana obrigatória.</p></div>
+    <div class="glass p-6"><h3 class="font-bold text-white mb-3"><i class="fas fa-file-shield text-emerald-400 mr-2"></i>Política de logs</h3><p class="text-sm text-gray-400">Definir retenção, trilhas de auditoria, segregação de perfis, mascaramento de dados sensíveis e regras de descarte conforme normativos institucionais.</p></div>
+    <div class="glass p-6"><h3 class="font-bold text-white mb-3"><i class="fas fa-people-group text-amber-400 mr-2"></i>Comitê gestor</h3><p class="text-sm text-gray-400">Formalização de comitê com liderança operacional, TI, jurídico e proteção de dados para acompanhar piloto, métricas, riscos e expansão.</p></div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Roadmap Operacional</h2>
+  <div class="max-w-3xl mx-auto space-y-0">
+
+    <div class="flex gap-6">
+      <div class="flex flex-col items-center"><div class="timeline-dot bg-gray-900 border-gray-500"></div><div class="timeline-line"></div></div>
+      <div class="glass p-6 mb-6 flex-1">
+        <div class="flex items-center gap-2 mb-2"><span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded font-bold">FASE 0</span><span class="text-gray-500 text-sm">Meses -3 a 0</span></div>
+        <h4 class="font-bold text-white">Preparação</h4>
+        <p class="text-sm text-gray-400">Aprovação institucional, captação (BDMG/SEBRAE), formalização UNIPAM, licitação hardware, designação de equipe.</p>
+      </div>
+    </div>
+
+    <div class="flex gap-6">
+      <div class="flex flex-col items-center"><div class="timeline-dot bg-gray-900 border-emerald-500"></div><div class="timeline-line"></div></div>
+      <div class="glass p-6 mb-6 flex-1 border border-emerald-500/20">
+        <div class="flex items-center gap-2 mb-2"><span class="text-xs bg-emerald-900/50 text-emerald-300 px-2 py-1 rounded font-bold">FASE 1</span><span class="text-gray-500 text-sm">Meses 1-2</span></div>
+        <h4 class="font-bold text-white">Infraestrutura</h4>
+        <p class="text-sm text-gray-400">Instalação física, configuração de segurança/backup, stack de software, testes de carga, capacitação TI (40h).</p>
+      </div>
+    </div>
+
+    <div class="flex gap-6">
+      <div class="flex flex-col items-center"><div class="timeline-dot bg-gray-900 border-blue-500"></div><div class="timeline-line"></div></div>
+      <div class="glass p-6 mb-6 flex-1 border border-blue-500/20">
+        <div class="flex items-center gap-2 mb-2"><span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded font-bold">FASE 2</span><span class="text-gray-500 text-sm">Meses 3-5</span></div>
+        <h4 class="font-bold text-white">Piloto: Transcrição Inteligente</h4>
+        <p class="text-sm text-gray-400">Deploy Whisper, integração PPJ-e, capacitação escrivães (24h), coleta de métricas antes/depois, fine-tuning PT-BR policial.</p>
+        <div class="mt-3 bg-black/30 p-3 rounded"><span class="text-emerald-400 font-bold text-sm">KPI: Redução de 85-90% no tempo de transcrição</span></div>
+      </div>
+    </div>
+
+    <div class="flex gap-6">
+      <div class="flex flex-col items-center"><div class="timeline-dot bg-gray-900 border-purple-500"></div><div class="timeline-line"></div></div>
+      <div class="glass p-6 mb-6 flex-1 border border-purple-500/20">
+        <div class="flex items-center gap-2 mb-2"><span class="text-xs bg-purple-900/50 text-purple-300 px-2 py-1 rounded font-bold">FASE 3</span><span class="text-gray-500 text-sm">Meses 6-9</span></div>
+        <h4 class="font-bold text-white">Análise de Padrões REDS</h4>
+        <p class="text-sm text-gray-400">Carga histórica 3+ anos, índice RAG (Weaviate), dashboard para delegados, capacitação investigadores (16h), primeiros relatórios de inteligência.</p>
+        <div class="mt-3 bg-black/30 p-3 rounded"><span class="text-purple-400 font-bold text-sm">KPI: +40% na identificação de padrões criminais recorrentes</span></div>
+      </div>
+    </div>
+
+    <div class="flex gap-6">
+      <div class="flex flex-col items-center"><div class="timeline-dot bg-gray-900 border-amber-500"></div><div class="timeline-line"></div></div>
+      <div class="glass p-6 mb-6 flex-1 border border-amber-500/20">
+        <div class="flex items-center gap-2 mb-2"><span class="text-xs bg-amber-900/50 text-amber-300 px-2 py-1 rounded font-bold">FASE 4</span><span class="text-gray-500 text-sm">Meses 10-18</span></div>
+        <h4 class="font-bold text-white">Predição + Assistente Jurídico</h4>
+        <p class="text-sm text-gray-400">Modelo preditivo de hotspots, assistente jurídico-policial (LLM + base legal TJMG), integração completa, avaliação de impacto.</p>
+        <div class="mt-3 bg-black/30 p-3 rounded"><span class="text-amber-400 font-bold text-sm">KPI: -15 a 25% em crimes violentos nas áreas piloto</span></div>
+      </div>
+    </div>
+
+    <div class="flex gap-6">
+      <div class="flex flex-col items-center"><div class="timeline-dot bg-gray-900 border-red-500"></div></div>
+      <div class="glass p-6 flex-1 border border-red-500/20">
+        <div class="flex items-center gap-2 mb-2"><span class="text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded font-bold">FASE 5</span><span class="text-gray-500 text-sm">Meses 19-36</span></div>
+        <h4 class="font-bold text-white">Expansão Regional</h4>
+        <p class="text-sm text-gray-400">Replicação em delegacias vizinhas (Pará de Minas, Abaeté), câmeras inteligentes, parcerias Prefeitura/SEBRAE/UNIPAM, certificação ISO 42001, publicação científica.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAPACITAÇÃO -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Plano de Capacitação</h2>
+  <div class="glass p-6 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-gray-700 text-left text-gray-400">
+        <th class="py-3 pr-4">Público</th><th class="py-3 pr-4">Qtd</th><th class="py-3 pr-4">Carga</th><th class="py-3 pr-4">Conteúdo</th><th class="py-3">Modalidade</th>
+      </tr></thead>
+      <tbody class="text-gray-300">
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Delegados</td><td>5</td><td>16h</td><td>Uso do assistente IA, interpretação de relatórios, compliance LGPD</td><td>Presencial</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Escrivães</td><td>10</td><td>24h</td><td>Transcrição automática, validação, exportação PPJ-e</td><td>Hands-on</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Equipe TI</td><td>3</td><td>40h</td><td>Administração do servidor, manutenção de modelos, backups</td><td>Técnico</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Investigadores</td><td>8</td><td>16h</td><td>Consulta ao banco vetorial, análise de hotspots</td><td>Presencial</td></tr>
+        <tr><td class="py-3 pr-4 font-bold text-emerald-400">Total</td><td class="text-emerald-400">26</td><td class="text-emerald-400">~320h</td><td colspan="2" class="text-emerald-400">Parceria UNIPAM (curso de extensão certificado)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- FAQ TÉCNICO -->
+<section id="faq" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">FAQ Técnico</h2>
+  <div class="space-y-3 max-w-3xl mx-auto">
+    <details class="glass p-5"><summary class="flex items-center justify-between font-bold text-white">Qual a performance real do Whisper para transcrição de oitivas?<i class="fas fa-chevron-down text-gray-500 chevron transition-transform ml-2"></i></summary><p class="mt-4 text-sm text-gray-300">O Whisper Large V3 apresenta desempenho muito alto em português brasileiro, mas o resultado depende da qualidade do áudio, ruído, sotaque e sobreposição de fala. Em cenários favoráveis, pode ficar abaixo de 5% de WER. Em uma RTX 5090, 1 hora de áudio tende a ser processada em poucos minutos, com validação humana obrigatória antes de uso oficial.</p></details>
+
+    <details class="glass p-5"><summary class="flex items-center justify-between font-bold text-white">As 2x RTX 5090 conseguem rodar Llama 3.x 70B sem quantização?<i class="fas fa-chevron-down text-gray-500 chevron transition-transform ml-2"></i></summary><p class="mt-4 text-sm text-gray-300">Em FP16, um modelo de 70B exige memória muito acima da disponível. A operação prevista no NDIA é com quantização avançada (Q4/INT4, GGUF ou EXL2), reduzindo o footprint para algo em torno de 35GB a 40GB. Com 64GB de VRAM total, o modelo quantizado roda com folga suficiente para coexistir com o pipeline de transcrição e busca vetorial.</p></details>
+
+    <details class="glass p-5"><summary class="flex items-center justify-between font-bold text-white">Como funciona o RAG sobre REDS?<i class="fas fa-chevron-down text-gray-500 chevron transition-transform ml-2"></i></summary><p class="mt-4 text-sm text-gray-300">Os REDS são ingeridos e fatiados em chunks. O modelo nomic-embed-text gera vetores semânticos de cada chunk, armazenados no Weaviate. Quando um delegado faz uma consulta ("furtos de veículos no bairro X nos últimos 6 meses"), o sistema faz busca semântica (não por palavras-chave), encontra os chunks relevantes e passa ao Llama para gerar a resposta contextualizada.</p></details>
+
+    <details class="glass p-5"><summary class="flex items-center justify-between font-bold text-white">O que acontece se o servidor cair?<i class="fas fa-chevron-down text-gray-500 chevron transition-transform ml-2"></i></summary><p class="mt-4 text-sm text-gray-300">Política de DR: RTO &lt;4h, RPO &lt;1h. UPS de 3kVA mantém o servidor ligado por ~30 min durante queda. Backups 3-2-1 (3 cópias, 2 mídias, 1 offsite). O MacBook M5 Max serve como fallback móvel, rodando modelos menores localmente enquanto o servidor é restaurado.</p></details>
+
+    <details class="glass p-5"><summary class="flex items-center justify-between font-bold text-white">Como garantimos que nenhum dado vaza?<i class="fas fa-chevron-down text-gray-500 chevron transition-transform ml-2"></i></summary><p class="mt-4 text-sm text-gray-300">O desenho proposto elimina internet pública e opera em rede institucional segregada, com mTLS entre serviços, criptografia AES-256 em repouso, RBAC por perfil e trilhas de auditoria. Não é uma ilha sem rede: é um nó seguro dentro da intranet da PCMG, com controle rigoroso de tráfego e acesso.</p></details>
+  </div>
+</section>
+
+<footer class="border-t border-white/10 py-12 text-center text-gray-600 text-sm">
+  <p>Documento Técnico — Delegacia Regional de Patos de Minas / PCMG</p>
+  <p class="mt-2">Março 2026 • Versão 2 de 3: Técnica/Operacional</p>
+</footer>
+</body>
+</html>

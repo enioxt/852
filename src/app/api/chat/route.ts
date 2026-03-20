@@ -45,7 +45,7 @@ function sanitizeMessages(messages: unknown) {
     })
     .map(message => ({
       role: message.role,
-      content: getMessageText(message).slice(0, 4000),
+      content: getMessageText(message).slice(0, 32000), // increased from 4000 to 32000 for pasted files
     }))
     .filter(message => message.content.length > 0);
 }
@@ -96,7 +96,19 @@ export async function POST(req: Request) {
       });
     }
 
-    const { provider, modelId, providerLabel, pricing, routingReason } = getModelConfig('chat');
+    let { provider, modelId, providerLabel, pricing, routingReason } = getModelConfig('chat');
+
+    // Dynamic Context Orchestration
+    const totalChars = messages.reduce((acc, msg) => acc + msg.content.length, 0);
+    if (totalChars > 8000) {
+      // Large Payload: force route to high-context intelligence model (e.g. qwen-max or gemini)
+      const configObj = getModelConfig('intelligence_report');
+      provider = configObj.provider;
+      modelId = configObj.modelId;
+      providerLabel = configObj.providerLabel;
+      pricing = configObj.pricing;
+      routingReason = 'Payload massivo detectado (>8000 caracteres). Roteado dinamicamente para modelo de alto contexto.';
+    }
 
     const result = streamText({
       model: provider.chat(modelId),

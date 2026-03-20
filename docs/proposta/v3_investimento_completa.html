@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDIA Patos de Minas — Modelo de Investimento</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#030712;color:#e5e7eb;margin:0}
+.glass{background:rgba(15,23,42,.65);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:1.25rem}
+.grad-text{background:linear-gradient(135deg,#f59e0b,#ef4444);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.glow-amber{box-shadow:0 0 40px rgba(245,158,11,.12)}
+.fade{animation:fadeIn .7s ease-out both}@keyframes fadeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+section{max-width:72rem;margin:0 auto;padding:0 1.5rem}
+nav{position:fixed;top:0;width:100%;z-index:50;background:rgba(3,7,18,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
+.counter{font-variant-numeric:tabular-nums}
+details summary{cursor:pointer;list-style:none}details summary::-webkit-details-marker{display:none}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#030712}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+</style>
+</head>
+<body class="antialiased">
+
+<nav>
+<div style="max-width:72rem;margin:0 auto;padding:0 1.5rem" class="flex items-center justify-between h-16">
+  <div class="flex items-center gap-2 font-bold text-lg"><i class="fas fa-chart-line text-amber-500"></i> NDIA <span class="text-gray-500 font-light">Business Case</span></div>
+  <div class="hidden md:flex gap-6 text-sm font-medium text-gray-400">
+    <a href="#hero" class="hover:text-white">Resumo</a>
+    <a href="#comparativo" class="hover:text-white">Comparativo</a>
+    <a href="#receitas" class="hover:text-white">Cooperação</a>
+    <a href="#fontes" class="hover:text-white">Fontes de Recurso</a>
+    <a href="#parcerias" class="hover:text-white">Parcerias</a>
+    <a href="#risco" class="hover:text-white">Análise de Risco</a>
+  </div>
+</div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="pt-28 pb-20 text-center fade">
+  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs font-bold text-gray-300 mb-8 uppercase tracking-widest border border-amber-500/30">
+    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Business Case & ROI
+  </div>
+  <h1 class="text-5xl md:text-7xl font-black mb-6 leading-[1.08] text-white">
+    Modelo de<br><span class="grad-text">Investimento</span>
+  </h1>
+  <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-4">Análise financeira completa do Núcleo de Desenvolvimento e Inteligência Artificial</p>
+  <p class="text-gray-500 text-sm">Para: SEBRAE-MG, FIEMG, BDMG, Parlamentares, Gestores Públicos</p>
+
+  <!-- Key Metrics -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-16 max-w-5xl mx-auto">
+    <div class="glass p-5 glow-amber"><div class="text-2xl font-black text-amber-400 counter">R$ 314,6k</div><div class="text-xs text-gray-400 mt-1">Investimento Base</div></div>
+    <div class="glass p-5"><div class="text-2xl font-black text-emerald-400 counter">R$ 27,6k</div><div class="text-xs text-gray-400 mt-1">OPEX Base/Ano</div></div>
+    <div class="glass p-5"><div class="text-2xl font-black text-blue-400 counter">~15 meses</div><div class="text-xs text-gray-400 mt-1">Payback Base Líquido</div></div>
+    <div class="glass p-5"><div class="text-2xl font-black text-purple-400 counter">2</div><div class="text-xs text-gray-400 mt-1">Alternativas mais baratas</div></div>
+    <div class="glass p-5"><div class="text-2xl font-black text-red-400 counter">~R$ 44k</div><div class="text-xs text-gray-400 mt-1">ChatGPT Business/ano (26 seats)</div></div>
+  </div>
+</section>
+
+<!-- TABELA CAPEX DETALHADA -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">CAPEX Detalhado</h2>
+  <div class="glass p-6 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-gray-700 text-left text-gray-400">
+        <th class="py-3 pr-4">Item</th><th class="py-3 pr-4">Especificação</th><th class="py-3 pr-4 text-right">Valor Unit.</th><th class="py-3 pr-4 text-center">Qtd</th><th class="py-3 text-right">Subtotal</th>
+      </tr></thead>
+      <tbody class="text-gray-300">
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">CPU</td><td>AMD Threadripper PRO 7985WX (64c/128t)</td><td class="text-right">R$ 45.000</td><td class="text-center">1</td><td class="text-right font-mono">R$ 45.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">GPU</td><td>NVIDIA RTX 5090 (32GB GDDR7)</td><td class="text-right">R$ 22.000</td><td class="text-center">2</td><td class="text-right font-mono">R$ 44.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">RAM</td><td>DDR5 ECC (8x64GB)</td><td class="text-right">R$ 3.500</td><td class="text-center">8</td><td class="text-right font-mono">R$ 28.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">SSD</td><td>NVMe high-endurance 4TB (classe PCIe 4.0+)</td><td class="text-right">R$ 8.000</td><td class="text-center">2</td><td class="text-right font-mono">R$ 16.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">NAS</td><td>Synology RS3621xs+ 100TB RAID-6</td><td class="text-right">R$ 55.000</td><td class="text-center">1</td><td class="text-right font-mono">R$ 55.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Rede</td><td>Switches gerenciados + cabeamento Cat6a</td><td class="text-right">R$ 18.000</td><td class="text-center">1</td><td class="text-right font-mono">R$ 18.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">UPS</td><td>APC Smart-UPS 3kVA + estabilização</td><td class="text-right">R$ 12.000</td><td class="text-center">1</td><td class="text-right font-mono">R$ 12.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Estação móvel</td><td>MacBook Pro 16" classe Max 128GB/2TB (opcional / fase 2)</td><td class="text-right">R$ 58.000</td><td class="text-center">1</td><td class="text-right font-mono">R$ 58.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Rack</td><td>Rack 42U + infraestrutura física</td><td class="text-right">R$ 15.000</td><td class="text-center">1</td><td class="text-right font-mono">R$ 15.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Implantação</td><td>Configuração, testes, go-live</td><td class="text-right">R$ 35.000</td><td class="text-center">1</td><td class="text-right font-mono">R$ 35.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold">Capacitação</td><td>320h de treinamento (26 servidores)</td><td class="text-right">R$ 18.000</td><td class="text-center">1</td><td class="text-right font-mono">R$ 18.000</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-3 pr-4 font-bold text-gray-500">Contingência</td><td class="text-gray-500">10% sobre total</td><td class="text-right text-gray-500">—</td><td class="text-center text-gray-500">—</td><td class="text-right font-mono text-gray-500">R$ 34.400</td></tr>
+        <tr class="border-t-2 border-amber-500/50"><td colspan="4" class="py-3 pr-4 font-bold text-white text-lg">TOTAL CAPEX PREMIUM</td><td class="text-right font-mono text-amber-400 text-lg font-bold">R$ 378.400</td></tr>
+      </tbody>
+    </table>
+    <div class="mt-4 bg-amber-900/20 border border-amber-500/30 p-3 rounded-lg">
+      <p class="text-sm text-amber-300"><i class="fas fa-info-circle mr-2"></i>100% vira patrimônio público permanente. Vida útil estimada: 5-7 anos para hardware. Core institucional sem estação móvel premium: <strong>R$ 314.600</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- OPEX ANUAL -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">OPEX Anual (Custo Operacional)</h2>
+  <div class="grid md:grid-cols-2 gap-8">
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-money-bill-wave text-red-400 mr-2"></i> Custos Recorrentes</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Energia elétrica (faixa média operacional)</span><span class="text-white font-mono">R$ 12.000/ano</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Manutenção preventiva</span><span class="text-white font-mono">R$ 6.000/ano</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Suporte técnico sob demanda</span><span class="text-white font-mono">R$ 7.200/ano</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Licenças de software</span><span class="text-emerald-400 font-mono">R$ 0 (Open Source)</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Backup / seguro / contingência operacional</span><span class="text-white font-mono">R$ 2.400/ano</span></div>
+        <div class="flex justify-between pt-2 text-lg font-bold"><span class="text-white">TOTAL OPEX ANUAL BASE</span><span class="text-red-400">R$ 27.600</span></div>
+      </div>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-calculator text-blue-400 mr-2"></i> Custo por Uso</h3>
+      <div class="grid grid-cols-2 gap-4 text-center">
+        <div class="bg-black/30 p-4 rounded-lg"><span class="text-2xl font-bold text-blue-400">R$ 2.300</span><br><span class="text-gray-500 text-xs">Custo mensal base</span></div>
+        <div class="bg-black/30 p-4 rounded-lg"><span class="text-2xl font-bold text-blue-400">R$ 76</span><br><span class="text-gray-500 text-xs">Custo/dia</span></div>
+        <div class="bg-black/30 p-4 rounded-lg"><span class="text-2xl font-bold text-emerald-400">R$ 0,00</span><br><span class="text-gray-500 text-xs">Por consulta à IA</span></div>
+        <div class="bg-black/30 p-4 rounded-lg"><span class="text-2xl font-bold text-emerald-400">R$ 0,00</span><br><span class="text-gray-500 text-xs">Por transcrição</span></div>
+      </div>
+      <div class="mt-4 bg-blue-900/20 border border-blue-500/30 p-3 rounded-lg">
+        <p class="text-sm text-blue-300"><i class="fas fa-arrow-right mr-2"></i>Benchmark público: ChatGPT Business custa <strong>US$ 25 por assento/mês</strong> no anual ou <strong>US$ 30</strong> no mensal. Para 26 usuários, isso representa cerca de <strong>US$ 7,8 mil/ano</strong> (~R$ 44 mil/ano em cotação de referência), sem resolver soberania de dados, RAG sigiloso local ou processamento de vídeo on-premise. No Claude, a Anthropic publica planos seat-based e Enterprise sob proposta comercial.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Benchmark Público: OpenAI, Anthropic e Uso Institucional</h2>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-comments text-blue-400 mr-2"></i>OpenAI</h3>
+      <p class="text-sm text-gray-400 mb-3">Preço público de referência: ChatGPT Business por assento. Para 26 usuários, o custo fica na faixa de ~US$ 7,8 mil/ano no plano anual, antes de impostos e integrações.</p>
+      <p class="text-xs text-gray-500">A OpenAI divulga adoção enterprise por Block, Canva, Carlyle, Estée Lauder, PwC e Zapier. Já o preço enterprise costuma ser customizado.</p>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-brain text-amber-400 mr-2"></i>Anthropic</h3>
+      <p class="text-sm text-gray-400 mb-3">A Anthropic publica preços por API e por assento em seus planos públicos, mas o Enterprise é normalmente negociado sob proposta comercial, especialmente em ambientes regulados.</p>
+      <p class="text-xs text-gray-500">A Anthropic já divulga Claude para governo e grandes organizações, mas o gasto institucional efetivo raramente é público.</p>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-scale-balanced text-emerald-400 mr-2"></i>Leitura correta do benchmark</h3>
+      <p class="text-sm text-gray-400 mb-3">Ferramentas SaaS por assento podem parecer baratas no início, mas não entregam o mesmo pacote do NDIA: soberania local, retenção controlada, integração sigilosa, RAG institucional e processamento multimodal on-premise.</p>
+      <p class="text-xs text-gray-500">Também existem descontos e contratos promocionais públicos excepcionais. Eles não devem ser usados como baseline de planejamento permanente.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARATIVO 5 ANOS -->
+<section id="comparativo" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Comparativo em 5 Anos</h2>
+  <div class="grid md:grid-cols-2 gap-8 mb-8">
+    <div class="glass p-6">
+      <canvas id="compareChart" height="280"></canvas>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4">Economia Acumulada em 5 Anos</h3>
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-400 text-sm">NDIA Core (Custo Total 5 anos)</span><span class="text-blue-400 font-bold">R$ 452.600</span></div>
+          <div class="w-full bg-gray-800 h-3 rounded-full"><div class="bg-blue-500 h-3 rounded-full" style="width:20%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-400 text-sm">Benchmark corporativo completo (5 anos)</span><span class="text-red-400 font-bold">R$ 2.250.000+</span></div>
+          <div class="w-full bg-gray-800 h-3 rounded-full"><div class="bg-red-500 h-3 rounded-full" style="width:100%"></div></div>
+        </div>
+        <div class="bg-emerald-900/20 border border-emerald-500/30 p-4 rounded-lg mt-6">
+          <div class="text-3xl font-black text-emerald-400 text-center">R$ 1.797.400</div>
+          <div class="text-center text-emerald-300 text-sm mt-1">Economia líquida em 5 anos vs SaaS</div>
+        </div>
+        <div class="text-xs text-gray-500 mt-2">
+          <p>* Benchmark corporativo completo: plataformas analíticas especializadas + transcrição cloud + licenças LLM por assento. Contratos enterprise normalmente são customizados e pouco transparentes; por isso foi adotada uma faixa conservadora de ~R$ 450 mil/ano.</p>
+          <p class="mt-1">** ChatGPT Business tem preço público; Claude Team/Enterprise e contratos governamentais costumam ser negociados caso a caso.</p>
+          <p class="mt-1">*** NDIA Core: CAPEX R$ 314.600 + OPEX R$ 27.600/ano x 5 = R$ 452.600.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ECONOMIAS DIRETAS -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Economias Diretas (Anuais)</h2>
+  <div class="grid md:grid-cols-3 gap-6 mb-8">
+    <div class="glass p-6 text-center border-t-4 border-emerald-500">
+      <div class="text-4xl font-black text-emerald-400 mb-2">R$ 180k</div>
+      <h4 class="font-bold text-white mb-2">Transcrição Automática</h4>
+      <p class="text-sm text-gray-400">2.400 horas-homem/ano liberadas. Escrivães dedicam tempo a atividades de maior valor. Cálculo: 12 escrivães × 200h/ano × R$ 75/h.</p>
+    </div>
+    <div class="glass p-6 text-center border-t-4 border-blue-500">
+      <div class="text-4xl font-black text-blue-400 mb-2">R$ 45k</div>
+      <h4 class="font-bold text-white mb-2">Eficiência Investigativa</h4>
+      <p class="text-sm text-gray-400">Redução de 15% no tempo médio de investigação via análise de padrões e sugestões automatizadas.</p>
+    </div>
+    <div class="glass p-6 text-center border-t-4 border-purple-500">
+      <div class="text-4xl font-black text-purple-400 mb-2">R$ 60k</div>
+      <h4 class="font-bold text-white mb-2">Eliminação de SaaS</h4>
+      <p class="text-sm text-gray-400">Substituição de ferramentas comerciais de transcrição, análise e BI por soluções locais open source.</p>
+    </div>
+  </div>
+  <div class="glass p-6">
+    <canvas id="savingsChart" height="200"></canvas>
+  </div>
+</section>
+
+<!-- COFINANCIAMENTO INSTITUCIONAL -->
+<section id="receitas" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Cofinanciamento e Cooperação Institucional</h2>
+  <p class="text-gray-400 text-center mb-8">Não se trata de receita operacional da delegacia. Trata-se de potencial de convênios, cooperação técnica e descentralização de crédito em projetos formalmente segregados.</p>
+  <div class="grid md:grid-cols-2 gap-6 mb-8">
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-hand-holding-usd text-amber-400 mr-2"></i> Fontes Potenciais de Cofinanciamento</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Capacitação institucional via convênio / extensão</span><span class="text-amber-400 font-mono">R$ 72.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Projeto demonstrativo com Prefeitura (base não sigilosa)</span><span class="text-amber-400 font-mono">R$ 48.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Pesquisa aplicada com UNIPAM</span><span class="text-amber-400 font-mono">R$ 24.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Replicação institucional por cooperação técnica</span><span class="text-amber-400 font-mono">R$ 36.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Apoio setorial em ambiente demonstrativo separado</span><span class="text-amber-400 font-mono">R$ 3.000</span></div>
+        <div class="flex justify-between pt-2 text-lg font-bold"><span class="text-white">TETO POTENCIAL/ANO</span><span class="text-amber-400">R$ 183.000</span></div>
+      </div>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-chart-pie mr-2 text-purple-400"></i> Distribuição do Cofinanciamento</h3>
+      <canvas id="revenueChart" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- Payback Analysis -->
+  <div class="glass p-8">
+    <h3 class="text-2xl font-bold text-white mb-6 text-center">Análise de Payback</h3>
+    <div class="grid md:grid-cols-3 gap-6 text-center">
+      <div class="bg-black/30 p-6 rounded-xl border border-emerald-500/30">
+        <div class="text-sm text-gray-400 mb-2">Piloto Validado</div>
+        <div class="text-4xl font-black text-emerald-400">~21 meses</div>
+        <p class="text-xs text-gray-500 mt-2">Entrada enxuta + foco em transcrição<br>Payback com economia líquida da fase 1</p>
+      </div>
+      <div class="bg-black/30 p-6 rounded-xl border border-blue-500/30">
+        <div class="text-sm text-gray-400 mb-2">Base Institucional</div>
+        <div class="text-4xl font-black text-blue-400">~15 meses</div>
+        <p class="text-xs text-gray-500 mt-2">R$ 314,6k de CAPEX core<br>Payback com economia líquida anual estimada</p>
+      </div>
+      <div class="bg-black/30 p-6 rounded-xl border border-amber-500/30">
+        <div class="text-sm text-gray-400 mb-2">Premium Completo</div>
+        <div class="text-4xl font-black text-amber-400">~18 meses</div>
+        <p class="text-xs text-gray-500 mt-2">R$ 378,4k com estação móvel premium<br>Mais flexibilidade operacional e contingência</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Duas Alternativas Mais Baratas</h2>
+  <p class="text-gray-400 text-center mb-8">Rotas eficientes para começar menor, validar rápido e escalar sem desperdiçar recurso público.</p>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6 border-t-4 border-emerald-500">
+      <h3 class="text-xl font-bold text-white mb-3">Alternativa A — Piloto Enxuto</h3>
+      <div class="space-y-2 text-sm text-gray-300">
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span>CAPEX estimado</span><span class="text-emerald-400 font-mono">~R$ 182.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span>OPEX estimado</span><span class="text-emerald-400 font-mono">~R$ 18.000/ano</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span>Hardware</span><span class="text-right">1x RTX 5090, 192-256GB RAM, 20-40TB</span></div>
+      </div>
+      <ul class="mt-4 text-sm text-gray-400 space-y-2">
+        <li>✅ Foco em transcrição, OCR, RAG documental e dashboard inicial</li>
+        <li>✅ Ideal para piloto de 60-90 dias com metas antes/depois</li>
+        <li>✅ Menor risco político e orçamentário</li>
+      </ul>
+    </div>
+    <div class="glass p-6 border-t-4 border-blue-500">
+      <h3 class="text-xl font-bold text-white mb-3">Alternativa B — Intermediária Escalável</h3>
+      <div class="space-y-2 text-sm text-gray-300">
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span>CAPEX estimado</span><span class="text-blue-400 font-mono">~R$ 236.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span>OPEX estimado</span><span class="text-blue-400 font-mono">~R$ 21.600/ano</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span>Hardware</span><span class="text-right">1x RTX 5090, Threadripper, 256-384GB RAM, 40-60TB</span></div>
+      </div>
+      <ul class="mt-4 text-sm text-gray-400 space-y-2">
+        <li>✅ Roda transcrição, RAG institucional e modelos grandes quantizados</li>
+        <li>✅ Permite crescer para arquitetura premium adicionando segunda GPU</li>
+        <li>✅ Melhor equilíbrio entre robustez e prudência fiscal</li>
+      </ul>
+    </div>
+  </div>
+  <div class="bg-amber-900/20 border border-amber-500/30 p-4 rounded-lg mt-6">
+    <p class="text-sm text-amber-300"><i class="fas fa-info-circle mr-2"></i>Arquitetura premium completa permanece útil como referência final, mas a recomendação institucional mais defensável é começar pelo core ou por uma das duas alternativas acima.</p>
+  </div>
+</section>
+
+<!-- FONTES DE RECURSO -->
+<section id="fontes" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Fontes de Recurso</h2>
+  <p class="text-gray-400 text-center mb-8">Mapeamento das linhas de financiamento disponíveis para captação.</p>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6 border-l-4 border-emerald-500">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400"><i class="fas fa-landmark"></i></div>
+        <div><h3 class="font-bold text-white">FNSP — Fundo Nacional de Segurança Pública</h3></div>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">R$ 1,4 bilhão executados em 2025. Linhas específicas para TIC e modernização tecnológica. Acesso via SENASP.</p>
+      <div class="flex gap-2"><span class="text-xs bg-emerald-900/50 text-emerald-300 px-2 py-1 rounded">Federal</span><span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">Médio Prazo</span></div>
+    </div>
+
+    <div class="glass p-6 border-l-4 border-blue-500">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-university"></i></div>
+        <div><h3 class="font-bold text-white">BDMG — Crédito Municipal</h3></div>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">Linhas de crédito para modernização de municípios. Juros subsidiados. Processo simplificado para prefeituras.</p>
+      <div class="flex gap-2"><span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Estadual</span><span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Rápido</span></div>
+    </div>
+
+    <div class="glass p-6 border-l-4 border-amber-500">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400"><i class="fas fa-rocket"></i></div>
+        <div><h3 class="font-bold text-white">SEBRAE-MG Inova Minas</h3></div>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">Programa de inovação com foco em cidades do interior. Já apoiou o lançamento do "Patos Valley" em 2024. Editais semestrais.</p>
+      <div class="flex gap-2"><span class="text-xs bg-amber-900/50 text-amber-300 px-2 py-1 rounded">Misto</span><span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Rápido</span></div>
+    </div>
+
+    <div class="glass p-6 border-l-4 border-purple-500">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400"><i class="fas fa-file-contract"></i></div>
+        <div><h3 class="font-bold text-white">Emendas Parlamentares</h3></div>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">Deputados estaduais e federais da região (11ª Circunscrição) com orçamento para segurança pública e inovação.</p>
+      <div class="flex gap-2"><span class="text-xs bg-purple-900/50 text-purple-300 px-2 py-1 rounded">Federal/Estadual</span><span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">Médio Prazo</span></div>
+    </div>
+
+    <div class="glass p-6 border-l-4 border-cyan-500">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400"><i class="fas fa-industry"></i></div>
+        <div><h3 class="font-bold text-white">FIEMG / SENAI</h3></div>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">Programas de inovação industrial. Interesse em capacitação em IA para o setor metalúrgico e agro do Alto Paranaíba.</p>
+      <div class="flex gap-2"><span class="text-xs bg-cyan-900/50 text-cyan-300 px-2 py-1 rounded">Privado</span><span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Rápido</span></div>
+    </div>
+
+    <div class="glass p-6 border-l-4 border-red-500">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400"><i class="fas fa-microchip"></i></div>
+        <div><h3 class="font-bold text-white">MGI/MCTI — Editais Federais</h3></div>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">Ministério da Gestão e da Inovação e Ministério de C&T publicam editais para projetos de IA aplicada ao governo. Finep como agência de fomento.</p>
+      <div class="flex gap-2"><span class="text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded">Federal</span><span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">Longo Prazo</span></div>
+    </div>
+  </div>
+
+  <div class="glass p-6 mt-8">
+    <h3 class="font-bold text-white mb-3 text-center">Estratégia de Captação Recomendada</h3>
+    <div class="grid md:grid-cols-3 gap-4 text-center text-sm">
+      <div class="bg-green-900/20 border border-green-500/30 p-4 rounded-lg">
+        <div class="font-bold text-green-400 mb-1">Curto Prazo (0-3 meses)</div>
+        <p class="text-gray-400">BDMG + SEBRAE Inova Minas + FIEMG. Processos ágeis, aprovação em semanas.</p>
+      </div>
+      <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-lg">
+        <div class="font-bold text-blue-400 mb-1">Médio Prazo (3-12 meses)</div>
+        <p class="text-gray-400">Emendas parlamentares + FNSP via SENASP. Exigem articulação política e projeto técnico.</p>
+      </div>
+      <div class="bg-purple-900/20 border border-purple-500/30 p-4 rounded-lg">
+        <div class="font-bold text-purple-400 mb-1">Longo Prazo (12-24 meses)</div>
+        <p class="text-gray-400">Editais MCTI/Finep + parcerias acadêmicas. Sustentabilidade do projeto após implantação.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARCERIAS -->
+<section id="parcerias" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Ecossistema de Parcerias</h2>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6 text-center">
+      <i class="fas fa-graduation-cap text-4xl text-yellow-400 mb-4"></i>
+      <h4 class="font-bold text-white mb-2">UNIPAM</h4>
+      <p class="text-sm text-gray-400">Alunos de TI como estagiários. Professores como instrutores. Pesquisas com dados reais. Papers acadêmicos de alto impacto. Curso de extensão certificado em IA aplicada.</p>
+    </div>
+    <div class="glass p-6 text-center">
+      <i class="fas fa-building text-4xl text-purple-400 mb-4"></i>
+      <h4 class="font-bold text-white mb-2">Prefeitura Municipal</h4>
+      <p class="text-sm text-gray-400">Cooperação técnica e convênios para projetos paralelos, ambientes demonstrativos e bases não sigilosas. Qualquer uso multissetorial deve ocorrer com segregação formal e governança própria.</p>
+    </div>
+    <div class="glass p-6 text-center">
+      <i class="fas fa-chart-line text-4xl text-amber-400 mb-4"></i>
+      <h4 class="font-bold text-white mb-2">SEBRAE-MG</h4>
+      <p class="text-sm text-gray-400">Mapeamento econômico com IA, análise de vocação regional e capacitação de MEIs em ambiente demonstrativo ou espelho. O núcleo policial não é apresentado como serviço comercial para terceiros.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ANÁLISE DE RISCO -->
+<section id="risco" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Análise de Riscos e Mitigações</h2>
+  <div class="glass p-6 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-gray-700 text-left text-gray-400">
+        <th class="py-3 pr-4">Risco</th><th class="py-3 pr-4">Probabilidade</th><th class="py-3 pr-4">Impacto</th><th class="py-3">Mitigação</th>
+      </tr></thead>
+      <tbody class="text-gray-300">
+        <tr class="border-b border-gray-800">
+          <td class="py-3 pr-4 font-bold">Resistência cultural à adoção</td>
+          <td><span class="text-amber-400">Média</span></td><td><span class="text-amber-400">Médio</span></td>
+          <td>Fase piloto com early adopters. Gamificação. Resultados rápidos (transcrição) geram buy-in.</td>
+        </tr>
+        <tr class="border-b border-gray-800">
+          <td class="py-3 pr-4 font-bold">Falha de hardware</td>
+          <td><span class="text-green-400">Baixa</span></td><td><span class="text-red-400">Alto</span></td>
+          <td>UPS 3kVA. Backup 3-2-1. MacBook como fallback. DR: RTO &lt;4h. Garantia de 3 anos.</td>
+        </tr>
+        <tr class="border-b border-gray-800">
+          <td class="py-3 pr-4 font-bold">Mudança de gestão</td>
+          <td><span class="text-amber-400">Média</span></td><td><span class="text-amber-400">Médio</span></td>
+          <td>Formalização via portaria, comitê gestor e convênios institucionais bem delimitados.</td>
+        </tr>
+        <tr class="border-b border-gray-800">
+          <td class="py-3 pr-4 font-bold">Atraso na captação</td>
+          <td><span class="text-amber-400">Média</span></td><td><span class="text-amber-400">Médio</span></td>
+          <td>Múltiplas fontes simultâneas. Fase 0 pode começar com orçamento próprio mínimo.</td>
+        </tr>
+        <tr class="border-b border-gray-800">
+          <td class="py-3 pr-4 font-bold">Obsolescência tecnológica</td>
+          <td><span class="text-green-400">Baixa</span></td><td><span class="text-green-400">Baixo</span></td>
+          <td>Stack self-hosted com componentes open-source e open-weight. Novos modelos podem ser incorporados sem dependência de fornecedor único.</td>
+        </tr>
+        <tr>
+          <td class="py-3 pr-4 font-bold">Vazamento de dados</td>
+          <td><span class="text-green-400">Muito Baixa</span></td><td><span class="text-red-400">Crítico</span></td>
+          <td>Rede segregada sem internet pública, AES-256, mTLS, RBAC e logs auditáveis com retenção controlada.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- IMPACTO LOCAL -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-8 text-center">Impacto para Patos de Minas</h2>
+  <div class="grid md:grid-cols-2 gap-8">
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-trophy text-amber-400 mr-2"></i> Posicionamento Estratégico</h3>
+      <ul class="space-y-3 text-sm text-gray-300">
+        <li><i class="fas fa-medal text-amber-400 mr-2"></i><strong>Projeto pioneiro entre delegacias regionais.</strong> Potencial real de virar referência mineira e nacional em IA soberana aplicada à investigação.</li>
+        <li><i class="fas fa-medal text-amber-400 mr-2"></i><strong>Patos Valley fortalecido.</strong> Marca lançada com SEBRAE-MG em 2024 ganha infraestrutura real de processamento pesado.</li>
+        <li><i class="fas fa-medal text-amber-400 mr-2"></i><strong>Polo de capacitação.</strong> Parceria UNIPAM + delegacia atrai talentos e pesquisadores da região.</li>
+        <li><i class="fas fa-medal text-amber-400 mr-2"></i><strong>Atração de investimentos.</strong> Empresas de tech se instalam onde há infraestrutura de IA e talento local.</li>
+      </ul>
+    </div>
+    <div class="glass p-6">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-users text-blue-400 mr-2"></i> Impacto Social</h3>
+      <ul class="space-y-3 text-sm text-gray-300">
+        <li><i class="fas fa-shield-alt text-blue-400 mr-2"></i><strong>Segurança reforçada.</strong> Investigações mais rápidas e precisas para 169 mil habitantes.</li>
+        <li><i class="fas fa-briefcase text-blue-400 mr-2"></i><strong>Empregos qualificados.</strong> Pelo menos 5 novos postos diretos e 15+ indiretos em 2 anos.</li>
+        <li><i class="fas fa-graduation-cap text-blue-400 mr-2"></i><strong>Formação de talentos.</strong> Estagiários da UNIPAM com experiência prática em IA governamental.</li>
+        <li><i class="fas fa-hands-helping text-blue-400 mr-2"></i><strong>Serviços públicos melhores.</strong> Dados processados = decisões melhores para saúde, trânsito e educação.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-white/10 py-12 text-center text-gray-600 text-sm">
+  <p>Documento de Investimento — Delegacia Regional de Patos de Minas / PCMG</p>
+  <p class="mt-2">Março 2026 • Versão 3 de 3: Investimento/ROI</p>
+</footer>
+
+<script>
+// 5-year comparison chart
+new Chart(document.getElementById('compareChart'), {
+  type: 'line',
+  data: {
+    labels: ['Ano 0', 'Ano 1', 'Ano 2', 'Ano 3', 'Ano 4', 'Ano 5'],
+    datasets: [
+      { label: 'NDIA Core', data: [314600, 342200, 369800, 397400, 425000, 452600], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)', fill: true, tension: 0.3 },
+      { label: 'Benchmark corporativo completo', data: [0, 450000, 900000, 1350000, 1800000, 2250000], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,.1)', fill: true, tension: 0.3 }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: { ticks: { color: '#9ca3af', callback: v => 'R$ ' + (v/1000) + 'k' }, grid: { color: '#1e293b' } },
+      x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+    },
+    plugins: { legend: { labels: { color: '#9ca3af' } } }
+  }
+});
+
+// Savings chart
+new Chart(document.getElementById('savingsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Ano 1', 'Ano 2', 'Ano 3', 'Ano 4', 'Ano 5'],
+    datasets: [
+      { label: 'Economia Bruta Acumulada', data: [285000, 570000, 855000, 1140000, 1425000], backgroundColor: '#10b981' },
+      { label: 'Custo Acumulado NDIA Core', data: [342200, 369800, 397400, 425000, 452600], backgroundColor: '#3b82f6' }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: { ticks: { color: '#9ca3af', callback: v => 'R$ ' + (v/1000) + 'k' }, grid: { color: '#1e293b' } },
+      x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+    },
+    plugins: { legend: { labels: { color: '#9ca3af' } } }
+  }
+});
+
+// Revenue pie
+new Chart(document.getElementById('revenueChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Capacitação (R$72k)', 'Prefeitura demo (R$48k)', 'Replicação institucional (R$36k)', 'UNIPAM (R$24k)', 'Apoio setorial (R$3k)'],
+    datasets: [{ data: [72000, 48000, 36000, 24000, 3000], backgroundColor: ['#f59e0b', '#8b5cf6', '#ef4444', '#3b82f6', '#10b981'], borderWidth: 0 }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11 } } } }
+  }
+});
+</script>
+</body>
+</html>

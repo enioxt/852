@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDIA PCMG - Força e Inteligência</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#10b981',
+                        grad1: '#059669',
+                        grad2: '#0284c7',
+                        darkbg: '#050505',
+                        panelbg: '#111111'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #e5e5e5; overflow-x: hidden; }
+        .glass { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem; }
+        .gradient-text { background: linear-gradient(135deg, #059669, #0284c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glow-bg { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, #05966940 0%, transparent 60%); filter: blur(80px); z-index: -1; pointer-events: none; }
+        
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body class="antialiased relative">
+    <div class="glow-bg top-[-200px] left-[-200px]"></div>
+    <div class="glow-bg bottom-[-200px] right-[-200px]" style="background: radial-gradient(circle, #0284c730 0%, transparent 60%);"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass border-b-0 rounded-none border-b border-white/10 top-0">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 font-bold text-xl tracking-tight">
+                <i class="fas fa-layer-group text-[#059669]"></i>
+                <span>NDIA <span class="text-gray-500 font-light">| Patos de Minas</span></span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium text-gray-400">
+                <a href="#visao" class="hover:text-white transition-colors">Visão</a>
+                <a href="#casos" class="hover:text-white transition-colors">Casos Reais</a>
+                <a href="#validacao" class="hover:text-white transition-colors">Validação</a>
+                <a href="#investimento" class="hover:text-[#059669] transition-colors">Investimento</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-24">
+        <!-- Hero Section -->
+        <section class="max-w-5xl mx-auto px-6 pt-12 pb-20 text-center fade-in">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs font-bold text-gray-300 mb-8 border border-[#059669]/30 uppercase tracking-widest">
+                <span class="w-2 h-2 rounded-full bg-[#059669] animate-pulse"></span>
+                Segurança Pública e IA
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-[1.1] tracking-tight text-white">
+                Automação Total. <br/>
+                <span class="gradient-text">Sigilo Investigativo Absoluto.</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-400 max-w-4xl mx-auto leading-relaxed font-light">
+                Libertando policiais de milhares de horas de burocracia documental através de modelos de Inteligência Artificial rodando em hardware local (Off-Grid).
+            </p>
+        </section>
+
+        
+    <!-- Visão -->
+    <section id="visao" class="max-w-7xl mx-auto px-6 mb-24 fade-in delay-1">
+        <div class="grid md:grid-cols-2 gap-10 items-center">
+            <div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white">O Gargalo da Burocracia</h2>
+                <p class="text-lg text-gray-300 mb-6 leading-relaxed">
+                    Nossos investigadores perdem horas copiando dados de laudos, redigindo sinopses de oitivas e cortando vídeos de interrogatórios. A atividade-fim (investigar na rua) fica comprometida.
+                </p>
+                <p class="text-lg text-gray-300 mb-6 leading-relaxed">
+                    Segundo a Lei 12.527/2011, <strong>não podemos enviar dados de inquéritos para o ChatGPT ou Google</strong>. A única solução legal e moderna é o processamento de IA em infraestrutura própria (On-Premise).
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass p-6 text-center">
+                    <i class="fas fa-clock text-4xl text-emerald-500 mb-4"></i>
+                    <div class="text-3xl font-bold text-white mb-2">95%</div>
+                    <div class="text-sm text-gray-400">Redução de Tempo em Relatórios</div>
+                </div>
+                <div class="glass p-6 text-center">
+                    <i class="fas fa-lock text-4xl text-emerald-500 mb-4"></i>
+                    <div class="text-3xl font-bold text-white mb-2">100%</div>
+                    <div class="text-sm text-gray-400">Auditoria e Sigilo de Dados</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Casos Concretos (PCMG / PM) -->
+    <section id="casos" class="max-w-7xl mx-auto px-6 mb-24 fade-in delay-2">
+        <h2 class="text-3xl font-bold mb-10 text-center text-white">Capacidades em Produção e Futuras</h2>
+        
+        <div class="space-y-6">
+            <!-- Tira Voz -->
+            <div class="glass p-8 flex flex-col md:flex-row gap-8 items-center border-l-4 border-emerald-500">
+                <div class="w-16 h-16 shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl">
+                    <i class="fas fa-microphone-slash"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Tira-Voz (Em operação)</h3>
+                    <p class="text-gray-300">Plataforma de inteligência anônima já em uso (<a href="https://852.egos.ia.br" class="text-emerald-400 hover:underline">852.egos.ia.br</a>) por policiais civis. Coleta relatos e a IA gera dossiês estratégicos, detectando nomes, CPFs e ocultando PII automaticamente (ATRiAN).</p>
+                </div>
+            </div>
+
+            <!-- Oitivas -->
+            <div class="glass p-8 flex flex-col md:flex-row gap-8 items-center border-l-4 border-cyan-500">
+                <div class="w-16 h-16 shrink-0 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-2xl">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Transcrição e Sinopse de Oitivas (Local)</h3>
+                    <p class="text-gray-300">Com as RTX 5090, modelos rodarão localmente transcrevendo vídeos de 2 horas de interrogatório e gerando a sinopse formatada em formato oficial (DOCX) em <strong>menos de 15 minutos</strong>. Trabalho que levaria 6 horas de um escrivão.</p>
+                </div>
+            </div>
+
+            <!-- Integracao PM -->
+            <div class="glass p-8 flex flex-col md:flex-row gap-8 items-center border-l-4 border-blue-500">
+                <div class="w-16 h-16 shrink-0 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-2xl">
+                    <i class="fas fa-car-side"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-white mb-2">Integração PCMG e PM (Padrões Criminais)</h3>
+                    <p class="text-gray-300">O sistema ingere centenas de REDS (Boletins de Ocorrência) diários em linguagem natural. A IA extrai "modus operandi", veículos e comparsas, alertando os investigadores sobre elos ocultos que um humano não perceberia rapidamente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Validacao Especialistas -->
+    <section id="validacao" class="max-w-5xl mx-auto px-6 mb-24 fade-in delay-3">
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-white/5 p-8 rounded-2xl border border-white/10 relative">
+                <i class="fas fa-quote-left text-3xl text-emerald-500/40 absolute top-6 left-6"></i>
+                <p class="text-gray-300 mt-8 mb-6 italic">"No futuro próximo, a programação será apenas falar em inglês. IA e os 'agentic workflows' são a maior mudança no trabalho intelectual da nossa geração."</p>
+                <p class="text-white font-bold">Andrej Karpathy</p>
+                <p class="text-gray-500 text-sm">Ex-Diretor de IA da Tesla e Pesquisador OpenAI</p>
+            </div>
+            <div class="bg-white/5 p-8 rounded-2xl border border-white/10">
+                <h3 class="text-xl font-bold text-emerald-400 mb-4"><i class="fas fa-landmark mr-2"></i> Validação do Governo</h3>
+                <ul class="space-y-4 text-sm text-gray-300">
+                    <li><strong class="text-white">Portaria do Ministério da Justiça (Jun/2025):</strong> Autorizou formalmente o uso de IA em investigações para polícias que usam o Fundo Nacional (FNSP).</li>
+                    <li><strong class="text-white">Projeto INSPIRE:</strong> R$ 390 milhões injetados pelo MCTI/MGI em inovação pública com IA. O momento orçamentário é agora.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- O Pedido de Maquinas -->
+    <section id="investimento" class="max-w-5xl mx-auto px-6 fade-in delay-3 text-center">
+        <h2 class="text-3xl font-bold text-white mb-8">Hardware Necessário</h2>
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <div class="glass px-6 py-4 flex items-center gap-3">
+                <i class="fas fa-microchip text-2xl text-emerald-500"></i>
+                <div class="text-left">
+                    <p class="text-white font-bold">Servidor Deep Learning</p>
+                    <p class="text-emerald-400 text-sm">2x RTX 5090</p>
+                </div>
+            </div>
+            <div class="glass px-6 py-4 flex items-center gap-3">
+                <i class="fas fa-laptop text-2xl text-blue-500"></i>
+                <div class="text-left">
+                    <p class="text-white font-bold">M5 Max 128GB</p>
+                    <p class="text-blue-400 text-sm">Mobilidade Extrema</p>
+                </div>
+            </div>
+            <div class="glass px-6 py-4 flex items-center gap-3">
+                <i class="fas fa-server text-2xl text-gray-400"></i>
+                <div class="text-left">
+                    <p class="text-white font-bold">Edge Nodes (RPi 5)</p>
+                    <p class="text-gray-400 text-sm">Monitoramento 24/7</p>
+                </div>
+            </div>
+        </div>
+        <p class="text-xl text-gray-300">Investimento Total de Patrimônio: <span class="text-emerald-400 font-bold text-2xl">R$ 153.000</span></p>
+    </section>
+    
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 mt-20 py-12 text-center text-gray-500 text-sm">
+        <p>Projeto de Inovação Institucional — Polícia Civil de Minas Gerais (Delegacia Regional de Patos de Minas)</p>
+        <p class="mt-2">Proposta 2026 • Tecnologia Soberana e Código Aberto</p>
+    </footer>
+</body>
+</html>

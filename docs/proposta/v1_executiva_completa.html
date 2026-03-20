@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDIA Patos de Minas — Visão Executiva</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#030712;color:#e5e7eb;margin:0}
+.glass{background:rgba(15,23,42,.65);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06);border-radius:1.25rem}
+.grad-text{background:linear-gradient(135deg,#3b82f6,#a855f7);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.glow{box-shadow:0 0 40px rgba(59,130,246,.15)}
+.fade{animation:fadeIn .7s ease-out both}@keyframes fadeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+section{max-width:72rem;margin:0 auto;padding:0 1.5rem}
+nav{position:fixed;top:0;width:100%;z-index:50;background:rgba(3,7,18,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
+.tab-btn{cursor:pointer;padding:.5rem 1.25rem;border-radius:.5rem;font-weight:600;font-size:.875rem;transition:all .2s}
+.tab-btn.active{background:#1e3a5f;color:#93c5fd;border:1px solid rgba(59,130,246,.4)}
+.tab-btn:not(.active){color:#9ca3af;border:1px solid transparent}
+.tab-panel{display:none}.tab-panel.active{display:block;animation:fadeIn .5s ease-out both}
+details summary{cursor:pointer;list-style:none}details summary::-webkit-details-marker{display:none}
+details[open] .chevron{transform:rotate(180deg)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#030712}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+</style>
+</head>
+<body class="antialiased">
+
+<!-- NAV -->
+<nav>
+<div style="max-width:72rem;margin:0 auto;padding:0 1.5rem" class="flex items-center justify-between h-16">
+  <div class="flex items-center gap-2 font-bold text-lg"><i class="fas fa-layer-group text-blue-500"></i> NDIA <span class="text-gray-500 font-light">Patos de Minas</span></div>
+  <div class="hidden md:flex gap-6 text-sm font-medium text-gray-400">
+    <a href="#hero" class="hover:text-white">Início</a>
+    <a href="#jafizemos" class="hover:text-white">Já Fizemos</a>
+    <a href="#casos" class="hover:text-white">Casos Reais</a>
+    <a href="#capacidades" class="hover:text-white">Capacidades</a>
+    <a href="#investimento" class="hover:text-white">Investimento</a>
+    <a href="#faq" class="hover:text-white">FAQ</a>
+  </div>
+</div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="pt-28 pb-20 text-center fade">
+  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs font-bold text-gray-300 mb-8 uppercase tracking-widest border border-blue-500/30">
+    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> Documento Estratégico Completo
+  </div>
+  <h1 class="text-5xl md:text-7xl font-black mb-6 leading-[1.08] text-white">
+    Núcleo de Desenvolvimento<br>e <span class="grad-text">Inteligência Artificial</span>
+  </h1>
+  <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-4">Polícia Civil de Minas Gerais — Delegacia Regional de Patos de Minas</p>
+  <p class="text-gray-500 text-sm">Versão 2.0 | Março 2026 | Documento Institucional</p>
+
+  <!-- Stats bar -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto">
+    <div class="glass p-5 glow"><div class="text-3xl font-black text-blue-400">169 mil</div><div class="text-xs text-gray-400 mt-1">Habitantes (IBGE 2025)</div></div>
+    <div class="glass p-5"><div class="text-3xl font-black text-purple-400">24 meses</div><div class="text-xs text-gray-400 mt-1">Escala institucional completa</div></div>
+    <div class="glass p-5"><div class="text-3xl font-black text-emerald-400">3</div><div class="text-xs text-gray-400 mt-1">Ferramentas Já em Operação</div></div>
+    <div class="glass p-5"><div class="text-3xl font-black text-amber-400">Pioneiro</div><div class="text-xs text-gray-400 mt-1">Projeto regional de IA soberana</div></div>
+  </div>
+</section>
+
+<!-- CONTEXTO NACIONAL -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Por Que Agora?</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-2xl mx-auto">O Brasil abriu uma janela normativa e orçamentária única para projetos de IA na segurança pública e na gestão municipal.</p>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6 border-t-4 border-blue-500">
+      <h3 class="font-bold text-white mb-2"><i class="fas fa-gavel text-blue-400 mr-2"></i>Marco Legal da IA</h3>
+      <p class="text-sm text-gray-400">PL 2338/2023 aprovado no Senado (dez/2024). Framework Federal de Ética em IA lançado em out/2025. Contexto regulatório favorável e maduro.</p>
+    </div>
+    <div class="glass p-6 border-t-4 border-emerald-500">
+      <h3 class="font-bold text-white mb-2"><i class="fas fa-coins text-emerald-400 mr-2"></i>FNSP: R$ 1,4 Bilhão</h3>
+      <p class="text-sm text-gray-400">O Fundo Nacional de Segurança Pública executou recorde de R$ 1,4 bilhão em 2025. Há linhas específicas para TIC e modernização.</p>
+    </div>
+    <div class="glass p-6 border-t-4 border-amber-500">
+      <h3 class="font-bold text-white mb-2"><i class="fas fa-landmark text-amber-400 mr-2"></i>Portaria MJ (Jun/2025)</h3>
+      <p class="text-sm text-gray-400">O ambiente normativo federal passou a admitir e orientar o uso de soluções avançadas de tecnologia da informação, inclusive IA, em investigação criminal e inteligência.</p>
+    </div>
+  </div>
+</section>
+
+<!-- JÁ FIZEMOS -->
+<section id="jafizemos" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">O Que Já Construímos</h2>
+  <p class="text-gray-400 text-center mb-10">Tudo isso foi feito com recursos mínimos e computadores pessoais. Imagine o que faremos com infraestrutura de verdade.</p>
+  <div class="space-y-6">
+    <div class="glass p-8 flex flex-col md:flex-row gap-6 items-start border-l-4 border-blue-500">
+      <div class="w-14 h-14 shrink-0 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-2xl"><i class="fas fa-microphone-slash"></i></div>
+      <div class="flex-1">
+        <h3 class="text-xl font-bold text-white">Tira-Voz 852 — Inteligência Institucional Anônima</h3>
+        <p class="text-gray-300 mt-2 mb-3">Plataforma completa em produção (<a href="https://852.egos.ia.br" class="text-blue-400 hover:underline" target="_blank">852.egos.ia.br</a>). Chat com IA (Qwen-plus), fórum anônimo com votação, relatórios automáticos a cada 5 relatos, biblioteca jurídica com 27+ leis, validação ética (ATRiAN), filtro de PII (CPF, RG, MASP, placas), exportação PDF/DOCX, gamificação com ranking policial.</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Next.js 16</span>
+          <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">React</span>
+          <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Supabase</span>
+          <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Alibaba Qwen</span>
+          <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Docker</span>
+          <span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">46 capacidades ativas</span>
+          <span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Código Aberto</span>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-8 flex flex-col md:flex-row gap-6 items-start border-l-4 border-emerald-500">
+      <div class="w-14 h-14 shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl"><i class="fas fa-scissors"></i></div>
+      <div class="flex-1">
+        <h3 class="text-xl font-bold text-white">Pochete 2.0 — Processamento de Vídeo</h3>
+        <p class="text-gray-300 mt-2">Corta e segmenta vídeos de investigação automaticamente para envio ao Ministério Público e Poder Judiciário. Antes eram horas de trabalho manual. Agora são minutos.</p>
+      </div>
+    </div>
+    <div class="glass p-8 flex flex-col md:flex-row gap-6 items-start border-l-4 border-amber-500">
+      <div class="w-14 h-14 shrink-0 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-2xl"><i class="fas fa-file-medical-alt"></i></div>
+      <div class="flex-1">
+        <h3 class="text-xl font-bold text-white">Extrator de Exames de Direção</h3>
+        <p class="text-gray-300 mt-2">Extrai automaticamente os campos de centenas de folhas de laudos do DETRAN e consolida em arquivo DOC. O que antes consumia horas semanais de um investigador agora é feito em minutos. <strong>O investigador é liberado para investigar.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASOS REAIS -->
+<section id="casos" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Casos de Sucesso Documentados</h2>
+  <p class="text-gray-400 text-center mb-10">Instituições que já investiram e colheram resultados mensuráveis.</p>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6 hover:scale-[1.01] transition-transform">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400"><i class="fas fa-flag"></i></div>
+        <div><h3 class="font-bold text-white">Goiás — "IA Contra o Crime"</h3><span class="text-xs text-gray-500">2024</span></div>
+      </div>
+      <p class="text-gray-300 text-sm mb-3">100+ casos solucionados em 30 dias após implantação. Análise de dados criminais com reconhecimento de padrões. Modelo replicado em 3 outros estados.</p>
+      <a href="https://goias.gov.br/institucional/ia-contra-o-crime-impulsiona-seguranca-publica-e-soluciona-mais-de-100-casos-em-30-dias/" target="_blank" class="text-xs text-blue-400 hover:underline"><i class="fas fa-external-link-alt mr-1"></i> Fonte oficial</a>
+    </div>
+
+    <div class="glass p-6 hover:scale-[1.01] transition-transform">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400"><i class="fas fa-chart-area"></i></div>
+        <div><h3 class="font-bold text-white">Alagoas — Programa IA-SSP</h3><span class="text-xs text-gray-500">2023-2024</span></div>
+      </div>
+      <p class="text-gray-300 text-sm mb-3">Redução estimada de 26% em criminalidade violenta nas áreas piloto. Predição de hotspots e alocação dinâmica de efetivo baseada em análise de REDS.</p>
+      <a href="https://alagoas.al.gov.br/noticia/programa-de-inteligencia-artificial-da-ssp-estima-reduzir-criminalidade-em-ate-26" target="_blank" class="text-xs text-blue-400 hover:underline"><i class="fas fa-external-link-alt mr-1"></i> Fonte oficial</a>
+    </div>
+
+    <div class="glass p-6 hover:scale-[1.01] transition-transform">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400"><i class="fas fa-video"></i></div>
+        <div><h3 class="font-bold text-white">São Paulo — Sistema DETECTA</h3><span class="text-xs text-gray-500">PM-SP</span></div>
+      </div>
+      <p class="text-gray-300 text-sm mb-3">Integração de 700+ câmeras com IA para identificação em tempo real. Parceria SSP-SP + Prodam. A PM-SP também criou sua "Fábrica de Inteligência Artificial" própria.</p>
+    </div>
+
+    <div class="glass p-6 hover:scale-[1.01] transition-transform">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400"><i class="fas fa-city"></i></div>
+        <div><h3 class="font-bold text-white">Curitiba — Smart City Hub</h3><span class="text-xs text-gray-500">2022-2025</span></div>
+      </div>
+      <p class="text-gray-300 text-sm mb-3">7 prêmios internacionais em inovação urbana. Câmeras inteligentes, análise preditiva de tráfego e criminalidade. Referência global no Smart City Expo World Congress (Barcelona).</p>
+    </div>
+
+    <div class="glass p-6 hover:scale-[1.01] transition-transform">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400"><i class="fas fa-desktop"></i></div>
+        <div><h3 class="font-bold text-white">PC Roraima — Modernização</h3><span class="text-xs text-gray-500">2025</span></div>
+      </div>
+      <p class="text-gray-300 text-sm mb-3">R$ 3,5 milhões investidos: 400+ computadores, 130 notebooks. A modernização completa com IA permitiu digitalizar todo o fluxo investigativo.</p>
+    </div>
+
+    <div class="glass p-6 hover:scale-[1.01] transition-transform">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-file-signature"></i></div>
+        <div><h3 class="font-bold text-white">PC Santa Catarina — IP Digital</h3><span class="text-xs text-gray-500">Getin/Gepla</span></div>
+      </div>
+      <p class="text-gray-300 text-sm mb-3">Inquérito Policial 100% digital. Digitalização total do fluxo de IP desenvolvida internamente, eliminando papel e acelerando tramitação.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CAPACIDADES / SETORES -->
+<section id="capacidades" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Impacto Multissetorial</h2>
+  <p class="text-gray-400 text-center mb-10">O NDIA nasce na Polícia Civil, mas serve à cidade inteira.</p>
+
+  <div class="flex flex-wrap justify-center gap-3 mb-8">
+    <button onclick="showTab('tab-pcmg','cap-tabs')" class="tab-btn cap-tabs active"><i class="fas fa-shield-alt mr-1"></i> Polícia Civil</button>
+    <button onclick="showTab('tab-pm','cap-tabs')" class="tab-btn cap-tabs"><i class="fas fa-car-side mr-1"></i> Polícia Militar</button>
+    <button onclick="showTab('tab-pref','cap-tabs')" class="tab-btn cap-tabs"><i class="fas fa-building mr-1"></i> Prefeitura</button>
+    <button onclick="showTab('tab-edu','cap-tabs')" class="tab-btn cap-tabs"><i class="fas fa-graduation-cap mr-1"></i> Escolas</button>
+    <button onclick="showTab('tab-sebrae','cap-tabs')" class="tab-btn cap-tabs"><i class="fas fa-chart-line mr-1"></i> SEBRAE / Comércio</button>
+    <button onclick="showTab('tab-cameras','cap-tabs')" class="tab-btn cap-tabs"><i class="fas fa-video mr-1"></i> Câmeras / Monitoramento</button>
+  </div>
+
+  <div id="tab-pcmg" class="tab-panel cap-tabs active">
+    <div class="glass p-8">
+      <h3 class="text-2xl font-bold text-white mb-6"><i class="fas fa-shield-alt text-blue-400 mr-2"></i> Polícia Civil de Minas Gerais</h3>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-bold text-blue-300 mb-3">Fase 1 (Meses 1-3): Transcrição Inteligente</h4>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li><i class="fas fa-check text-green-500 mr-2"></i>Whisper Large V3 transcreve 1h de oitiva em &lt;2 min</li>
+            <li><i class="fas fa-check text-green-500 mr-2"></i>Exportação direta para PPJ-e com formatação PCMG</li>
+            <li><i class="fas fa-check text-green-500 mr-2"></i><strong>Ganho: 2.400h/ano de escrivães liberados</strong></li>
+          </ul>
+          <h4 class="font-bold text-blue-300 mb-3 mt-6">Fase 2 (Meses 4-9): Análise de Padrões REDS</h4>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li><i class="fas fa-check text-green-500 mr-2"></i>Pipeline RAG sobre base histórica de boletins</li>
+            <li><i class="fas fa-check text-green-500 mr-2"></i>LLM identifica correlações, horários críticos, reincidentes</li>
+            <li><i class="fas fa-check text-green-500 mr-2"></i><strong>+40% na identificação de padrões criminais</strong></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-blue-300 mb-3">Fase 3 (Meses 10-18): Predição de Hotspots</h4>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li><i class="fas fa-check text-green-500 mr-2"></i>Modelo preditivo treinado com REDS de 2+ anos</li>
+            <li><i class="fas fa-check text-green-500 mr-2"></i>Alocação dinâmica de viaturas e efetivo</li>
+            <li><i class="fas fa-check text-green-500 mr-2"></i><strong>Base teórica: -26% em criminalidade (Alagoas)</strong></li>
+          </ul>
+          <h4 class="font-bold text-blue-300 mb-3 mt-6">Fase 4 (Meses 19-24): Assistente Jurídico</h4>
+          <ul class="space-y-2 text-sm text-gray-300">
+            <li><i class="fas fa-check text-green-500 mr-2"></i>LLM treinado em legislação penal + jurisprudência TJMG</li>
+            <li><i class="fas fa-check text-green-500 mr-2"></i>Delegado consulta enquadramento legal em tempo real</li>
+            <li><i class="fas fa-check text-green-500 mr-2"></i><strong>-30% em procedimentos devolvidos por inadequação</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-pm" class="tab-panel cap-tabs">
+    <div class="glass p-8">
+      <h3 class="text-2xl font-bold text-white mb-4"><i class="fas fa-car-side text-emerald-400 mr-2"></i> Polícia Militar</h3>
+      <p class="text-gray-300 mb-4">Integração direta entre PC e PM no mesmo cluster computacional:</p>
+      <ul class="space-y-3 text-gray-300">
+        <li><i class="fas fa-bolt text-emerald-400 mr-2"></i><strong>Cruzamento REDS/PC + PM:</strong> Análise conjunta de Boletins de Ocorrência de ambas as forças, identificando elos criminais ocultos.</li>
+        <li><i class="fas fa-bolt text-emerald-400 mr-2"></i><strong>Mapas de Calor Dinâmicos:</strong> Geração automática de mapas de criminalidade por bairro, horário e dia da semana para otimizar rondas.</li>
+        <li><i class="fas fa-bolt text-emerald-400 mr-2"></i><strong>Alertas Preditivos:</strong> O modelo aprende sazonalidade (férias, eventos, feriados) e envia alertas de risco para o COPOM local.</li>
+        <li><i class="fas fa-bolt text-emerald-400 mr-2"></i><strong>Alocação Inteligente:</strong> Com base nos hotspots previstos, sugestão automática de distribuição de viaturas e efetivo.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-pref" class="tab-panel cap-tabs">
+    <div class="glass p-8">
+      <h3 class="text-2xl font-bold text-white mb-4"><i class="fas fa-building text-purple-400 mr-2"></i> Prefeitura Municipal</h3>
+      <p class="text-gray-300 mb-4">Capacidade computacional ociosa pode ser usada para projetos municipais:</p>
+      <ul class="space-y-3 text-gray-300">
+        <li><i class="fas fa-bolt text-purple-400 mr-2"></i><strong>Análise de Filas SUS:</strong> IA lê dados de atendimento e prevê picos, otimizando escalas médicas.</li>
+        <li><i class="fas fa-bolt text-purple-400 mr-2"></i><strong>Diários Oficiais:</strong> Modelo treinado com 10 anos de legislação municipal para gerar rascunhos de ofícios e alvarás.</li>
+        <li><i class="fas fa-bolt text-purple-400 mr-2"></i><strong>Zeladoria Preditiva:</strong> Cruzamento de dados de reclamações com geolocalização para priorizar manutenção urbana (caso Mapzer, Curitiba).</li>
+        <li><i class="fas fa-bolt text-purple-400 mr-2"></i><strong>Trânsito Inteligente:</strong> Processamento de dados de fluxo viário + acidentes do SAMU para pontos de intervenção prioritários.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-edu" class="tab-panel cap-tabs">
+    <div class="glass p-8">
+      <h3 class="text-2xl font-bold text-white mb-4"><i class="fas fa-graduation-cap text-yellow-400 mr-2"></i> Rede Escolar e Universidades</h3>
+      <ul class="space-y-3 text-gray-300">
+        <li><i class="fas fa-bolt text-yellow-400 mr-2"></i><strong>Previsão de Evasão Escolar:</strong> Cruzando faltas, notas e relatos de professores, o modelo detecta risco de abandono antes de acontecer (modelo já usado pela Secretaria de Educação de SP).</li>
+        <li><i class="fas fa-bolt text-yellow-400 mr-2"></i><strong>Tutoria Inteligente:</strong> Modelos locais que auxiliam alunos com conteúdo personalizado, treinado na grade curricular de Patos.</li>
+        <li><i class="fas fa-bolt text-yellow-400 mr-2"></i><strong>UNIPAM como Parceiro:</strong> Alunos de TI param de depender do Google Colab e ganham acesso ao supercomputador. Professores como instrutores, alunos como estagiários técnicos.</li>
+        <li><i class="fas fa-bolt text-yellow-400 mr-2"></i><strong>Publicação Acadêmica:</strong> Papers com dados reais de IA aplicada em segurança pública — potencial alto impacto.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-sebrae" class="tab-panel cap-tabs">
+    <div class="glass p-8">
+      <h3 class="text-2xl font-bold text-white mb-4"><i class="fas fa-chart-line text-amber-400 mr-2"></i> SEBRAE, Comércio e Agronegócio</h3>
+      <ul class="space-y-3 text-gray-300">
+        <li><i class="fas fa-bolt text-amber-400 mr-2"></i><strong>Mapeamento de Vocação Econômica:</strong> IA analisando abertura de CNPJs, dados climáticos e demográficos para orientar onde abrir novos negócios (caso Bairros Inteligentes, Campinas).</li>
+        <li><i class="fas fa-bolt text-amber-400 mr-2"></i><strong>Patos Valley:</strong> Marca lançada com apoio SEBRAE-MG em 2024. O NDIA fortalece o ecossistema com infraestrutura de processamento pesado.</li>
+        <li><i class="fas fa-bolt text-amber-400 mr-2"></i><strong>Consultoria para Produtores Rurais:</strong> Processamento de dados satelitais + séries históricas para alertar sobre rotas de escoamento e segurança rural.</li>
+        <li><i class="fas fa-bolt text-amber-400 mr-2"></i><strong>Processamento Noturno:</strong> Cluster computacional pode processar bases de dados do SEBRAE nos horários ociosos (~22h-6h), gerando mapas de calor de oportunidades.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="tab-cameras" class="tab-panel cap-tabs">
+    <div class="glass p-8">
+      <h3 class="text-2xl font-bold text-white mb-4"><i class="fas fa-video text-red-400 mr-2"></i> Câmeras e Monitoramento Integrado</h3>
+      <p class="text-gray-300 mb-4">Com as GPUs RTX 5090, podemos processar feeds de vídeo em tempo real:</p>
+      <ul class="space-y-3 text-gray-300">
+        <li><i class="fas fa-bolt text-red-400 mr-2"></i><strong>Integração Olho Vivo / Câmeras Municipais:</strong> Processar imagens de câmeras de segurança da cidade no cluster local, sem enviar vídeo para nuvem.</li>
+        <li><i class="fas fa-bolt text-red-400 mr-2"></i><strong>Detecção de Placas (ALPR):</strong> Modelos de reconhecimento de placas veiculares rodando na rede institucional local para alertar sobre veículos roubados/furtados em tempo real.</li>
+        <li><i class="fas fa-bolt text-red-400 mr-2"></i><strong>Análise de Fluxo:</strong> Monitoramento de pontos estratégicos (praças, avenidas, escolas) com detecção de aglomerações ou movimentações suspeitas.</li>
+        <li><i class="fas fa-bolt text-red-400 mr-2"></i><strong>Caso Real:</strong> Sistema DETECTA de SP integra 700+ câmeras com IA. O CIVITAS do Rio planeja 20.000 câmeras inteligentes até 2028.</li>
+      </ul>
+      <div class="bg-red-900/20 border border-red-500/30 p-4 rounded-lg mt-4">
+        <p class="text-sm text-red-300"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Importante:</strong> O processamento de vídeo proposto ocorre em rede institucional segregada, sem internet pública. Nenhuma imagem sai da infraestrutura controlada, e qualquer uso depende de base legal, governança e revisão humana.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INVESTIMENTO -->
+<section id="investimento" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Investimento Detalhado</h2>
+  <p class="text-gray-400 text-center mb-10">100% em equipamentos patrimoniais. Sem obras, sem reformas.</p>
+
+  <div class="grid md:grid-cols-2 gap-8 mb-10">
+    <!-- CAPEX -->
+    <div class="glass p-6">
+      <h3 class="text-xl font-bold text-blue-400 mb-4"><i class="fas fa-shopping-cart mr-2"></i>CAPEX (Investimento Único)</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Servidor base (Threadripper PRO 7985WX)</span><span class="text-white font-mono">R$ 45.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">2x NVIDIA RTX 5090 (32GB VRAM cada)</span><span class="text-white font-mono">R$ 44.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">512GB DDR5 ECC</span><span class="text-white font-mono">R$ 28.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">2x SSD NVMe 4TB (sistema + modelos)</span><span class="text-white font-mono">R$ 16.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">NAS 100TB RAID-6 (dados históricos)</span><span class="text-white font-mono">R$ 55.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Rede isolada + switches gerenciados</span><span class="text-white font-mono">R$ 18.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">UPS 3kVA + estabilização</span><span class="text-white font-mono">R$ 12.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Estação móvel premium (opcional / fase 2)</span><span class="text-white font-mono">R$ 58.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Rack + infraestrutura física</span><span class="text-white font-mono">R$ 15.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Implantação + configuração</span><span class="text-white font-mono">R$ 35.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Capacitação inicial (320h)</span><span class="text-white font-mono">R$ 18.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Contingência (10%)</span><span class="text-white font-mono">R$ 34.400</span></div>
+        <div class="flex justify-between pt-2 text-lg font-bold"><span class="text-white">TOTAL CAPEX PREMIUM</span><span class="text-blue-400">R$ 378.400</span></div>
+        <div class="flex justify-between pt-2 text-sm font-semibold"><span class="text-gray-400">Core institucional sem estação móvel</span><span class="text-emerald-400">R$ 314.600</span></div>
+      </div>
+    </div>
+
+    <!-- ROI Charts -->
+    <div class="glass p-6">
+      <h3 class="text-xl font-bold text-emerald-400 mb-4"><i class="fas fa-chart-pie mr-2"></i>Retorno sobre Investimento</h3>
+      <canvas id="roiChart" height="220"></canvas>
+      <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+        <div class="bg-black/30 p-3 rounded-lg text-center">
+          <div class="text-2xl font-bold text-emerald-400">R$ 285k</div>
+          <div class="text-gray-400 text-xs">Economia Anual Direta</div>
+        </div>
+        <div class="bg-black/30 p-3 rounded-lg text-center">
+          <div class="text-2xl font-bold text-amber-400">15–18 meses</div>
+          <div class="text-gray-400 text-xs">Payback Base Líquido</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPEX + Economias -->
+  <div class="grid md:grid-cols-2 gap-8">
+    <div class="glass p-6">
+      <h3 class="text-xl font-bold text-red-400 mb-4"><i class="fas fa-sync mr-2"></i>OPEX (Custo Mensal)</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Energia elétrica (faixa média operacional)</span><span class="text-white font-mono">R$ 1.200</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Manutenção preventiva</span><span class="text-white font-mono">R$ 500</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Licenças de software</span><span class="text-emerald-400 font-mono">R$ 0 (Open Source)</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Suporte técnico sob demanda</span><span class="text-white font-mono">R$ 600</span></div>
+        <div class="flex justify-between pt-2 font-bold"><span class="text-white">TOTAL MENSAL BASE</span><span class="text-red-400">R$ 2.300</span></div>
+      </div>
+    </div>
+    <div class="glass p-6">
+      <h3 class="text-xl font-bold text-green-400 mb-4"><i class="fas fa-piggy-bank mr-2"></i>Economias Diretas Anuais</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Transcrição de oitivas (2.400h liberadas)</span><span class="text-green-400 font-mono">R$ 180.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Redução tempo de investigação (15%)</span><span class="text-green-400 font-mono">R$ 45.000</span></div>
+        <div class="flex justify-between border-b border-gray-800 pb-2"><span class="text-gray-300">Eliminação de licenças SaaS</span><span class="text-green-400 font-mono">R$ 60.000</span></div>
+        <div class="flex justify-between pt-2 font-bold"><span class="text-white">TOTAL ANUAL</span><span class="text-green-400">R$ 285.000</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparativo 5 anos -->
+  <div class="glass p-6 mt-8">
+    <h3 class="text-xl font-bold text-white mb-4 text-center">Comparativo em 5 Anos: NDIA vs Software Comercial (SaaS)</h3>
+    <canvas id="compareChart" height="180"></canvas>
+  </div>
+</section>
+
+<!-- GOVERNANÇA -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Governança e Compliance</h2>
+  <p class="text-gray-400 text-center mb-10">Estrutura de controle alinhada ao regime jurídico aplicável à segurança pública, ao framework federal de ética em IA e a boas práticas de governança algorítmica.</p>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6">
+      <h4 class="font-bold text-white mb-3"><i class="fas fa-balance-scale text-blue-400 mr-2"></i>LGPD</h4>
+      <ul class="text-sm text-gray-400 space-y-2">
+        <li>✅ Art. 4º III — exceção para segurança pública</li>
+        <li>✅ Regime próprio para investigação e segurança pública</li>
+        <li>✅ Registro de atividades e trilhas de auditoria</li>
+        <li>✅ RIPD quando aplicável</li>
+        <li>✅ Encarregado de Dados (DPO) designado</li>
+      </ul>
+    </div>
+    <div class="glass p-6">
+      <h4 class="font-bold text-white mb-3"><i class="fas fa-robot text-purple-400 mr-2"></i>Framework Federal IA</h4>
+      <ul class="text-sm text-gray-400 space-y-2">
+        <li>✅ Autoavaliação de impacto ético</li>
+        <li>✅ Classificação de risco (alto)</li>
+        <li>✅ Medidas de mitigação documentadas</li>
+        <li>✅ Transparência algorítmica</li>
+        <li>🎯 Meta: ISO 42001 em 2028</li>
+      </ul>
+    </div>
+    <div class="glass p-6">
+      <h4 class="font-bold text-white mb-3"><i class="fas fa-lock text-emerald-400 mr-2"></i>Segurança da Informação</h4>
+      <ul class="text-sm text-gray-400 space-y-2">
+        <li>✅ Rede segregada sem internet pública</li>
+        <li>✅ Criptografia AES-256 em repouso</li>
+        <li>✅ TLS 1.3 em trânsito</li>
+        <li>✅ RBAC + logs auditáveis imutáveis</li>
+        <li>✅ Backup 3-2-1, DR: RTO &lt;4h</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Travas Institucionais do Projeto</h2>
+  <p class="text-gray-400 text-center mb-10">O NDIA é uma proposta de apoio à decisão e ganho operacional, não de automação cega.</p>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6">
+      <h4 class="font-bold text-white mb-3"><i class="fas fa-ban text-red-400 mr-2"></i>O que não fará</h4>
+      <ul class="text-sm text-gray-400 space-y-2">
+        <li>❌ decisão automática sem revisão humana</li>
+        <li>❌ comercialização de dados</li>
+        <li>❌ uso indiscriminado de reconhecimento facial</li>
+        <li>❌ prestação comercial de serviço pela delegacia</li>
+      </ul>
+    </div>
+    <div class="glass p-6">
+      <h4 class="font-bold text-white mb-3"><i class="fas fa-users-cog text-blue-400 mr-2"></i>Governança mínima</h4>
+      <ul class="text-sm text-gray-400 space-y-2">
+        <li>✅ comitê gestor</li>
+        <li>✅ jurídico + TI + liderança operacional</li>
+        <li>✅ trilhas de auditoria e logs</li>
+        <li>✅ validação humana obrigatória</li>
+      </ul>
+    </div>
+    <div class="glass p-6">
+      <h4 class="font-bold text-white mb-3"><i class="fas fa-flask text-emerald-400 mr-2"></i>Piloto controlado</h4>
+      <ul class="text-sm text-gray-400 space-y-2">
+        <li>✅ fase 1: transcrição + apoio analítico</li>
+        <li>✅ metas antes/depois em 60-90 dias</li>
+        <li>✅ expansão só após validação</li>
+        <li>✅ arquitetura escalável por etapas</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Perguntas Frequentes (FAQ)</h2>
+  <p class="text-gray-400 text-center mb-10">Respostas para as dúvidas mais comuns sobre o projeto.</p>
+  <div class="space-y-3 max-w-3xl mx-auto">
+
+    <details class="glass p-5 group">
+      <summary class="flex items-center justify-between font-bold text-white">
+        O que é Inteligência Artificial "local" e por que importa?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Significa que os modelos de IA rodam dentro da máquina que fica na delegacia, sem enviar nenhum dado para a internet. Isso é crucial para sigilo investigativo: inquéritos, oitivas e dados sensíveis nunca saem do prédio. É como ter um "ChatGPT" que só a polícia de Patos de Minas acessa, treinado especificamente para as nossas necessidades.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Isso não é caro demais para uma cidade do interior?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">A arquitetura premium chega a ~R$ 378 mil, mas o núcleo institucional pode começar em ~R$ 314,6 mil sem a estação móvel. Para comparação, a PC de Roraima investiu R$ 3,5 milhões em modernização. Nosso modelo vira patrimônio público e gera economia operacional anual estimada em R$ 285 mil, com OPEX base enxuto.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Outras polícias já fizeram isso?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Sim. Segundo dados divulgados pelos próprios governos, Goiás resolveu mais de 100 casos em 30 dias com IA, Alagoas estimou redução de até 26% na criminalidade violenta e São Paulo opera estruturas robustas de vídeo e análise. O diferencial do NDIA é ser um <strong>projeto pioneiro entre delegacias regionais com foco em IA soberana e processamento local</strong>.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        E se a tecnologia ficar obsoleta?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Todo o software é open source (Llama, Whisper, Weaviate). Quando surgem novos modelos melhores, basta baixar e instalar — custo zero. O hardware (GPUs RTX 5090) tem vida útil de 5-7 anos antes de precisar de upgrade, e mesmo após esse período continua sendo capaz de rodar modelos de médio porte.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Como a Prefeitura e o SEBRAE podem usar isso?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">A cooperação com Prefeitura, SEBRAE e UNIPAM deve ocorrer por convênios e projetos institucionais, priorizando capacitação, pesquisa aplicada, ambientes demonstrativos e bases não sigilosas. O núcleo policial não é proposto como serviço comercial para terceiros, e qualquer expansão multissetorial depende de governança própria e segregação formal.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        E a LGPD? Dados de investigação podem ser processados por IA?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Sim, desde que haja base jurídica, governança e revisão humana. A LGPD exclui segurança pública e investigação criminal do regime geral no Art. 4º, III, remetendo o tema a disciplina própria. Em 2025, o MJSP passou a orientar o uso de soluções avançadas de TI, inclusive IA, no contexto investigativo. O processamento local reduz drasticamente o risco de transferência indevida de dados para infraestrutura de terceiros.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        De onde pode vir o dinheiro?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Diversas fontes: <strong>FNSP</strong> (R$ 1,4 bi em 2025), <strong>BDMG</strong> (crédito municipal), <strong>SEBRAE-MG Inova Minas</strong>, <strong>FIEMG</strong>, <strong>MGI/MCTI</strong> (editais de IA para governo), <strong>emendas parlamentares</strong>, e o <strong>próprio orçamento da delegacia regional</strong>. A estratégia recomendada é começar com BDMG + SEBRAE (rápido) e buscar FNSP no médio prazo.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Por que um MacBook Pro?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Uma estação móvel com Apple Silicon e alta memória unificada está entre as poucas opções portáteis capazes de operar modelos muito grandes sob quantização. No NDIA, ela é tratada como item opcional de fase 2, útil para demonstrações, contingência e trabalho de campo sem depender do servidor fixo.</p>
+    </details>
+
+  </div>
+</section>
+
+<!-- VALIDAÇÕES DE AUTORIDADE -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-10 text-center">Validações de Autoridade</h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6">
+      <i class="fas fa-quote-left text-blue-400/30 text-3xl mb-3"></i>
+      <p class="text-gray-300 italic mb-4">"Plataformas de IA de código aberto rodando localmente são essenciais para que governos mantenham a soberania sobre seus dados."</p>
+      <p class="text-white font-bold">Yann LeCun</p>
+      <p class="text-gray-500 text-sm">Cientista-Chefe de IA da Meta, Prêmio Turing</p>
+    </div>
+    <div class="glass p-6">
+      <i class="fas fa-quote-left text-emerald-400/30 text-3xl mb-3"></i>
+      <p class="text-gray-300 italic mb-4">"No futuro próximo, a maior parte do trabalho intelectual será feita em colaboração com agentes de IA. Quem dominar essa ferramenta primeiro terá vantagem decisiva."</p>
+      <p class="text-white font-bold">Andrej Karpathy</p>
+      <p class="text-gray-500 text-sm">Ex-Diretor de IA da Tesla, Pesquisador OpenAI</p>
+    </div>
+  </div>
+</section>
+
+<!-- FONTES -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-6 text-center">Referências e Fontes</h2>
+  <div class="glass p-6 text-sm text-gray-400 space-y-2 max-w-3xl mx-auto">
+    <p>1. <strong>Goiás — IA Contra o Crime:</strong> <a href="https://goias.gov.br/institucional/ia-contra-o-crime-impulsiona-seguranca-publica-e-soluciona-mais-de-100-casos-em-30-dias/" class="text-blue-400 hover:underline" target="_blank">goias.gov.br</a></p>
+    <p>2. <strong>Alagoas — IA-SSP (26% redução):</strong> <a href="https://alagoas.al.gov.br/noticia/programa-de-inteligencia-artificial-da-ssp-estima-reduzir-criminalidade-em-ate-26" class="text-blue-400 hover:underline" target="_blank">alagoas.al.gov.br</a></p>
+    <p>3. <strong>PCMG — Plantão Digital (67 delegacias):</strong> <a href="https://www.agenciaminas.mg.gov.br/noticia/plantao-digital-da-pcmg-chega-a-67-delegacias-em-menos-de-tres-anos" class="text-blue-400 hover:underline" target="_blank">agenciaminas.mg.gov.br</a></p>
+    <p>4. <strong>PCMG — PPJ-e 100% eletrônico:</strong> <a href="https://www.agenciaminas.mg.gov.br/noticia/novos-procedimentos-da-policia-civil-tem-100-de-tramitacao-eletronica-em-minas-gerais" class="text-blue-400 hover:underline" target="_blank">agenciaminas.mg.gov.br</a></p>
+    <p>5. <strong>Framework Federal Ética em IA (2025):</strong> <a href="https://tiinside.com.br/30/10/2025/governo-federal-desenvolve-framework-para-garantir-uso-etico-da-ia-no-estado-brasileiro/" class="text-blue-400 hover:underline" target="_blank">tiinside.com.br</a></p>
+    <p>6. <strong>PL 2338/2023 — Marco Legal IA:</strong> <a href="https://www12.senado.leg.br/noticias/materias/2024/12/10/senado-aprova-regulamentacao-da-inteligencia-artificial-texto-vai-a-camara" class="text-blue-400 hover:underline" target="_blank">senado.leg.br</a></p>
+    <p>7. <strong>FNSP — R$ 1,4 bi em 2025:</strong> <a href="https://www.gov.br/mj/pt-br/assuntos/noticias/fundo-nacional-de-seguranca-publica-bate-recorde-em-2025-com-execucao-de-mais-de-r-1-4-bilhao-nos-estados-e-no-df" class="text-blue-400 hover:underline" target="_blank">gov.br/mj</a></p>
+    <p>8. <strong>Patos Valley — SEBRAE-MG:</strong> <a href="https://mg.agenciasebrae.com.br/inovacao-e-tecnologia/patos-de-minas-avanca-em-acoes-de-inovacao-e-lanca-marca-patos-valley/" class="text-blue-400 hover:underline" target="_blank">agenciasebrae.com.br</a></p>
+    <p>9. <strong>Patos de Minas — Parceria Gov MG:</strong> <a href="https://www.patosdeminas.mg.gov.br/portal/noticias/0/3/2349/patos-de-minas-fecha-parceria-com-o-governo-de-minas-para-trazer-mais-tecnologia-e-melhorar-servicos-publicos" class="text-blue-400 hover:underline" target="_blank">patosdeminas.mg.gov.br</a></p>
+    <p>10. <strong>Smart City Expo Curitiba 2026:</strong> <a href="https://gpcnoticias.com.br/smart-city-expo-curitiba-2026-e-lancado-e-reforca-lideranca-global-em-inovacao-urbana/" class="text-blue-400 hover:underline" target="_blank">gpcnoticias.com.br</a></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/10 py-12 text-center text-gray-600 text-sm">
+  <p>Documento elaborado pelo setor de desenvolvimento — Delegacia Regional de Patos de Minas / PCMG</p>
+  <p class="mt-2">Março 2026 • Tecnologia Soberana e Código Aberto</p>
+  <p class="mt-1 text-gray-700">Versão 1 de 3: Executiva/Política</p>
+</footer>
+
+<script>
+// Tab switching
+function showTab(tabId, group) {
+  document.querySelectorAll('.tab-panel.' + group).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn.' + group).forEach(btn => { btn.classList.remove('active'); });
+  document.getElementById(tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ROI Chart
+new Chart(document.getElementById('roiChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Transcrições (R$180k)', 'Eficiência (R$45k)', 'Licenças SaaS (R$60k)'],
+    datasets: [{
+      data: [180000, 45000, 60000],
+      backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+      borderWidth: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11 } } } }
+  }
+});
+
+// 5-year comparison
+new Chart(document.getElementById('compareChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Ano 1', 'Ano 2', 'Ano 3', 'Ano 4', 'Ano 5'],
+    datasets: [
+      { label: 'NDIA Core (Custo Acumulado)', data: [342200, 369800, 397400, 425000, 452600], backgroundColor: '#3b82f6' },
+      { label: 'SaaS + Ferramentas Corporativas (Acumulado)', data: [450000, 900000, 1350000, 1800000, 2250000], backgroundColor: '#ef4444' }
+    ]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: { ticks: { color: '#9ca3af', callback: v => 'R$ ' + (v/1000) + 'k' }, grid: { color: '#1e293b' } },
+      x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+    },
+    plugins: { legend: { labels: { color: '#9ca3af' } } }
+  }
+});
+</script>
+</body>
+</html>

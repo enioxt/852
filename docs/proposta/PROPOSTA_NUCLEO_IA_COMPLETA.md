@@ -16,10 +16,12 @@ A presente proposta visa a criacao formal do **Nucleo de Desenvolvimento e Intel
 - Desenvolver ferramentas proprias de automacao e inteligencia para investigacao
 - Rodar e treinar modelos de linguagem (LLM) localmente, sem dependencia de nuvem
 - Processar grandes volumes de dados documentais
-- Prestar servico de tecnologia para todo o estado de Minas Gerais
+- Prestar servico de tecnologia para o estado e para a cidade de Patos de Minas
+- Estabelecer parcerias com empresas privadas, prefeitura e setores municipais
 - Formar multiplicadores em IA aplicada a seguranca publica
+- Treinar modelos proprios e criar solucoes integradas para o ecossistema local
 
-O investimento total estimado e de **R$ 140.000 a R$ 215.000** em equipamentos e implantacao inicial, mais **R$ 2.500 a R$ 3.600 mensais** em operacao recorrente. Desse valor, uma parte mantem a base minima de producao no ar (VPS, banco, dominio, APIs e observabilidade) e outra parte acelera desenvolvimento, manutencao e pesquisa aplicada em IA. Os ganhos em produtividade, desoneramento de servidores e modernizacao institucional justificam amplamente o investimento.
+O investimento total estimado e de **R$ 126.000 a R$ 183.000**, focado estritamente em equipamentos computacionais de ponta, mais **R$ 2.500 a R$ 3.600 mensais** em operacao recorrente. Desse valor, uma parte mantem a base minima de producao no ar (VPS, banco, dominio, APIs e observabilidade) e outra parte acelera desenvolvimento, manutencao e pesquisa aplicada em IA. Os ganhos em produtividade, desoneramento de servidores e modernizacao institucional justificam amplamente o investimento.
 
 ---
 
@@ -93,9 +95,8 @@ Plataforma completa de **inteligencia institucional anonima** para policiais civ
 
 1. **Formalizar o NDIA** como unidade tecnica vinculada a Delegacia Regional de Patos de Minas
 2. **Adquirir equipamentos** para processamento local de IA e dados
-3. **Estabelecer infraestrutura fisica** adequada (espaco, rede, energia)
-4. **Expandir o Tira-Voz (852)** com upload de documentos, transcricao de audio e integracao com LGPD
-5. **Desenvolver novas ferramentas** de automacao documental (OCR, extracao de dados, geracao de relatorios)
+3. **Expandir o Tira-Voz (852)** com upload de documentos, transcricao de audio e integracao com LGPD
+4. **Desenvolver novas ferramentas** de automacao documental (OCR, extracao de dados, geracao de relatorios)
 
 ### 2.2 Objetivos de Medio Prazo (6-18 meses)
 
@@ -108,9 +109,10 @@ Plataforma completa de **inteligencia institucional anonima** para policiais civ
 ### 2.3 Objetivos de Longo Prazo (18-36 meses)
 
 1. **Replicar o modelo** em outras regionais da PCMG
-2. **Estabelecer parcerias** com universidades (UFU, UFMG, PUC Minas, UNIPAM) e centros de pesquisa
-3. **Contribuir com o ecossistema nacional** de IA em seguranca publica
-4. **Tornar Patos de Minas referencia** em inovacao policial no Brasil
+2. **Estabelecer parcerias estrategicas** com a Prefeitura Municipal, autarquias e empresas privadas para prestacao de servicos em IA
+3. **Treinar modelos proprios** adaptados a realidade do municipio e demandas parceiras
+4. **Contribuir com o ecossistema nacional** de IA em seguranca publica
+5. **Tornar Patos de Minas a referencia maxima** em inovacao de IA no interior do Brasil
 
 ### 2.4 Governanca e Salvaguardas Minimas
 
@@ -292,48 +294,9 @@ Sem VPS, o projeto fica restrito a demonstracoes locais e perde continuidade ins
 
 ---
 
-## 5. INFRAESTRUTURA FISICA
+## 5. FERRAMENTAS E TECNOLOGIAS
 
-### 5.1 Requisitos Minimos
-
-| Requisito | Especificacao |
-|---|---|
-| **Espaco** | Sala de 20-40m2, climatizada, com controle de acesso |
-| **Rede** | Internet dedicada de 200+ Mbps (idealmente fibra empresarial) |
-| **Energia** | Circuito dedicado de 20A (220V) para equipamentos de alta potencia |
-| **No-break** | UPS de 3000VA para protecao contra quedas de energia |
-| **Refrigeracao** | Ar-condicionado de 12.000-18.000 BTU (equipamentos geram calor significativo) |
-| **Seguranca** | Porta com tranca eletronica, CFTV, controle de acesso restrito |
-| **Mobiliario** | Mesas com passagem de cabos, cadeiras ergonomicas, rack de rede |
-
-### 5.2 Opcoes de Local
-
-**Opcao A — Reforma do 4o andar da Delegacia Regional de Patos de Minas**
-
-O quarto andar do predio da Delegacia Regional atualmente abriga o setor de Inteligencia da Policia Civil. A reforma deste espaco para acomodar o NDIA teria as seguintes vantagens:
-
-- Proximidade fisica com o setor de inteligencia (sinergia operacional)
-- Estrutura predial ja existente (economia em construcao)
-- Seguranca fisica do predio ja estabelecida
-- Controle de acesso institucional
-
-**Estimativa de reforma:** R$ 15.000 a R$ 30.000 (climatizacao, rede eletrica dedicada, cabeamento de rede, mobiliario)
-
-**Opcao B — Locacao de Espaco Externo**
-
-Em caso de inviabilidade da reforma, um espaco comercial proximo a delegacia com:
-
-- Sala comercial de 30-50m2
-- Infraestrutura de rede ja instalada
-- Aluguel estimado: R$ 2.000-4.000/mes
-
-**Recomendacao:** A Opcao A e preferivel por custo, seguranca e integracao operacional.
-
----
-
-## 6. FERRAMENTAS E TECNOLOGIAS
-
-### 6.1 Stack de Desenvolvimento
+### 5.1 Stack de Desenvolvimento
 
 | Categoria | Tecnologias | Uso |
 |---|---|---|
@@ -346,7 +309,7 @@ Em caso de inviabilidade da reforma, um espaco comercial proximo a delegacia com
 | **OCR/NLP** | Tesseract, PaddleOCR, spaCy, LangChain | Processamento de documentos |
 | **Seguranca** | ATRiAN (validacao etica), PII Scanner, LGPD | Protecao de dados |
 
-### 6.2 OpenClaw — Agentes Autonomos de Codigo Aberto
+### 5.2 OpenClaw — Agentes Autonomos de Codigo Aberto
 
 O **OpenClaw** e um assistente de IA autonomo de codigo aberto que roda **localmente**, sem enviar dados para servidores externos. Isso e critico para uso policial, onde a confidencialidade e mandatoria (LC 129/2013 Art. 84, Lei 12.527/2011).
 
@@ -358,7 +321,7 @@ O **OpenClaw** e um assistente de IA autonomo de codigo aberto que roda **localm
 - Organizacao de base de conhecimento juridico local
 - Custo operacional: **R$ 150-500/mes** (energia + servidor local)
 
-### 6.3 Modelos de Linguagem Locais
+### 5.3 Modelos de Linguagem Locais
 
 Com a estacao de IA proposta, o nucleo podera executar localmente:
 
@@ -374,9 +337,9 @@ Com a estacao de IA proposta, o nucleo podera executar localmente:
 
 ---
 
-## 7. GANHOS ESPERADOS
+## 6. GANHOS ESPERADOS
 
-### 7.1 Desoneramento de Servidores
+### 6.1 Desoneramento de Servidores
 
 | Tarefa Atual | Tempo Atual | Com Automacao | Economia |
 |---|---|---|---|
@@ -388,7 +351,7 @@ Com a estacao de IA proposta, o nucleo podera executar localmente:
 
 **Resultado:** Centenas de horas-homem liberadas por ano para a **atividade-fim: investigacao.**
 
-### 7.2 Ganhos Institucionais
+### 6.2 Ganhos Institucionais
 
 - **Pioneirismo:** Primeiro nucleo de IA em Policia Civil estadual do Brasil
 - **Ganho politico:** Visibilidade para MG como estado inovador em seguranca publica
@@ -398,7 +361,7 @@ Com a estacao de IA proposta, o nucleo podera executar localmente:
 - **Ganho de inteligencia:** Capacidade de analise de padroes que seria impossivel manualmente
 - **Escalabilidade:** O modelo pode ser replicado para todas as 850+ delegacias de MG
 
-### 7.3 Indicadores Sugeridos de Acompanhamento
+### 6.3 Indicadores Sugeridos de Acompanhamento
 
 - **Horas-homem economizadas** em OCR, digitacao, corte de video e consolidacao de dados
 - **Quantidade de relatorios** produzidos com apoio de IA ou automacao
@@ -406,44 +369,45 @@ Com a estacao de IA proposta, o nucleo podera executar localmente:
 - **Numero de policiais capacitados** em IA e automacao por semestre
 - **Numero de unidades atendidas** por solucoes desenvolvidas em Patos de Minas
 
-### 7.4 Disponibilidade para o Estado
+### 6.4 Disponibilidade para a Sociedade, Municipio e Estado
 
-O NDIA se coloca **a disposicao de todo o estado de Minas Gerais** para:
+O NDIA tera capacidade computacional de sobra, colocando-se **a disposicao da cidade de Patos de Minas e de todo o estado** para:
 
-1. **Treinamentos** em IA aplicada a seguranca publica para policiais de qualquer regional
-2. **Desenvolvimento de sistemas** sob demanda para setores da PCMG
-3. **Manutencao e suporte** de ferramentas ja implantadas
-4. **Consultoria tecnica** para projetos de modernizacao em outras regionais
-5. **Formacao de multiplicadores** que levem o conhecimento para suas unidades
+1. **Parcerias de Desenvolvimento:** Criar solucoes conjuntas com a Prefeitura, autarquias e iniciativa privada
+2. **Processamento de Dados Locais:** Treinamento de modelos customizados para demandas externas
+3. **Treinamentos** em IA aplicada a seguranca publica para policiais de qualquer regional
+4. **Desenvolvimento de sistemas** sob demanda para setores da PCMG
+5. **Manutencao e suporte** de ferramentas ja implantadas
+6. **Consultoria tecnica** para projetos de modernizacao em outras regionais
+7. **Formacao de multiplicadores** que levem o conhecimento para suas unidades
 
 O plano e que **o conhecimento desenvolvido em Patos de Minas se espalhe por todo o estado**, criando uma rede de inovacao dentro da Policia Civil de Minas Gerais.
 
 ---
 
-## 8. COMPARATIVO DE INVESTIMENTO
+## 7. COMPARATIVO DE INVESTIMENTO
 
 | Alternativa | Custo Estimado | Resultado |
 |---|---|---|
 | Contratar empresa terceirizada de TI | R$ 30.000-80.000/mes | Dependencia externa, sem transferencia de conhecimento |
 | Contratar 3 desenvolvedores CLT | R$ 50.000-80.000/mes (salarios + encargos) | Alto custo recorrente, rotatividade |
 | Comprar software comercial de IA | R$ 100.000-500.000/ano (licencas) | Vendor lock-in, sem customizacao, dados em nuvem terceira |
-| **NDIA (esta proposta)** | **R$ 140.000-215.000 (unico) + R$ 2.500-3.600/mes** | Autonomia total, codigo aberto, dados locais, conhecimento institucional |
+| **NDIA (esta proposta)** | **R$ 126.000-183.000 (unico) + R$ 2.500-3.600/mes** | Autonomia total, codigo aberto, dados locais, conhecimento institucional |
 
 **O investimento em equipamentos se paga em menos de 3 meses** comparado a alternativa de terceirizacao ou contratacao equivalente.
 
 ---
 
-## 9. INVESTIMENTO CONSOLIDADO
+## 8. INVESTIMENTO CONSOLIDADO
 
-### 9.1 Investimento Inicial (Unico)
+### 8.1 Investimento Inicial (Unico)
 
 | Categoria | Valor |
 |---|---|
 | Equipamentos (Secao 3) | R$ 126.600 — R$ 183.200 |
-| Infraestrutura fisica — reforma (Secao 5) | R$ 15.000 — R$ 30.000 |
-| **TOTAL INICIAL** | **R$ 141.600 — R$ 213.200** |
+| **TOTAL INICIAL** | **R$ 126.600 — R$ 183.200** |
 
-### 9.2 Custo Mensal Recorrente
+### 8.2 Custo Mensal Recorrente
 
 | Categoria | Valor |
 |---|---|
@@ -456,7 +420,7 @@ O plano e que **o conhecimento desenvolvido em Patos de Minas se espalhe por tod
 
 ---
 
-## 10. FONTES DE FINANCIAMENTO SUGERIDAS
+## 9. FONTES DE FINANCIAMENTO SUGERIDAS
 
 1. **Fundo Nacional de Seguranca Publica (FNSP)** — Linha especifica para TIC, inteligencia e modernizacao em seguranca publica
 2. **FNDCT/Finep** — Financiamento de inovacao tecnologica no setor publico, em linha com a agenda do PBIA e do INSPIRE
@@ -468,13 +432,12 @@ O plano e que **o conhecimento desenvolvido em Patos de Minas se espalhe por tod
 
 ---
 
-## 11. CRONOGRAMA PROPOSTO
+## 10. CRONOGRAMA PROPOSTO
 
 | Fase | Periodo | Acoes |
 |---|---|---|
 | **Fase 0** | Agora | Apresentacao da proposta a Chefia da PCMG e autoridades |
 | **Fase 1** | Mes 1-2 | Aprovacao, captacao de recursos, licitacao/aquisicao de equipamentos |
-| **Fase 2** | Mes 2-3 | Preparacao da infraestrutura fisica (reforma, rede, energia) |
 | **Fase 3** | Mes 3-4 | Instalacao dos equipamentos, configuracao do ambiente |
 | **Fase 4** | Mes 4-6 | Desenvolvimento das primeiras ferramentas, testes, documentacao |
 | **Fase 5** | Mes 6-12 | Treinamento de modelos locais, capacitacao de policiais, publicacao de resultados |
@@ -482,15 +445,15 @@ O plano e que **o conhecimento desenvolvido em Patos de Minas se espalhe por tod
 
 ---
 
-## 12. CONCLUSAO
+## 11. CONCLUSAO
 
 A criacao do Nucleo de Desenvolvimento e Inteligencia Artificial na Delegacia Regional de Patos de Minas nao e um projeto futurista — **e uma necessidade presente e uma oportunidade historica.**
 
 O cenario nacional ja se movimenta rapidamente: a PM de Sao Paulo cria sua Fabrica de IA, Goias lanca o "IA Contra o Crime", o Rio expande cameras inteligentes, a PF firma acordos com a ABDI, e o Ministerio da Justica autoriza formalmente o uso de IA em investigacoes. **Quem nao agir agora ficara para tras.**
 
-Patos de Minas ja demonstrou, com recursos minimos e iniciativa propria, que e possivel desenvolver ferramentas de alto impacto. O Pochete 2.0, o extrator de exames e o Tira-Voz sao provas concretas de viabilidade. O que falta e **infraestrutura, formalizacao e apoio institucional.**
+Patos de Minas ja demonstrou, com recursos minimos e iniciativa propria, que e possivel desenvolver ferramentas de alto impacto. O Pochete 2.0, o extrator de exames e o Tira-Voz sao provas concretas de viabilidade. O que falta sao **os equipamentos de ponta para processamento local.**
 
-Com um investimento inicial de **R$ 140.000 a R$ 215.000** — ainda compativel com projetos estruturantes de TIC e menor que diversas aquisicoes patrimoniais recorrentes da seguranca publica — a PCMG tera:
+Com um investimento inicial de **R$ 126.000 a R$ 183.000** — focado puramente em poder computacional e ainda compativel com projetos estruturantes de TIC e menor que diversas aquisicoes patrimoniais recorrentes da seguranca publica — a PCMG tera:
 
 - O **primeiro nucleo de IA em Policia Civil estadual do Brasil**
 - Capacidade de **rodar modelos de inteligencia artificial localmente**, com sigilo total

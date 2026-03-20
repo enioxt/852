@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Copy, Check, AlertTriangle } from 'lucide-react';
 import MarkdownMessage from '@/components/chat/MarkdownMessage';
+import CollapsibleMessage from '@/components/chat/CollapsibleMessage';
 
 export function getMessageText(message: { content?: string; parts?: Array<{ type?: string; text?: string }> }): string {
   if (typeof message.content === 'string' && message.content) return message.content;
@@ -47,13 +48,15 @@ export default function MessageList({ messages, isLoading, error, copiedId, onCo
                     ? 'bg-blue-600 text-white rounded-2xl rounded-tr-md px-4 py-3'
                     : 'text-neutral-200'
                 }`}>
-                  {isUser ? (
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">{text}</div>
-                  ) : (
-                    <div className="text-sm leading-relaxed break-words prose-sm">
-                      <MarkdownMessage content={text} />
-                    </div>
-                  )}
+                  <CollapsibleMessage maxHeight={isUser ? 160 : 360}>
+                    {isUser ? (
+                      <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">{text}</div>
+                    ) : (
+                      <div className="text-sm leading-relaxed break-words prose-sm">
+                        <MarkdownMessage content={text} />
+                      </div>
+                    )}
+                  </CollapsibleMessage>
                 </div>
                 {/* Action buttons (assistant only) */}
                 {!isUser && (

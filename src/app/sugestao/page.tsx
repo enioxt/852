@@ -199,14 +199,26 @@ export default function SugestaoPage() {
     setReviewLoading(true);
     setReviewError('');
     try {
-      const res = await fetch('/api/review', {
+      const res = await fetch('/api/extract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: sanitizedBody }] }),
+        body: JSON.stringify({ content: sanitizedBody }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Falha na revisão.');
-      setReviewData(data as ReviewData);
+      
+      if (data.title && !title.trim()) setTitle(data.title);
+      if (data.category && CATEGORIES.some(c => c.value === data.category)) setCategory(data.category);
+      if (Array.isArray(data.tags) && !tagsInput.trim()) {
+        setTagsInput(data.tags.join(', '));
+      }
+
+      setReviewData({
+        completude: data.completude || 0,
+        impacto: data.impacto || 'Médio',
+        resumo: data.resumo || '',
+        sugestoes: data.sugestoes || []
+      } as ReviewData);
     } catch (error) {
       setReviewError(error instanceof Error ? error.message : 'Falha na revisão.');
     } finally {

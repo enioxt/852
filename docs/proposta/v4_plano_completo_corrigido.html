@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDIA Patos de Minas — Plano Completo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- EDITAR: Para personalizar cores, fontes e espaçamentos, altere as variáveis CSS abaixo -->
+<style>
+:root{--cor-principal:#3b82f6;--cor-destaque:#f59e0b;--cor-fundo:#030712;--cor-vidro:rgba(15,23,42,.65);--cor-borda:rgba(255,255,255,.06);--cor-texto:#e5e7eb;--cor-texto-claro:#9ca3af;--cor-texto-escuro:#6b7280;--raio:1.25rem}
+*{box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--cor-fundo);color:var(--cor-texto);margin:0}
+.glass{background:var(--cor-vidro);backdrop-filter:blur(16px);border:1px solid var(--cor-borda);border-radius:var(--raio)}
+.grad-text{background:linear-gradient(135deg,var(--cor-principal),var(--cor-destaque));background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.glow{box-shadow:0 0 40px rgba(59,130,246,.15)}
+.fade{animation:fadeIn .7s ease-out both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+section{max-width:72rem;margin:0 auto;padding:0 1.5rem}
+nav{position:fixed;top:0;width:100%;z-index:50;background:rgba(3,7,18,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--cor-borda)}
+.tab-btn{cursor:pointer;padding:.5rem 1.25rem;border-radius:.5rem;font-weight:600;font-size:.875rem;transition:all .2s}
+.tab-btn.active{background:#1e3a5f;color:#93c5fd;border:1px solid rgba(59,130,246,.4)}
+.tab-btn:not(.active){color:var(--cor-texto-claro);border:1px solid transparent}
+.tab-panel{display:none}.tab-panel.active{display:block;animation:fadeIn .5s ease-out both}
+details summary{cursor:pointer;list-style:none}details summary::-webkit-details-marker{display:none}
+details[open] .chevron{transform:rotate(180deg)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--cor-fundo)}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+/* Sistema de Tooltips — passe o mouse/toque em termos sublinhados para ver a explicação */
+.termo{border-bottom:1.5px dotted #60a5fa;cursor:help;position:relative;color:#93c5fd;font-weight:500}
+.termo:hover::after,.termo:focus::after{content:attr(data-explicacao);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:.5rem;padding:.5rem .75rem;font-size:.75rem;font-weight:400;line-height:1.4;white-space:normal;width:max-content;max-width:280px;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.4);pointer-events:none}
+.termo:hover::before,.termo:focus::before{content:'';position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#1e293b;z-index:101}
+@media(max-width:640px){.termo:hover::after,.termo:focus::after{left:0;transform:none;max-width:220px}}
+/* Timeline */
+.timeline-dot{width:16px;height:16px;border-radius:50%;border:3px solid;position:relative;z-index:2}
+.timeline-line{position:absolute;left:7px;top:16px;bottom:0;width:2px;background:#1e293b}
+</style>
+</head>
+<body class="antialiased">
+
+<!-- EDITAR: Navegação principal — adicione ou remova links conforme as seções do documento -->
+<nav>
+<div style="max-width:72rem;margin:0 auto;padding:0 1.5rem" class="flex items-center justify-between h-16">
+  <div class="flex items-center gap-2 font-bold text-lg"><i class="fas fa-layer-group text-blue-500"></i> NDIA <span class="text-gray-500 font-light">Patos de Minas</span></div>
+  <div class="hidden md:flex gap-6 text-sm font-medium text-gray-400">
+    <a href="#inicio" class="hover:text-white">Início</a>
+    <a href="#jafizemos" class="hover:text-white">Já Fizemos</a>
+    <a href="#capacidades" class="hover:text-white">Capacidades</a>
+    <a href="#casos" class="hover:text-white">Casos Reais</a>
+    <a href="#etapas" class="hover:text-white">Etapas</a>
+    <a href="#governanca" class="hover:text-white">Governança</a>
+    <a href="#investimento" class="hover:text-white">Investimento</a>
+    <a href="#faq" class="hover:text-white">FAQ</a>
+  </div>
+</div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 1: HERO — O que é e por que importa                    -->
+<!-- EDITAR: Ajuste título, subtítulo e indicadores conforme o projeto -->
+<!-- ============================================================ -->
+<section id="inicio" class="pt-28 pb-20 text-center fade">
+  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs font-bold text-gray-300 mb-8 uppercase tracking-widest border border-blue-500/30">
+    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> Documento Institucional Completo
+  </div>
+  <h1 class="text-4xl md:text-6xl font-black mb-6 leading-[1.08] text-white">
+    Núcleo de Desenvolvimento<br>e <span class="grad-text">Inteligência Artificial</span>
+  </h1>
+  <p class="text-xl text-gray-400 max-w-4xl mx-auto mb-2">Um investimento em desenvolvimento, educação e capacidade institucional para a Delegacia Regional de Patos de Minas e para toda a cidade.</p>
+  <p class="text-gray-500 text-sm mb-2">Polícia Civil de Minas Gerais • Março 2026</p>
+  <p class="text-xs text-blue-400/60 mt-2"><i class="fas fa-info-circle mr-1"></i> Termos técnicos aparecem <span class="termo" data-explicacao="Quando você vir um termo sublinhado como este, passe o mouse ou toque nele para ver a explicação em linguagem simples.">sublinhados em azul</span> — passe o mouse para ver a explicação.</p>
+
+  <!-- EDITAR: Indicadores principais -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-4xl mx-auto">
+    <div class="glass p-5 glow"><div class="text-3xl font-black text-blue-400">169 mil</div><div class="text-xs text-gray-400 mt-1">habitantes beneficiados (IBGE 2025)</div></div>
+    <div class="glass p-5"><div class="text-3xl font-black text-emerald-400">3</div><div class="text-xs text-gray-400 mt-1">ferramentas já em operação</div></div>
+    <div class="glass p-5"><div class="text-3xl font-black text-purple-400">24 meses</div><div class="text-xs text-gray-400 mt-1">para escala institucional completa</div></div>
+    <div class="glass p-5"><div class="text-3xl font-black text-amber-400">Pioneiro</div><div class="text-xs text-gray-400 mt-1">projeto regional de <span class="termo" data-explicacao="Inteligência Artificial que funciona dentro da própria instituição, sem enviar dados para servidores externos na internet.">IA soberana</span></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 2: POR QUE AGORA — Contexto nacional                  -->
+<!-- EDITAR: Atualize referências normativas e valores conforme o ano -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Por Que Agora?</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O Brasil abriu uma janela normativa e orçamentária única para projetos de <span class="termo" data-explicacao="Inteligência Artificial: programas de computador capazes de analisar grandes volumes de informação, identificar padrões e auxiliar na tomada de decisão.">IA</span> na segurança pública e na gestão municipal. Quem se posicionar agora terá acesso prioritário a recursos e reconhecimento institucional.</p>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6 border-t-4 border-blue-500">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-gavel text-blue-400 mr-2"></i>Marco Legal da IA</h3>
+      <p class="text-sm text-gray-400">O PL 2338/2023 foi aprovado no Senado em dezembro de 2024 e estabelece as bases para o uso responsável de Inteligência Artificial no Brasil. Em outubro de 2025, o Governo Federal lançou o Framework de Ética em IA, orientando como instituições públicas devem adotar essa tecnologia com transparência, segurança e respeito aos direitos fundamentais.</p>
+    </div>
+    <div class="glass p-6 border-t-4 border-emerald-500">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-coins text-emerald-400 mr-2"></i>R$ 1,4 Bilhão em Segurança</h3>
+      <p class="text-sm text-gray-400">O <span class="termo" data-explicacao="Fundo Nacional de Segurança Pública: recurso federal destinado a estados e municípios para modernização, equipamentos e tecnologia na área de segurança.">FNSP</span> executou recorde de R$ 1,4 bilhão em 2025, com linhas específicas para tecnologia da informação e modernização. É o maior volume já investido pelo fundo, e há editais abertos para projetos como o NDIA.</p>
+    </div>
+    <div class="glass p-6 border-t-4 border-amber-500">
+      <h3 class="font-bold text-white mb-3"><i class="fas fa-landmark text-amber-400 mr-2"></i>Portaria do Ministério da Justiça</h3>
+      <p class="text-sm text-gray-400">Em junho de 2025, o ambiente normativo federal passou a admitir e orientar o uso de soluções avançadas de tecnologia, inclusive Inteligência Artificial, em investigação criminal e inteligência policial. Isso dá respaldo jurídico e institucional para projetos como o NDIA.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 3: O QUE JÁ CONSTRUÍMOS — Prova de conceito            -->
+<!-- EDITAR: Adicione ou atualize ferramentas conforme o portfólio -->
+<!-- ============================================================ -->
+<section id="jafizemos" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">O Que Já Construímos</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">Este projeto não nasce no papel. As ferramentas abaixo já foram desenvolvidas e estão em operação real, criadas com recursos mínimos e computadores pessoais. São a prova de que temos capacidade técnica para entregar. <strong>Imagine o que será possível construir com infraestrutura adequada.</strong></p>
+  <div class="space-y-6">
+
+    <div class="glass p-8 flex flex-col md:flex-row gap-6 items-start border-l-4 border-blue-500">
+      <div class="w-14 h-14 shrink-0 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-2xl"><i class="fas fa-microphone-slash"></i></div>
+      <div class="flex-1">
+        <h3 class="text-xl font-bold text-white">Tira-Voz 852 — Plataforma de Inteligência Institucional</h3>
+        <p class="text-gray-300 mt-2 mb-3">Sistema completo, já em produção e acessível pela internet (<a href="https://852.egos.ia.br" class="text-blue-400 hover:underline" target="_blank">852.egos.ia.br</a>). Permite que policiais conversem com uma Inteligência Artificial treinada para o contexto policial, de forma anônima e segura. Inclui:</p>
+        <ul class="text-sm text-gray-400 space-y-1 mb-3">
+          <li>• Conversa com IA especializada em legislação e procedimentos policiais</li>
+          <li>• Fórum anônimo com votação para sugestões e problemas operacionais</li>
+          <li>• Relatórios automáticos gerados pela IA a cada 5 relatos</li>
+          <li>• Biblioteca jurídica com mais de 27 leis e normas</li>
+          <li>• Proteção automática contra exposição de dados pessoais (CPF, RG, placas)</li>
+          <li>• Exportação de conversas em PDF e Word</li>
+          <li>• Sistema de pontuação e ranking para engajamento</li>
+        </ul>
+        <div class="flex flex-wrap gap-2">
+          <span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">46 funcionalidades ativas</span>
+          <span class="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded">Código aberto</span>
+          <span class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Em produção</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-8 flex flex-col md:flex-row gap-6 items-start border-l-4 border-emerald-500">
+      <div class="w-14 h-14 shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl"><i class="fas fa-scissors"></i></div>
+      <div class="flex-1">
+        <h3 class="text-xl font-bold text-white">Pochete 2.0 — Processamento Automatizado de Vídeo</h3>
+        <p class="text-gray-300 mt-2">Ferramenta que corta e organiza vídeos de investigação automaticamente, preparando-os para envio ao Ministério Público e ao Poder Judiciário. O que antes exigia horas de trabalho manual de um policial — assistindo, cortando e renomeando trechos — agora é feito em minutos. <strong>O investigador é liberado para investigar.</strong></p>
+      </div>
+    </div>
+
+    <div class="glass p-8 flex flex-col md:flex-row gap-6 items-start border-l-4 border-amber-500">
+      <div class="w-14 h-14 shrink-0 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-2xl"><i class="fas fa-file-medical-alt"></i></div>
+      <div class="flex-1">
+        <h3 class="text-xl font-bold text-white">Extrator de Exames — Processamento Automático de Laudos</h3>
+        <p class="text-gray-300 mt-2">Extrai automaticamente os campos de centenas de folhas de laudos do DETRAN e consolida tudo em um único documento organizado. O que antes consumia horas semanais de um investigador agora é resolvido em minutos. <strong>Menos burocracia, mais tempo para o que realmente importa.</strong></p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 4: CAPACIDADES — O que o Núcleo entrega                -->
+<!-- EDITAR: Adicione ou remova abas conforme as áreas atendidas  -->
+<!-- ============================================================ -->
+<section id="capacidades" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">O Que o Núcleo Entrega</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O NDIA não é apenas uma sala de computadores. É uma capacidade institucional que transforma a forma como a delegacia, a cidade e as instituições parceiras trabalham. Veja o que cada setor ganha:</p>
+
+  <!-- Tabs -->
+  <div class="flex flex-wrap justify-center gap-2 mb-8">
+    <button class="tab-btn setor active" onclick="showTab('tab-policia','setor')"><i class="fas fa-shield-halved mr-1"></i> Polícia Civil</button>
+    <button class="tab-btn setor" onclick="showTab('tab-prefeitura','setor')"><i class="fas fa-landmark mr-1"></i> Prefeitura</button>
+    <button class="tab-btn setor" onclick="showTab('tab-educacao','setor')"><i class="fas fa-graduation-cap mr-1"></i> Educação</button>
+    <button class="tab-btn setor" onclick="showTab('tab-comunidade','setor')"><i class="fas fa-users mr-1"></i> Comunidade</button>
+  </div>
+
+  <!-- Painel: Polícia Civil -->
+  <div id="tab-policia" class="tab-panel setor active">
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-headset"></i></div>
+          <h4 class="font-bold text-white">Transcrição Automática de Oitivas e Áudios</h4>
+        </div>
+        <p class="text-sm text-gray-400">O modelo <span class="termo" data-explicacao="Whisper Large V3: sistema de inteligência artificial da OpenAI, de código aberto, capaz de transcrever áudio em texto com alta precisão em mais de 90 idiomas, incluindo português brasileiro.">Whisper Large V3</span> transcreve áudios e vídeos de oitivas, depoimentos e interceptações com precisão superior a 95% em português brasileiro. A transcrição que antes consumia horas de trabalho manual de escrivães passa a ser feita em minutos, com revisão humana apenas no resultado final.</p>
+        <p class="text-xs text-gray-500 mt-2"><i class="fas fa-check text-green-500 mr-1"></i> Economiza até 85% do tempo de transcrição por oitiva</p>
+      </div>
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-brain"></i></div>
+          <h4 class="font-bold text-white">Consulta Inteligente a Bases de Conhecimento</h4>
+        </div>
+        <p class="text-sm text-gray-400">A técnica chamada <span class="termo" data-explicacao="RAG (Geração Aumentada por Recuperação): técnica em que a IA busca informações relevantes em documentos internos da instituição antes de gerar sua resposta, garantindo que as respostas sejam baseadas em fatos e fontes verificáveis, e não em 'achismos'.">RAG</span> permite que a IA busque informações em documentos internos — legislação, boletins, procedimentos, jurisprudência — e responda perguntas com citação da fonte. Funciona como um assistente de pesquisa disponível 24 horas por dia, que nunca esquece um artigo de lei.</p>
+        <p class="text-xs text-gray-500 mt-2"><i class="fas fa-check text-green-500 mr-1"></i> Resposta em segundos, com referência ao documento original</p>
+      </div>
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-file-lines"></i></div>
+          <h4 class="font-bold text-white">Resumo Automático de Inquéritos e Processos</h4>
+        </div>
+        <p class="text-sm text-gray-400">Modelos de linguagem processam documentos extensos — inquéritos com centenas de páginas, relatórios periciais, depoimentos múltiplos — e geram resumos estruturados com os pontos principais, cronologia dos fatos e contradições identificadas. O delegado recebe uma visão sintética que permite priorizar a leitura.</p>
+        <p class="text-xs text-gray-500 mt-2"><i class="fas fa-check text-green-500 mr-1"></i> Documentos de 300 páginas resumidos em 2-3 minutos</p>
+      </div>
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400"><i class="fas fa-lock"></i></div>
+          <h4 class="font-bold text-white">Processamento 100% Local e Sigiloso</h4>
+        </div>
+        <p class="text-sm text-gray-400">Nenhum dado sai do prédio da delegacia. Diferente de serviços na nuvem (como o ChatGPT ou Google), toda a inteligência funciona em equipamentos instalados fisicamente na própria unidade policial, em uma <span class="termo" data-explicacao="Rede segregada: rede de computadores fisicamente separada da internet pública, impedindo que dados internos sejam acessados ou interceptados de fora. É diferente de um 'firewall', que é uma barreira lógica — aqui a separação é física.">rede segregada</span>. Isso garante o sigilo de investigações conforme exige a lei.</p>
+        <p class="text-xs text-gray-500 mt-2"><i class="fas fa-check text-green-500 mr-1"></i> Conforme LGPD Art. 4º III e recomendações do MJSP</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel: Prefeitura -->
+  <div id="tab-prefeitura" class="tab-panel setor">
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400"><i class="fas fa-chart-line"></i></div>
+          <h4 class="font-bold text-white">Análise de Dados Públicos Municipais</h4>
+        </div>
+        <p class="text-sm text-gray-400">Processamento inteligente de dados públicos — saúde, educação, meio ambiente, finanças — para gerar indicadores, identificar tendências e apoiar a tomada de decisão baseada em evidências. A Prefeitura pode, por exemplo, cruzar dados de atendimentos de saúde com dados socioeconômicos para planejar campanhas mais eficazes.</p>
+      </div>
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400"><i class="fas fa-robot"></i></div>
+          <h4 class="font-bold text-white">Atendimento ao Cidadão com IA</h4>
+        </div>
+        <p class="text-sm text-gray-400">Assistente inteligente para atender dúvidas frequentes dos cidadãos sobre serviços municipais, documentos, horários de funcionamento e encaminhamentos. Funciona por texto ou mensagem de voz, disponível a qualquer hora, reduzindo filas e tempo de espera nos balcões de atendimento.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel: Educação -->
+  <div id="tab-educacao" class="tab-panel setor">
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400"><i class="fas fa-flask"></i></div>
+          <h4 class="font-bold text-white">Laboratório de Pesquisa Aplicada</h4>
+        </div>
+        <p class="text-sm text-gray-400">Parceria com a <span class="termo" data-explicacao="UNIPAM: Centro Universitário de Patos de Minas, principal instituição de ensino superior da região.">UNIPAM</span> para oferecer aos alunos de Ciência da Computação, Direito e áreas afins acesso a infraestrutura real de Inteligência Artificial. Os estudantes podem desenvolver projetos de pesquisa, trabalhos de conclusão de curso e estágios usando os equipamentos do núcleo, com dados não sigilosos e supervisão.</p>
+      </div>
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400"><i class="fas fa-chalkboard-teacher"></i></div>
+          <h4 class="font-bold text-white">Capacitação Profissional Contínua</h4>
+        </div>
+        <p class="text-sm text-gray-400">Cursos e workshops de Inteligência Artificial aplicada para servidores públicos, policiais, professores e profissionais da região. A presença do NDIA em Patos de Minas permite criar um polo de formação tecnológica no Alto Paranaíba, atraindo talentos e gerando oportunidades de emprego qualificado.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel: Comunidade -->
+  <div id="tab-comunidade" class="tab-panel setor">
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400"><i class="fas fa-rocket"></i></div>
+          <h4 class="font-bold text-white">Patos Valley e Ecossistema de Inovação</h4>
+        </div>
+        <p class="text-sm text-gray-400">O NDIA se conecta ao movimento <strong>Patos Valley</strong> e ao ecossistema de inovação da cidade, liderado pelo SEBRAE-MG. Empresas locais e <span class="termo" data-explicacao="Startups: empresas novas, geralmente de tecnologia, com potencial de crescimento rápido e modelo de negócio inovador.">startups</span> podem utilizar o ambiente demonstrativo do núcleo para desenvolver soluções, testar produtos e capacitar equipes em Inteligência Artificial, fortalecendo a economia local.</p>
+      </div>
+      <div class="glass p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400"><i class="fas fa-shield-virus"></i></div>
+          <h4 class="font-bold text-white">Segurança Pública Mais Eficiente</h4>
+        </div>
+        <p class="text-sm text-gray-400">Com investigações mais rápidas e melhor aproveitamento das provas, o cidadão é o maior beneficiado. Processos que antes ficavam parados por falta de recursos humanos para transcrever, organizar e analisar provas podem avançar com apoio da Inteligência Artificial, sempre sob supervisão humana.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 5: COMO FUNCIONA — Arquitetura explicada                -->
+<!-- EDITAR: Ajuste as especificações conforme o hardware real     -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Como Funciona na Prática</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">A estrutura do NDIA é composta por três camadas: o servidor central que faz o trabalho pesado, os computadores de cada setor que acessam o sistema, e o armazenamento seguro que guarda os documentos. Tudo dentro da delegacia, sem depender da internet.</p>
+  <div class="grid md:grid-cols-3 gap-6 mb-10">
+
+    <!-- Camada 1 -->
+    <div class="glass p-6 text-center border-t-4 border-blue-500">
+      <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-3xl mx-auto mb-4"><i class="fas fa-server"></i></div>
+      <h3 class="font-bold text-white text-lg mb-3">Servidor Central</h3>
+      <p class="text-sm text-gray-400 mb-4">O "cérebro" do NDIA. Um computador de alto desempenho que executa os modelos de Inteligência Artificial. Fica em sala climatizada, com acesso físico restrito.</p>
+      <div class="text-xs text-gray-500 space-y-1 text-left">
+        <p><i class="fas fa-microchip text-blue-400 mr-1"></i> <strong>Processador:</strong> <span class="termo" data-explicacao="AMD Threadripper PRO 7985WX: processador profissional com 64 núcleos de processamento, projetado para estações de trabalho que precisam executar muitas tarefas simultaneamente.">AMD Threadripper PRO 7985WX</span> (64 núcleos)</p>
+        <p><i class="fas fa-memory text-blue-400 mr-1"></i> <strong>Memória:</strong> 256 GB de <span class="termo" data-explicacao="DDR5 ECC: tipo de memória RAM moderna e rápida, com sistema de correção automática de erros — essencial em servidores que não podem falhar.">memória DDR5 ECC</span></p>
+        <p><i class="fas fa-display text-blue-400 mr-1"></i> <strong>Placa de IA:</strong> 2× <span class="termo" data-explicacao="NVIDIA RTX 5090: placa de processamento gráfico com 32 GB de memória dedicada, capaz de executar modelos de Inteligência Artificial grandes diretamente no hardware local.">NVIDIA RTX 5090</span> (64 GB de <span class="termo" data-explicacao="VRAM: memória dedicada exclusivamente à placa gráfica, usada para carregar e executar modelos de IA. Quanto maior a VRAM, maiores e mais sofisticados os modelos que podem ser executados.">VRAM</span> total)</p>
+        <p><i class="fas fa-hard-drive text-blue-400 mr-1"></i> <strong>Disco rápido:</strong> 4 TB <span class="termo" data-explicacao="NVMe SSD: unidade de armazenamento muito rápida, que permite carregar modelos de IA e processar documentos sem atrasos.">NVMe SSD</span></p>
+        <p><i class="fas fa-plug text-blue-400 mr-1"></i> <strong>Fonte:</strong> 1600W classe <span class="termo" data-explicacao="80 Plus Titanium: selo de eficiência energética que indica que a fonte de alimentação desperdiça menos de 6% da energia elétrica como calor.">80 Plus Titanium</span></p>
+      </div>
+    </div>
+
+    <!-- Camada 2 -->
+    <div class="glass p-6 text-center border-t-4 border-emerald-500">
+      <div class="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-3xl mx-auto mb-4"><i class="fas fa-laptop"></i></div>
+      <h3 class="font-bold text-white text-lg mb-3">Estações de Trabalho</h3>
+      <p class="text-sm text-gray-400 mb-4">Os computadores que os policiais e servidores já usam no dia a dia. Acessam o servidor central pela rede interna — basta abrir o navegador.</p>
+      <div class="text-xs text-gray-500 space-y-1 text-left">
+        <p><i class="fas fa-desktop text-emerald-400 mr-1"></i> <strong>Terminais existentes:</strong> os computadores já em uso na delegacia</p>
+        <p><i class="fas fa-wifi text-emerald-400 mr-1"></i> <strong>Acesso:</strong> pela rede interna, via navegador</p>
+        <p><i class="fas fa-laptop-code text-emerald-400 mr-1"></i> <strong>Estação móvel (opcional):</strong> notebook com <span class="termo" data-explicacao="Apple Silicon: processadores fabricados pela Apple com alta capacidade de processamento de IA em formato portátil, usados em seus notebooks MacBook Pro.">Apple Silicon</span> para demonstrações e trabalho de campo</p>
+        <p><i class="fas fa-tablet text-emerald-400 mr-1"></i> <strong>Pontos de borda:</strong> <span class="termo" data-explicacao="Raspberry Pi 5: minicomputador do tamanho de um cartão de crédito, usado em pontos remotos para tarefas simples como transcrição de áudio ou coleta de dados.">Raspberry Pi 5</span> para tarefas básicas em unidades remotas</p>
+      </div>
+    </div>
+
+    <!-- Camada 3 -->
+    <div class="glass p-6 text-center border-t-4 border-amber-500">
+      <div class="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-3xl mx-auto mb-4"><i class="fas fa-database"></i></div>
+      <h3 class="font-bold text-white text-lg mb-3">Armazenamento Seguro</h3>
+      <p class="text-sm text-gray-400 mb-4">Todos os documentos, transcrições e modelos ficam guardados em um equipamento dedicado de armazenamento, com proteção contra falha de disco e <span class="termo" data-explicacao="Criptografia AES-256: sistema de codificação de dados com nível de segurança militar. Mesmo se alguém roubasse o disco rígido, os dados seriam ilegíveis sem a chave de decodificação.">criptografia de nível militar</span>.</p>
+      <div class="text-xs text-gray-500 space-y-1 text-left">
+        <p><i class="fas fa-hdd text-amber-400 mr-1"></i> <strong>Capacidade:</strong> 100 TB úteis em <span class="termo" data-explicacao="NAS (Armazenamento Conectado à Rede): equipamento dedicado para guardar arquivos, acessível por todos os computadores autorizados na rede. Funciona como um 'HD compartilhado' seguro.">NAS</span></p>
+        <p><i class="fas fa-shield-halved text-amber-400 mr-1"></i> <strong>Proteção:</strong> <span class="termo" data-explicacao="RAID-6: sistema que distribui os dados por vários discos de forma que, mesmo se dois discos falharem ao mesmo tempo, nenhum dado é perdido.">RAID-6</span> — suporta falha simultânea de 2 discos</p>
+        <p><i class="fas fa-lock text-amber-400 mr-1"></i> <strong>Criptografia:</strong> dados protegidos mesmo em repouso</p>
+        <p><i class="fas fa-battery-full text-amber-400 mr-1"></i> <strong>Energia:</strong> <span class="termo" data-explicacao="UPS (Nobreak): equipamento que mantém o servidor funcionando durante quedas de energia elétrica, dando tempo para salvar os dados e desligar com segurança.">nobreak</span> de 3000 VA para operação contínua</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagrama simplificado de segurança -->
+  <div class="glass p-6">
+    <h4 class="font-bold text-white mb-4 text-center"><i class="fas fa-shield-halved text-blue-400 mr-2"></i>Camadas de Proteção</h4>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-center text-xs">
+      <div class="bg-red-900/30 border border-red-800/50 rounded-lg p-3"><i class="fas fa-network-wired text-red-400 text-lg mb-1 block"></i>Rede física separada da internet</div>
+      <div class="bg-orange-900/30 border border-orange-800/50 rounded-lg p-3"><i class="fas fa-key text-orange-400 text-lg mb-1 block"></i>Acesso por perfil (cada um vê só o que pode)</div>
+      <div class="bg-yellow-900/30 border border-yellow-800/50 rounded-lg p-3"><i class="fas fa-lock text-yellow-400 text-lg mb-1 block"></i>Criptografia em repouso e em trânsito</div>
+      <div class="bg-green-900/30 border border-green-800/50 rounded-lg p-3"><i class="fas fa-clipboard-check text-green-400 text-lg mb-1 block"></i>Registro de todas as operações</div>
+      <div class="bg-blue-900/30 border border-blue-800/50 rounded-lg p-3"><i class="fas fa-user-check text-blue-400 text-lg mb-1 block"></i>Toda decisão revisada por pessoa humana</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 7: MODELOS DE IA — Explicação simples                 -->
+<!-- EDITAR: Atualize modelos conforme novas versões forem lançadas -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">As Inteligências Artificiais Planejadas</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O NDIA propõe utilizar vários modelos de IA, cada um especializado em uma tarefa diferente. Todos são de código aberto ou pesos abertos — ou seja, não dependem de licença paga e podem ser auditados por qualquer pessoa.</p>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-2xl">🎙️</span>
+        <div><h4 class="font-bold text-white">Whisper Large V3</h4><p class="text-xs text-gray-500">OpenAI • Código aberto</p></div>
+      </div>
+      <p class="text-sm text-gray-400"><strong>O que faz:</strong> transforma áudio em texto escrito. Funciona com português brasileiro, incluindo sotaques regionais, áudio com ruído e gravações de baixa qualidade.</p>
+      <p class="text-sm text-gray-400 mt-2"><strong>Onde será usado:</strong> transcrição de oitivas, depoimentos em vídeo, áudios de campo, reuniões gravadas.</p>
+    </div>
+    <div class="glass p-6">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-2xl">🧠</span>
+        <div><h4 class="font-bold text-white">Llama 3.x 70B</h4><p class="text-xs text-gray-500">Meta (Facebook) • Pesos abertos</p></div>
+      </div>
+      <p class="text-sm text-gray-400"><strong>O que faz:</strong> modelo de linguagem capaz de ler, interpretar, resumir e responder perguntas sobre documentos longos em português. Executado localmente após <span class="termo" data-explicacao="Quantização: técnica que reduz o tamanho de um modelo de IA (por exemplo, de 140 GB para 40 GB) com perda mínima de qualidade, permitindo que ele funcione em hardware mais acessível.">quantização</span>.</p>
+      <p class="text-sm text-gray-400 mt-2"><strong>Onde será usado:</strong> resumo de inquéritos, consulta a bases de conhecimento, análise de textos.</p>
+    </div>
+    <div class="glass p-6">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-2xl">🔀</span>
+        <div><h4 class="font-bold text-white">Mixtral 8×22B</h4><p class="text-xs text-gray-500">Mistral AI (França) • Pesos abertos</p></div>
+      </div>
+      <p class="text-sm text-gray-400"><strong>O que faz:</strong> modelo que usa uma técnica especial chamada <span class="termo" data-explicacao="Mistura de Especialistas (MoE): em vez de usar o modelo inteiro para cada pergunta, o sistema ativa apenas as partes especializadas no tema da pergunta. Isso torna o processamento mais rápido e eficiente.">Mistura de Especialistas</span> para ser rápido e preciso. É como ter vários assistentes, e o sistema automaticamente escolhe o mais adequado para cada pergunta.</p>
+      <p class="text-sm text-gray-400 mt-2"><strong>Onde será usado:</strong> tarefas que exigem velocidade, como classificação de documentos e triagem de informações.</p>
+    </div>
+    <div class="glass p-6">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-2xl">🌐</span>
+        <div><h4 class="font-bold text-white">Qwen 2.5 72B</h4><p class="text-xs text-gray-500">Alibaba (China) • Pesos abertos</p></div>
+      </div>
+      <p class="text-sm text-gray-400"><strong>O que faz:</strong> modelo multilíngue com excelente compreensão de textos em português. Complementa os demais quando o volume de trabalho é alto ou quando é necessária uma segunda opinião.</p>
+      <p class="text-sm text-gray-400 mt-2"><strong>Onde será usado:</strong> segundo modelo para validação cruzada, análise multilíngue, e como reserva operacional.</p>
+    </div>
+  </div>
+  <div class="glass p-4 mt-6 text-center text-sm text-gray-400">
+    <i class="fas fa-info-circle text-blue-400 mr-1"></i> <strong>Importante:</strong> por serem de código/pesos abertos, quando surgem versões mais avançadas desses modelos, basta instalar a nova versão no equipamento — sem custo de licença e sem dependência de nenhuma empresa privada.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 7: CASOS REAIS — Outras polícias e governos            -->
+<!-- EDITAR: Adicione novos casos conforme surgirem referências    -->
+<!-- ============================================================ -->
+<section id="casos" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Casos Reais no Brasil</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O NDIA não é uma ideia teórica. Vários estados brasileiros já investiram em Inteligência Artificial para segurança pública e obtiveram resultados concretos e documentados. O diferencial do NDIA é ser o primeiro projeto regional com foco em processamento local e soberania sobre os dados.</p>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6 border-l-4 border-blue-500">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-2xl">🏛️</span>
+        <h4 class="font-bold text-white">Goiás</h4>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">O programa "IA Contra o Crime" resolveu mais de <strong>100 casos em 30 dias</strong> após a implantação, segundo dados divulgados pelo governo estadual.</p>
+      <p class="text-xs text-gray-500">Fonte: goias.gov.br (2024)</p>
+    </div>
+    <div class="glass p-6 border-l-4 border-emerald-500">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-2xl">🔍</span>
+        <h4 class="font-bold text-white">Alagoas</h4>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">O sistema IA-SSP da Secretaria de Segurança estimou uma <strong>redução de até 26% na criminalidade violenta</strong> nas áreas monitoradas, conforme relatório oficial.</p>
+      <p class="text-xs text-gray-500">Fonte: alagoas.al.gov.br (2024)</p>
+    </div>
+    <div class="glass p-6 border-l-4 border-amber-500">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-2xl">📋</span>
+        <h4 class="font-bold text-white">Minas Gerais (PCMG)</h4>
+      </div>
+      <p class="text-sm text-gray-400 mb-2">O Plantão Digital já opera em <strong>67 delegacias</strong> em menos de 3 anos, e o PPJ-e alcançou 100% de tramitação eletrônica — mostrando que a PCMG tem cultura de inovação.</p>
+      <p class="text-xs text-gray-500">Fonte: agenciaminas.mg.gov.br (2024)</p>
+    </div>
+  </div>
+  <div class="glass p-4 mt-6 text-center text-sm text-gray-400">
+    <i class="fas fa-lightbulb text-amber-400 mr-1"></i> O NDIA posiciona Patos de Minas como referência entre delegacias regionais do interior do Brasil — um modelo replicável para outras cidades de porte semelhante.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 8: ETAPAS — Cronograma de implantação                  -->
+<!-- EDITAR: Ajuste prazos conforme a realidade do projeto        -->
+<!-- ============================================================ -->
+<section id="etapas" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Etapas de Implantação</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O projeto é implementado em quatro fases ao longo de 24 meses, começando pelo que já está pronto e expandindo gradualmente. Cada fase entrega valor imediato — não é preciso esperar o final para colher resultados.</p>
+  <div class="max-w-3xl mx-auto space-y-0">
+
+    <!-- Fase 1 -->
+    <div class="flex gap-6 relative">
+      <div class="flex flex-col items-center">
+        <div class="timeline-dot bg-blue-500/30 border-blue-500"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="glass p-6 mb-6 flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="text-xs font-bold bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">FASE 1 — Meses 1 a 3</span>
+        </div>
+        <h4 class="font-bold text-white text-lg mb-2">Fundação e Validação</h4>
+        <ul class="text-sm text-gray-400 space-y-1">
+          <li>• Preparação da sala técnica (climatização, rede elétrica, acesso controlado)</li>
+          <li>• Aquisição e instalação do servidor central</li>
+          <li>• Configuração da rede segregada (sem acesso à internet)</li>
+          <li>• Instalação dos modelos de transcrição (<span class="termo" data-explicacao="Whisper Large V3: modelo de IA para transcrição de áudio em texto, da OpenAI, de código aberto.">Whisper</span>) e linguagem (<span class="termo" data-explicacao="Llama: família de modelos de linguagem da Meta (Facebook), de pesos abertos, capazes de interpretar e gerar texto.">Llama</span>)</li>
+          <li>• Primeiras transcrições reais de oitivas como teste</li>
+          <li>• Treinamento inicial da equipe técnica (2 policiais)</li>
+        </ul>
+        <p class="text-xs text-emerald-400 mt-3"><i class="fas fa-check-circle mr-1"></i> Ao final desta fase, a delegacia já terá transcrição automática funcionando.</p>
+      </div>
+    </div>
+
+    <!-- Fase 2 -->
+    <div class="flex gap-6 relative">
+      <div class="flex flex-col items-center">
+        <div class="timeline-dot bg-emerald-500/30 border-emerald-500"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="glass p-6 mb-6 flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="text-xs font-bold bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full">FASE 2 — Meses 4 a 9</span>
+        </div>
+        <h4 class="font-bold text-white text-lg mb-2">Expansão das Capacidades</h4>
+        <ul class="text-sm text-gray-400 space-y-1">
+          <li>• Instalação do sistema de consulta inteligente (<span class="termo" data-explicacao="RAG: técnica que permite à IA buscar informações em documentos antes de responder, garantindo respostas fundamentadas.">RAG</span>) com legislação e procedimentos</li>
+          <li>• Resumo automático de inquéritos e processos</li>
+          <li>• Instalação do armazenamento dedicado (NAS 100 TB)</li>
+          <li>• Integração com os sistemas existentes da delegacia</li>
+          <li>• Treinamento ampliado para delegados, escrivães e investigadores</li>
+          <li>• Estação móvel (opcional) para demonstrações e trabalho externo</li>
+        </ul>
+        <p class="text-xs text-emerald-400 mt-3"><i class="fas fa-check-circle mr-1"></i> Ao final desta fase, toda a equipe terá acesso à consulta inteligente e ao resumo de documentos.</p>
+      </div>
+    </div>
+
+    <!-- Fase 3 -->
+    <div class="flex gap-6 relative">
+      <div class="flex flex-col items-center">
+        <div class="timeline-dot bg-purple-500/30 border-purple-500"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="glass p-6 mb-6 flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="text-xs font-bold bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">FASE 3 — Meses 10 a 18</span>
+        </div>
+        <h4 class="font-bold text-white text-lg mb-2">Integração Institucional</h4>
+        <ul class="text-sm text-gray-400 space-y-1">
+          <li>• Convênio com a UNIPAM para pesquisa aplicada e estágios</li>
+          <li>• Abertura do ambiente demonstrativo para Prefeitura e SEBRAE</li>
+          <li>• Primeiros cursos de capacitação para servidores municipais</li>
+          <li>• Pontos de borda (<span class="termo" data-explicacao="Raspberry Pi 5: minicomputador barato que pode executar tarefas simples de IA em locais remotos.">Raspberry Pi</span>) em unidades remotas para tarefas básicas</li>
+          <li>• Ajuste fino dos modelos com dados locais (não sigilosos)</li>
+          <li>• Publicação de resultados para visibilidade institucional</li>
+        </ul>
+        <p class="text-xs text-emerald-400 mt-3"><i class="fas fa-check-circle mr-1"></i> O NDIA passa a ser um recurso compartilhado da cidade, não apenas da delegacia.</p>
+      </div>
+    </div>
+
+    <!-- Fase 4 -->
+    <div class="flex gap-6 relative">
+      <div class="flex flex-col items-center">
+        <div class="timeline-dot bg-amber-500/30 border-amber-500"></div>
+      </div>
+      <div class="glass p-6 flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="text-xs font-bold bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full">FASE 4 — Meses 19 a 24</span>
+        </div>
+        <h4 class="font-bold text-white text-lg mb-2">Consolidação e Escala</h4>
+        <ul class="text-sm text-gray-400 space-y-1">
+          <li>• Documentação completa do modelo para replicação em outras delegacias</li>
+          <li>• Apresentação de resultados para a PCMG, SEDS e MJSP</li>
+          <li>• Candidatura a editais do FNSP e MGI/MCTI com base nos resultados obtidos</li>
+          <li>• Avaliação de expansão para outras áreas (trânsito, meio ambiente)</li>
+          <li>• Planejamento de atualização de hardware para o próximo ciclo (3-5 anos)</li>
+        </ul>
+        <p class="text-xs text-emerald-400 mt-3"><i class="fas fa-check-circle mr-1"></i> Patos de Minas se torna referência regional em IA aplicada ao serviço público.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 9: CAPACITAÇÃO — Quem aprende o quê                    -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Programa de Capacitação</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">Tecnologia sem capacitação é desperdício. O NDIA inclui um programa estruturado de treinamento para que cada perfil de profissional saiba exatamente como usar as ferramentas no seu dia a dia.</p>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead>
+        <tr class="border-b border-white/10">
+          <th class="p-4 text-gray-400 font-semibold">Perfil</th>
+          <th class="p-4 text-gray-400 font-semibold">O que aprende</th>
+          <th class="p-4 text-gray-400 font-semibold">Carga horária</th>
+          <th class="p-4 text-gray-400 font-semibold">Fase</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-300">
+        <tr class="border-b border-white/5">
+          <td class="p-4 font-medium">Equipe técnica (2 policiais)</td>
+          <td class="p-4">Administração do servidor, instalação de modelos, manutenção, segurança da rede</td>
+          <td class="p-4">40 horas</td>
+          <td class="p-4"><span class="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded">Fase 1</span></td>
+        </tr>
+        <tr class="border-b border-white/5">
+          <td class="p-4 font-medium">Delegados</td>
+          <td class="p-4">Uso da consulta inteligente, revisão de resumos gerados pela IA, limites e responsabilidades</td>
+          <td class="p-4">16 horas</td>
+          <td class="p-4"><span class="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded">Fase 2</span></td>
+        </tr>
+        <tr class="border-b border-white/5">
+          <td class="p-4 font-medium">Escrivães</td>
+          <td class="p-4">Transcrição automática, revisão de textos, uso do sistema de documentos</td>
+          <td class="p-4">24 horas</td>
+          <td class="p-4"><span class="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded">Fase 2</span></td>
+        </tr>
+        <tr class="border-b border-white/5">
+          <td class="p-4 font-medium">Investigadores</td>
+          <td class="p-4">Consulta a bases de conhecimento, análise de documentos, uso de ferramentas de campo</td>
+          <td class="p-4">24 horas</td>
+          <td class="p-4"><span class="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded">Fase 2</span></td>
+        </tr>
+        <tr class="border-b border-white/5">
+          <td class="p-4 font-medium">Servidores municipais</td>
+          <td class="p-4">Uso do assistente de atendimento, análise de dados públicos, geração de relatórios</td>
+          <td class="p-4">16 horas</td>
+          <td class="p-4"><span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">Fase 3</span></td>
+        </tr>
+        <tr>
+          <td class="p-4 font-medium">Alunos UNIPAM</td>
+          <td class="p-4">Pesquisa aplicada, desenvolvimento de modelos, análise de dados (dados não sigilosos)</td>
+          <td class="p-4">Semestral</td>
+          <td class="p-4"><span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">Fase 3</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 10: GOVERNANÇA — O que a IA NÃO faz                    -->
+<!-- ============================================================ -->
+<section id="governanca" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Governança e Limites</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">É tão importante explicar o que a IA <strong>faz</strong> quanto o que ela <strong>não faz e não pode fazer</strong>. O NDIA opera sob regras claras de governança, com supervisão humana em todas as etapas.</p>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6 border-t-4 border-red-500">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-ban text-red-400 mr-2"></i>O Que a IA NÃO Faz</h3>
+      <ul class="text-sm text-gray-400 space-y-2">
+        <li><i class="fas fa-times text-red-400 mr-2"></i>Não toma decisões sozinha — toda conclusão é revisada por pessoa humana</li>
+        <li><i class="fas fa-times text-red-400 mr-2"></i>Não acessa a internet — opera em rede fisicamente separada</li>
+        <li><i class="fas fa-times text-red-400 mr-2"></i>Não identifica ou reconhece rostos — não há sistema de reconhecimento facial</li>
+        <li><i class="fas fa-times text-red-400 mr-2"></i>Não monitora pessoas em tempo real — não há câmeras nem vigilância</li>
+        <li><i class="fas fa-times text-red-400 mr-2"></i>Não substitui o trabalho policial — é ferramenta de apoio, não de substituição</li>
+        <li><i class="fas fa-times text-red-400 mr-2"></i>Não atribui culpa nem gera acusações — apenas organiza e resume informações</li>
+      </ul>
+    </div>
+    <div class="glass p-6 border-t-4 border-emerald-500">
+      <h3 class="font-bold text-white mb-4"><i class="fas fa-clipboard-check text-emerald-400 mr-2"></i>Mecanismos de Controle</h3>
+      <ul class="text-sm text-gray-400 space-y-2">
+        <li><i class="fas fa-check text-emerald-400 mr-2"></i><strong>Revisão humana obrigatória:</strong> nenhum documento gerado pela IA é finalizado sem revisão de um servidor</li>
+        <li><i class="fas fa-check text-emerald-400 mr-2"></i><strong>Registro completo:</strong> toda operação é registrada com data, hora, usuário e resultado</li>
+        <li><i class="fas fa-check text-emerald-400 mr-2"></i><strong>Acesso por perfil:</strong> cada servidor vê apenas o que é pertinente à sua função</li>
+        <li><i class="fas fa-check text-emerald-400 mr-2"></i><strong><span class="termo" data-explicacao="RIPD (Relatório de Impacto à Proteção de Dados Pessoais): documento obrigatório pela LGPD que avalia os riscos do tratamento de dados pessoais e as medidas adotadas para mitigá-los.">RIPD</span> obrigatório:</strong> documento de impacto à proteção de dados antes da operação</li>
+        <li><i class="fas fa-check text-emerald-400 mr-2"></i><strong>Auditoria periódica:</strong> revisão trimestral dos processos, acessos e resultados</li>
+        <li><i class="fas fa-check text-emerald-400 mr-2"></i><strong>Código aberto:</strong> qualquer pessoa pode auditar o software utilizado</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Marco legal -->
+  <div class="glass p-6 mt-6">
+    <h4 class="font-bold text-white mb-4 text-center"><i class="fas fa-balance-scale text-blue-400 mr-2"></i>Base Legal</h4>
+    <div class="grid md:grid-cols-3 gap-4 text-sm text-gray-400">
+      <div class="bg-slate-800/50 rounded-lg p-4">
+        <p class="font-bold text-white mb-1">LGPD Art. 4º, III</p>
+        <p>A Lei Geral de Proteção de Dados exclui do regime geral o tratamento de dados para fins de segurança pública e investigação criminal, remetendo o tema a legislação específica.</p>
+      </div>
+      <div class="bg-slate-800/50 rounded-lg p-4">
+        <p class="font-bold text-white mb-1">Portaria MJSP nº 961/2025</p>
+        <p>O Ministério da Justiça passou a orientar o uso de soluções avançadas de TI, inclusive IA, no contexto investigativo, com diretrizes de governança e ética.</p>
+      </div>
+      <div class="bg-slate-800/50 rounded-lg p-4">
+        <p class="font-bold text-white mb-1">Framework Federal de Ética em IA</p>
+        <p>Lançado em outubro de 2025, estabelece princípios de transparência, explicabilidade e supervisão humana para o uso de IA pelo Estado brasileiro.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 11: PARCERIAS — Ecossistema institucional               -->
+<!-- EDITAR: Adicione ou atualize parceiros conforme negociações   -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Parcerias Institucionais</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O NDIA é mais forte quando conectado a parceiros. A cooperação institucional deve ocorrer por convênios formais, com governança própria e segregação de dados conforme a natureza de cada parceiro.</p>
+  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="glass p-6 text-center">
+      <div class="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-2xl mx-auto mb-3"><i class="fas fa-graduation-cap"></i></div>
+      <h4 class="font-bold text-white mb-2">UNIPAM</h4>
+      <p class="text-xs text-gray-400">Pesquisa aplicada, estágios supervisionados, desenvolvimento de modelos com dados públicos e não sigilosos.</p>
+    </div>
+    <div class="glass p-6 text-center">
+      <div class="w-14 h-14 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 text-2xl mx-auto mb-3"><i class="fas fa-landmark"></i></div>
+      <h4 class="font-bold text-white mb-2">Prefeitura</h4>
+      <p class="text-xs text-gray-400">Ambiente demonstrativo para análise de dados municipais, atendimento ao cidadão e gestão baseada em evidências.</p>
+    </div>
+    <div class="glass p-6 text-center">
+      <div class="w-14 h-14 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl mx-auto mb-3"><i class="fas fa-store"></i></div>
+      <h4 class="font-bold text-white mb-2">SEBRAE-MG</h4>
+      <p class="text-xs text-gray-400">Conexão com o programa Inova Minas e o ecossistema Patos Valley para capacitação de empresas locais.</p>
+    </div>
+    <div class="glass p-6 text-center">
+      <div class="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-2xl mx-auto mb-3"><i class="fas fa-industry"></i></div>
+      <h4 class="font-bold text-white mb-2">FIEMG</h4>
+      <p class="text-xs text-gray-400">Apoio técnico e financeiro para projetos de inovação industrial e capacitação tecnológica na região do Alto Paranaíba.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 12: IMPACTO PARA PATOS DE MINAS                        -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Impacto para Patos de Minas</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O NDIA não é apenas um projeto da delegacia. É um investimento na capacidade tecnológica da cidade inteira.</p>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6 text-center">
+      <div class="text-4xl mb-3">🏆</div>
+      <h4 class="font-bold text-white mb-2">Referência Regional</h4>
+      <p class="text-sm text-gray-400">Patos de Minas se posiciona como polo de inovação em IA do Alto Paranaíba — a primeira delegacia regional do interior do Brasil com infraestrutura própria de Inteligência Artificial.</p>
+    </div>
+    <div class="glass p-6 text-center">
+      <div class="text-4xl mb-3">👨‍💻</div>
+      <h4 class="font-bold text-white mb-2">Empregos Qualificados</h4>
+      <p class="text-sm text-gray-400">A presença do núcleo atrai profissionais de tecnologia, cria oportunidades de estágio e pesquisa, e gera demanda por capacitação contínua — fortalecendo a economia do conhecimento local.</p>
+    </div>
+    <div class="glass p-6 text-center">
+      <div class="text-4xl mb-3">🤝</div>
+      <h4 class="font-bold text-white mb-2">Cooperação Institucional</h4>
+      <p class="text-sm text-gray-400">O modelo de parcerias (UNIPAM, Prefeitura, SEBRAE, FIEMG) cria um ecossistema onde cada instituição contribui e se beneficia, multiplicando o impacto do investimento inicial.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 13: CITAÇÕES DE AUTORIDADE                             -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-10 text-center">O Que Dizem os Especialistas</h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass p-6">
+      <i class="fas fa-quote-left text-blue-400/30 text-3xl mb-3"></i>
+      <p class="text-gray-300 italic mb-4">"Plataformas de IA de código aberto rodando localmente são essenciais para que governos mantenham a soberania sobre seus dados."</p>
+      <p class="text-white font-bold">Yann LeCun</p>
+      <p class="text-gray-500 text-sm">Cientista-Chefe de IA da Meta, Prêmio Turing</p>
+    </div>
+    <div class="glass p-6">
+      <i class="fas fa-quote-left text-emerald-400/30 text-3xl mb-3"></i>
+      <p class="text-gray-300 italic mb-4">"No futuro próximo, a maior parte do trabalho intelectual será feita em colaboração com agentes de IA. Quem dominar essa ferramenta primeiro terá vantagem decisiva."</p>
+      <p class="text-white font-bold">Andrej Karpathy</p>
+      <p class="text-gray-500 text-sm">Ex-Diretor de IA da Tesla, Pesquisador OpenAI</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 14: INVESTIMENTO — Detalhamento financeiro (no final)  -->
+<!-- EDITAR: Atualize valores conforme cotações reais             -->
+<!-- ============================================================ -->
+<section id="investimento" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Detalhamento do Investimento</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O investimento no NDIA é comparável ao custo de uma viatura equipada e gera capacidade institucional permanente. Os equipamentos se tornam patrimônio público e o software não tem custo de licença. Abaixo, os valores detalhados para duas configurações.</p>
+  
+  <!-- Alerta sobre escalada de preços -->
+  <div class="glass p-5 mb-8 border-l-4 border-amber-500">
+    <div class="flex items-start gap-3">
+      <i class="fas fa-chart-line text-amber-400 text-2xl mt-1"></i>
+      <div>
+        <h4 class="font-bold text-white mb-2">Contexto de Mercado: Escalada de Preços de Hardware de IA</h4>
+        <p class="text-sm text-gray-300 mb-2">O mercado global de chips e GPUs para IA está em forte alta desde 2024. Placas como a NVIDIA RTX 5090 tiveram aumento de ~40% entre 2025 e início de 2026. Processadores Threadripper PRO subiram ~35% no mesmo período.</p>
+        <p class="text-sm text-gray-300 mb-2"><strong>Principais fatores:</strong> corrida global por IA (governos e empresas), escassez de chips avançados, concentração de fabricação (TSMC, Samsung), e demanda crescente de data centers.</p>
+        <p class="text-sm text-amber-200"><strong>Recomendação:</strong> investir agora na configuração completa (Núcleo) garante capacidade plena e evita custos significativamente maiores em 12-18 meses. Adiar pode resultar em orçamento insuficiente para o mesmo hardware.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs: Configurações -->
+  <div class="flex flex-wrap justify-center gap-2 mb-8">
+    <button class="tab-btn config active" onclick="showTab('tab-core','config')"><i class="fas fa-cube mr-1"></i> Configuração Núcleo (~R$ 314,6 mil)</button>
+    <button class="tab-btn config" onclick="showTab('tab-premium','config')"><i class="fas fa-gem mr-1"></i> Configuração Premium (~R$ 378,4 mil)</button>
+  </div>
+
+  <!-- CAPEX Core -->
+  <div id="tab-core" class="tab-panel config active">
+    <div class="glass p-6">
+      <h4 class="font-bold text-white mb-4"><i class="fas fa-shopping-cart text-blue-400 mr-2"></i><span class="termo" data-explicacao="CAPEX (Investimento de Capital): valor gasto uma única vez na aquisição de equipamentos e infraestrutura. Diferente do custo operacional mensal.">CAPEX</span> — Investimento Inicial (Configuração Núcleo)</h4>
+      <div class="overflow-x-auto">
+        <!-- EDITAR: Atualize os valores conforme cotações do momento da aquisição -->
+        <table class="w-full text-sm text-left">
+          <thead><tr class="border-b border-white/10">
+            <th class="p-3 text-gray-400">Item</th>
+            <th class="p-3 text-gray-400">Especificação</th>
+            <th class="p-3 text-gray-400 text-right">Qtd</th>
+            <th class="p-3 text-gray-400 text-right">Valor Unit.</th>
+            <th class="p-3 text-gray-400 text-right">Total</th>
+          </tr></thead>
+          <tbody class="text-gray-300">
+            <tr class="border-b border-white/5"><td class="p-3">Processador</td><td class="p-3 text-xs text-gray-400">AMD Threadripper PRO 7985WX (64 núcleos)</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 52.000</td><td class="p-3 text-right font-medium">R$ 52.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Placa-mãe</td><td class="p-3 text-xs text-gray-400">WRX90 para Threadripper PRO</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 12.000</td><td class="p-3 text-right font-medium">R$ 12.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Placas de IA (GPU)</td><td class="p-3 text-xs text-gray-400">NVIDIA RTX 5090 32 GB VRAM</td><td class="p-3 text-right">2</td><td class="p-3 text-right">R$ 18.000</td><td class="p-3 text-right font-medium">R$ 36.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Memória RAM</td><td class="p-3 text-xs text-gray-400">DDR5 ECC 256 GB (8× 32 GB)</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 16.000</td><td class="p-3 text-right font-medium">R$ 16.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Armazenamento rápido</td><td class="p-3 text-xs text-gray-400">NVMe SSD 4 TB (PCIe Gen4)</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 4.000</td><td class="p-3 text-right font-medium">R$ 4.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Fonte de alimentação</td><td class="p-3 text-xs text-gray-400">1600W 80 Plus Titanium</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 6.000</td><td class="p-3 text-right font-medium">R$ 6.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Gabinete torre</td><td class="p-3 text-xs text-gray-400">Full tower com ventilação adequada</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 4.000</td><td class="p-3 text-right font-medium">R$ 4.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Refrigeração</td><td class="p-3 text-xs text-gray-400">Cooler industrial + ventilação extra</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 3.000</td><td class="p-3 text-right font-medium">R$ 3.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Armazenamento em rede</td><td class="p-3 text-xs text-gray-400">NAS 100 TB RAID-6 (Synology/QNAP)</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 80.000</td><td class="p-3 text-right font-medium">R$ 80.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Nobreak (UPS)</td><td class="p-3 text-xs text-gray-400">3000 VA senoidal online</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 8.000</td><td class="p-3 text-right font-medium">R$ 8.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Rede e segurança</td><td class="p-3 text-xs text-gray-400">Switch gerenciável + cabos + rack</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 5.000</td><td class="p-3 text-right font-medium">R$ 5.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Infraestrutura física</td><td class="p-3 text-xs text-gray-400">Climatização, elétrica, controle de acesso</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 25.000</td><td class="p-3 text-right font-medium">R$ 25.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Pontos de borda</td><td class="p-3 text-xs text-gray-400">Raspberry Pi 5 8 GB + acessórios</td><td class="p-3 text-right">3</td><td class="p-3 text-right">R$ 1.200</td><td class="p-3 text-right font-medium">R$ 3.600</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Capacitação inicial</td><td class="p-3 text-xs text-gray-400">Treinamento da equipe técnica (40h)</td><td class="p-3 text-right">1</td><td class="p-3 text-right">R$ 15.000</td><td class="p-3 text-right font-medium">R$ 15.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Contingência</td><td class="p-3 text-xs text-gray-400">Margem para imprevistos (~15%)</td><td class="p-3 text-right">—</td><td class="p-3 text-right">—</td><td class="p-3 text-right font-medium">R$ 45.000</td></tr>
+          </tbody>
+          <tfoot><tr class="border-t-2 border-blue-500/50">
+            <td colspan="4" class="p-3 font-bold text-white text-right">Total Configuração Núcleo</td>
+            <td class="p-3 font-bold text-blue-400 text-right text-lg">R$ 314.600</td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPEX Premium -->
+  <div id="tab-premium" class="tab-panel config">
+    <div class="glass p-6">
+      <h4 class="font-bold text-white mb-4"><i class="fas fa-gem text-purple-400 mr-2"></i>CAPEX — Investimento Inicial (Configuração Premium)</h4>
+      <p class="text-sm text-gray-400 mb-4">Inclui todos os itens da configuração núcleo, mais os seguintes adicionais:</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead><tr class="border-b border-white/10">
+            <th class="p-3 text-gray-400">Item adicional</th>
+            <th class="p-3 text-gray-400">Especificação</th>
+            <th class="p-3 text-gray-400 text-right">Valor</th>
+          </tr></thead>
+          <tbody class="text-gray-300">
+            <tr class="border-b border-white/5"><td class="p-3">Estação móvel de IA</td><td class="p-3 text-xs text-gray-400">MacBook Pro M4 Max 128 GB RAM unificada — única solução portátil capaz de rodar modelos 70B+ localmente (demonstrações, campo, contingência, treinamento descentralizado)</td><td class="p-3 text-right font-medium">R$ 38.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Monitores profissionais</td><td class="p-3 text-xs text-gray-400">2× monitores 4K 27" para a sala técnica</td><td class="p-3 text-right font-medium">R$ 6.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Microfone de sala</td><td class="p-3 text-xs text-gray-400">Microfone conferência omnidirecional para oitivas de alta qualidade</td><td class="p-3 text-right font-medium">R$ 4.800</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Pontos de borda extras</td><td class="p-3 text-xs text-gray-400">5× Raspberry Pi 5 adicionais</td><td class="p-3 text-right font-medium">R$ 6.000</td></tr>
+            <tr class="border-b border-white/5"><td class="p-3">Capacitação estendida</td><td class="p-3 text-xs text-gray-400">Workshops para delegados, escrivães, investigadores</td><td class="p-3 text-right font-medium">R$ 9.000</td></tr>
+          </tbody>
+          <tfoot>
+            <tr class="border-t border-white/10"><td colspan="2" class="p-3 text-gray-400 text-right">Subtotal adicional</td><td class="p-3 text-right font-medium text-gray-300">R$ 63.800</td></tr>
+            <tr class="border-t-2 border-purple-500/50"><td colspan="2" class="p-3 font-bold text-white text-right">Total Configuração Premium (Núcleo + Adicionais)</td><td class="p-3 font-bold text-purple-400 text-right text-lg">R$ 378.400</td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPEX -->
+  <div class="glass p-6 mt-8">
+    <h4 class="font-bold text-white mb-4"><i class="fas fa-sync-alt text-emerald-400 mr-2"></i><span class="termo" data-explicacao="OPEX (Custo Operacional): despesas recorrentes para manter o sistema funcionando — energia elétrica, internet, manutenção e suporte.">OPEX</span> — Custo Operacional Anual Estimado</h4>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <!-- EDITAR: Atualize os valores de custo operacional conforme a realidade -->
+      <div class="bg-slate-800/50 rounded-lg p-4 text-center">
+        <p class="text-2xl font-bold text-emerald-400">R$ 9.600</p>
+        <p class="text-xs text-gray-400 mt-1">Energia elétrica (estimativa 800W médios)</p>
+      </div>
+      <div class="bg-slate-800/50 rounded-lg p-4 text-center">
+        <p class="text-2xl font-bold text-emerald-400">R$ 6.000</p>
+        <p class="text-xs text-gray-400 mt-1">Internet dedicada (link exclusivo)</p>
+      </div>
+      <div class="bg-slate-800/50 rounded-lg p-4 text-center">
+        <p class="text-2xl font-bold text-emerald-400">R$ 6.000</p>
+        <p class="text-xs text-gray-400 mt-1">Manutenção preventiva e peças</p>
+      </div>
+      <div class="bg-slate-800/50 rounded-lg p-4 text-center">
+        <p class="text-2xl font-bold text-emerald-400">R$ 6.000</p>
+        <p class="text-xs text-gray-400 mt-1">Suporte técnico e capacitação contínua</p>
+      </div>
+    </div>
+    <div class="text-center">
+      <p class="text-lg font-bold text-white">Total OPEX anual estimado: <span class="text-emerald-400">~R$ 27.600</span></p>
+      <p class="text-xs text-gray-500 mt-1">Equivale a ~R$ 2.300/mês — custo operacional inferior ao de muitos contratos de software corporativo</p>
+    </div>
+  </div>
+
+  <!-- Licenças: custo zero -->
+  <div class="glass p-4 mt-6 text-center text-sm text-gray-400">
+    <i class="fas fa-info-circle text-blue-400 mr-1"></i> <strong>Custo de licenças de software: R$ 0 (zero).</strong> Todo o software utilizado é de código aberto ou pesos abertos. Não há cobrança mensal de licença para nenhum modelo de IA, banco de dados ou ferramenta do núcleo.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 15: ALTERNATIVAS — Diferentes pontos de entrada         -->
+<!-- EDITAR: Ajuste as alternativas conforme o orçamento disponível -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Alternativas de Entrada</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O mercado de hardware para IA está em forte escalada de preços devido à corrida global por chips e processadores especializados. <strong>Recomendamos começar pela configuração completa (Núcleo)</strong> para garantir capacidade plena desde o início e evitar custos maiores no futuro. Alternativas menores estão disponíveis, mas podem limitar o potencial do projeto.</p>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="glass p-6 border-t-4 border-emerald-500">
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-seedling text-emerald-400 mr-2"></i>Semente (~R$ 85 mil)</h4>
+      <p class="text-sm text-gray-400 mb-3">Estação de trabalho com 1× RTX 5090, 128 GB RAM, 2 TB NVMe. Roda transcrição (Whisper) e modelos menores (7B-13B) com qualidade. Ideal para validar o conceito antes de ampliar.</p>
+      <ul class="text-xs text-gray-500 space-y-1">
+        <li>✅ Transcrição de oitivas</li>
+        <li>✅ Consulta a legislação (RAG básico)</li>
+        <li>⚠️ Modelos menores (7B-13B), sem os grandes (70B)</li>
+        <li>⚠️ Sem NAS dedicado (HD local)</li>
+      </ul>
+    </div>
+    <div class="glass p-6 border-t-4 border-blue-500 ring-2 ring-blue-500/30">
+      <div class="text-xs font-bold text-blue-400 mb-2 uppercase tracking-wider">Recomendado</div>
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-cube text-blue-400 mr-2"></i>Núcleo (~R$ 314,6 mil)</h4>
+      <p class="text-sm text-gray-400 mb-3">Configuração completa com 2× RTX 5090, 256 GB RAM ECC, NAS 100 TB, rede segregada. Roda todos os modelos grandes, com capacidade para toda a delegacia e parceiros.</p>
+      <ul class="text-xs text-gray-500 space-y-1">
+        <li>✅ Todos os modelos grandes (70B+)</li>
+        <li>✅ NAS dedicado com RAID-6</li>
+        <li>✅ Rede segregada completa</li>
+        <li>✅ Capacitação da equipe</li>
+      </ul>
+    </div>
+    <div class="glass p-6 border-t-4 border-purple-500">
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-gem text-purple-400 mr-2"></i>Premium (~R$ 378,4 mil)</h4>
+      <p class="text-sm text-gray-400 mb-3">Tudo do Núcleo, mais <strong>MacBook Pro M4 Max</strong> (única solução portátil para modelos 70B+), monitores profissionais, microfone de conferência e pontos de borda extras.</p>
+      <ul class="text-xs text-gray-500 space-y-1">
+        <li>✅ Tudo do Núcleo</li>
+        <li>✅ MacBook Pro: IA profissional portátil (demonstrações, campo, contingência)</li>
+        <li>✅ 8 pontos de borda (cobertura regional)</li>
+        <li>✅ Capacitação estendida (todos os perfis)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="glass p-4 mt-6 text-center text-sm text-gray-400">
+    <i class="fas fa-exclamation-triangle text-amber-400 mr-1"></i> <strong>Atenção:</strong> devido à escalada de preços de GPUs e processadores de IA (alta de ~40% em 2025-2026), recomendamos <strong>começar pela configuração Núcleo completa</strong>. Investir agora garante capacidade plena e evita custos significativamente maiores em 12-18 meses. A configuração Semente pode ser usada apenas para validação técnica inicial, mas não substitui o Núcleo para operação institucional.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 16: FONTES DE RECURSO                                  -->
+<!-- EDITAR: Atualize fontes e editais conforme o calendário       -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">De Onde Vem o Recurso?</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">O investimento pode vir de diversas fontes, combinadas conforme a estratégia e o calendário de editais. A recomendação é começar pelas fontes mais rápidas e buscar as maiores no médio prazo.</p>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="glass p-5">
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-building-columns text-blue-400 mr-2"></i>FNSP</h4>
+      <p class="text-xs text-gray-400">Fundo Nacional de Segurança Pública — R$ 1,4 bilhão executados em 2025. Linhas para tecnologia e modernização. Médio prazo (6-12 meses para aprovação).</p>
+    </div>
+    <div class="glass p-5">
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-university text-emerald-400 mr-2"></i>BDMG</h4>
+      <p class="text-xs text-gray-400">Banco de Desenvolvimento de Minas Gerais — crédito municipal com taxas subsidiadas para modernização de serviços públicos. Curto prazo.</p>
+    </div>
+    <div class="glass p-5">
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-store text-amber-400 mr-2"></i>SEBRAE-MG</h4>
+      <p class="text-xs text-gray-400">Programa Inova Minas — financiamento de projetos de inovação municipal e capacitação. Curto prazo, alinhado com Patos Valley.</p>
+    </div>
+    <div class="glass p-5">
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-industry text-purple-400 mr-2"></i>FIEMG</h4>
+      <p class="text-xs text-gray-400">Federação das Indústrias de MG — apoio a projetos de inovação e capacitação tecnológica na região. Pode cofinanciar treinamentos.</p>
+    </div>
+    <div class="glass p-5">
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-flask text-cyan-400 mr-2"></i>MGI / MCTI</h4>
+      <p class="text-xs text-gray-400">Ministério da Gestão e Inovação / Ministério da Ciência e Tecnologia — editais de IA para governo. Médio prazo, alto valor.</p>
+    </div>
+    <div class="glass p-5">
+      <h4 class="font-bold text-white mb-2"><i class="fas fa-scroll text-red-400 mr-2"></i>Emendas Parlamentares</h4>
+      <p class="text-xs text-gray-400">Emendas de deputados estaduais e federais para projetos de segurança pública e inovação. Dependem de articulação política.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 17: FAQ — Perguntas frequentes                         -->
+<!-- EDITAR: Adicione novas perguntas conforme surgirem dúvidas    -->
+<!-- ============================================================ -->
+<section id="faq" class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-2 text-center">Perguntas Frequentes</h2>
+  <p class="text-gray-400 text-center mb-10 max-w-3xl mx-auto">Respostas diretas para as dúvidas mais comuns sobre o projeto, escritas para qualquer pessoa — técnica ou não.</p>
+  <div class="max-w-3xl mx-auto space-y-3">
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        O que é Inteligência Artificial, na prática?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">De forma simples: é um programa de computador que aprendeu a reconhecer padrões em grandes volumes de informação. No caso do NDIA, ela aprendeu a transcrever áudio em texto, a ler e resumir documentos longos, e a responder perguntas buscando a resposta em bases de dados. <strong>Ela não "pensa" — ela calcula probabilidades.</strong> E toda resposta precisa ser revisada por uma pessoa.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Os dados da delegacia vão para a internet?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Não. Essa é a diferença fundamental do NDIA. Serviços como ChatGPT, Google e similares enviam seus dados para servidores de empresas privadas no exterior. No NDIA, <strong>tudo funciona em equipamentos físicos dentro da própria delegacia</strong>, em uma rede que não tem conexão com a internet. Nenhum dado de investigação sai do prédio.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        A IA vai substituir policiais?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Não. A IA é uma ferramenta de apoio, como um computador ou uma viatura. Ela faz o trabalho repetitivo e demorado — transcrever áudios, organizar documentos, buscar informações — para que os policiais possam se dedicar ao que realmente exige experiência e julgamento humano: investigar, analisar e decidir. <strong>A IA nunca decide sozinha.</strong></p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Quanto custa e como se compara com alternativas comerciais?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">A configuração recomendada (Núcleo) custa cerca de R$ 314,6 mil em investimento inicial, mais ~R$ 27,6 mil/ano de custo operacional. Para comparação, uma assinatura corporativa de IA na nuvem (como ChatGPT Business a US$ 25/usuário/mês) para 30 usuários custaria cerca de R$ 54 mil/ano — <strong>mas enviaria os dados para servidores externos</strong>, o que é inadequado para investigações policiais. O NDIA vira patrimônio público e o software não tem custo de licença.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Outras polícias já fizeram algo parecido?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Sim. Goiás resolveu mais de 100 casos em 30 dias com IA, Alagoas estimou redução de até 26% na criminalidade violenta com IA, e São Paulo opera estruturas robustas de vídeo e análise. A PCMG já tem o Plantão Digital em 67 delegacias e 100% de tramitação eletrônica. O diferencial do NDIA é ser um <strong>projeto pioneiro entre delegacias regionais com foco em processamento local e soberania sobre os dados</strong>.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        E se a tecnologia ficar ultrapassada?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Todo o software é de código aberto. Quando surgem versões melhores dos modelos de IA (o que acontece a cada poucos meses), basta instalar a nova versão — custo zero de licença. O hardware (placas RTX 5090) tem vida útil de 5 a 7 anos para tarefas de IA, e mesmo após esse período continua sendo capaz de rodar modelos de médio porte. A parte técnica pode ser atualizada a qualquer momento sem recomeçar do zero.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Como a Prefeitura e o SEBRAE podem participar?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">A cooperação deve ocorrer por convênios formais, priorizando capacitação, pesquisa aplicada, ambientes demonstrativos e bases de dados não sigilosas. O núcleo policial não é proposto como serviço comercial para terceiros. Qualquer expansão multissetorial depende de governança própria e separação formal dos dados de cada instituição.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        E a LGPD? Dados de investigação podem ser processados por IA?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Sim, desde que haja base jurídica, governança e revisão humana. A LGPD exclui segurança pública e investigação criminal do regime geral (Art. 4º, III), remetendo o tema a legislação específica. Em 2025, o Ministério da Justiça passou a orientar o uso de IA no contexto investigativo. O processamento local reduz drasticamente o risco de transferência indevida de dados para infraestrutura de terceiros.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        De onde pode vir o dinheiro?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <p class="mt-4 text-sm text-gray-300">Diversas fontes: <strong>FNSP</strong> (R$ 1,4 bi em 2025), <strong>BDMG</strong> (crédito municipal), <strong>SEBRAE-MG Inova Minas</strong>, <strong>FIEMG</strong>, <strong>MGI/MCTI</strong> (editais de IA para governo), <strong>emendas parlamentares</strong>, e o <strong>próprio orçamento da delegacia regional</strong>. A estratégia recomendada é começar com BDMG + SEBRAE (rápido) e buscar FNSP no médio prazo.</p>
+    </details>
+
+    <details class="glass p-5">
+      <summary class="flex items-center justify-between font-bold text-white">
+        Por que um MacBook Pro na configuração premium?
+        <i class="fas fa-chevron-down text-gray-500 chevron transition-transform"></i>
+      </summary>
+      <div class="mt-4 text-sm text-gray-300 space-y-3">
+        <p>O MacBook Pro M4 Max com 128 GB de memória unificada não é apenas uma "estação móvel" — é a <strong>única solução portátil capaz de rodar modelos de IA de 70B+ parâmetros localmente</strong>, sem depender de servidores ou internet.</p>
+        
+        <p><strong>Capacidades técnicas comprovadas (benchmarks 2026):</strong></p>
+        <ul class="text-xs space-y-1 ml-4">
+          <li>• Roda Llama 3.1 70B, Mixtral 8x22B e até modelos 100B+ inteiramente na memória</li>
+          <li>• Arquitetura de Memória Unificada (UMA): GPU acessa 128 GB sem latência de barramento PCIe</li>
+          <li>• Consumo de 60-90W (3-5× mais eficiente que GPUs discretas equivalentes)</li>
+          <li>• Processamento de prompts até 4× mais rápido que gerações anteriores (M5 Max)</li>
+          <li>• Bateria: horas de inferência pesada sem tomada (laptops Windows com RTX throttle imediatamente sem energia)</li>
+        </ul>
+        
+        <p><strong>Casos de uso críticos para o NDIA:</strong></p>
+        <ul class="text-xs space-y-1 ml-4">
+          <li>• <strong>Demonstrações institucionais:</strong> apresentar o sistema funcionando para autoridades, parceiros e imprensa sem depender de rede ou servidor fixo</li>
+          <li>• <strong>Trabalho de campo:</strong> investigadores podem processar áudios, consultar legislação e analisar documentos em operações externas</li>
+          <li>• <strong>Contingência operacional:</strong> se o servidor principal estiver em manutenção, o MacBook mantém capacidades críticas</li>
+          <li>• <strong>Treinamento descentralizado:</strong> workshops e capacitações podem acontecer em qualquer local (escolas, unidades remotas, eventos)</li>
+          <li>• <strong>Isolamento físico total:</strong> processa dados sensíveis sem conexão com internet ou rede institucional</li>
+        </ul>
+        
+        <p class="text-amber-200"><strong>Conclusão:</strong> o MacBook Pro M4 Max é a única tecnologia portátil que entrega capacidade de IA de nível profissional sem comprometer segurança, autonomia ou desempenho. Para um projeto que visa ser referência regional, é um investimento estratégico, não um luxo.</p>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEÇÃO 18: REFERÊNCIAS E FONTES                               -->
+<!-- EDITAR: Adicione novas referências conforme forem citadas     -->
+<!-- ============================================================ -->
+<section class="mb-20 fade">
+  <h2 class="text-3xl font-bold text-white mb-6 text-center">Referências e Fontes</h2>
+  <div class="glass p-6 text-sm text-gray-400 space-y-2 max-w-3xl mx-auto">
+    <p>1. <strong>Goiás — IA Contra o Crime:</strong> <a href="https://goias.gov.br/institucional/ia-contra-o-crime-impulsiona-seguranca-publica-e-soluciona-mais-de-100-casos-em-30-dias/" class="text-blue-400 hover:underline" target="_blank">goias.gov.br</a></p>
+    <p>2. <strong>Alagoas — IA-SSP (26% redução):</strong> <a href="https://alagoas.al.gov.br/noticia/programa-de-inteligencia-artificial-da-ssp-estima-reduzir-criminalidade-em-ate-26" class="text-blue-400 hover:underline" target="_blank">alagoas.al.gov.br</a></p>
+    <p>3. <strong>PCMG — Plantão Digital (67 delegacias):</strong> <a href="https://www.agenciaminas.mg.gov.br/noticia/plantao-digital-da-pcmg-chega-a-67-delegacias-em-menos-de-tres-anos" class="text-blue-400 hover:underline" target="_blank">agenciaminas.mg.gov.br</a></p>
+    <p>4. <strong>PCMG — PPJ-e 100% eletrônico:</strong> <a href="https://www.agenciaminas.mg.gov.br/noticia/novos-procedimentos-da-policia-civil-tem-100-de-tramitacao-eletronica-em-minas-gerais" class="text-blue-400 hover:underline" target="_blank">agenciaminas.mg.gov.br</a></p>
+    <p>5. <strong>Framework Federal Ética em IA (2025):</strong> <a href="https://tiinside.com.br/30/10/2025/governo-federal-desenvolve-framework-para-garantir-uso-etico-da-ia-no-estado-brasileiro/" class="text-blue-400 hover:underline" target="_blank">tiinside.com.br</a></p>
+    <p>6. <strong>PL 2338/2023 — Marco Legal IA:</strong> <a href="https://www12.senado.leg.br/noticias/materias/2024/12/10/senado-aprova-regulamentacao-da-inteligencia-artificial-texto-vai-a-camara" class="text-blue-400 hover:underline" target="_blank">senado.leg.br</a></p>
+    <p>7. <strong>FNSP — R$ 1,4 bi em 2025:</strong> <a href="https://www.gov.br/mj/pt-br/assuntos/noticias/fundo-nacional-de-seguranca-publica-bate-recorde-em-2025-com-execucao-de-mais-de-r-1-4-bilhao-nos-estados-e-no-df" class="text-blue-400 hover:underline" target="_blank">gov.br/mj</a></p>
+    <p>8. <strong>Patos Valley — SEBRAE-MG:</strong> <a href="https://mg.agenciasebrae.com.br/inovacao-e-tecnologia/patos-de-minas-avanca-em-acoes-de-inovacao-e-lanca-marca-patos-valley/" class="text-blue-400 hover:underline" target="_blank">agenciasebrae.com.br</a></p>
+    <p>9. <strong>Patos de Minas — Parceria Gov MG:</strong> <a href="https://www.patosdeminas.mg.gov.br/portal/noticias/0/3/2349/patos-de-minas-fecha-parceria-com-o-governo-de-minas-para-trazer-mais-tecnologia-e-melhorar-servicos-publicos" class="text-blue-400 hover:underline" target="_blank">patosdeminas.mg.gov.br</a></p>
+    <p>10. <strong>ChatGPT Business — US$ 25/usuário/mês:</strong> <a href="https://openai.com/business/chatgpt-pricing/" class="text-blue-400 hover:underline" target="_blank">openai.com</a></p>
+    <p>11. <strong>Apple M4 Max — Unified Memory for Large Models:</strong> <a href="https://awesomeagents.ai/hardware/apple-m4-max/" class="text-blue-400 hover:underline" target="_blank">awesomeagents.ai</a></p>
+    <p>12. <strong>MacBook Pro M5 Max — Local LLM Benchmarks:</strong> <a href="https://llmcheck.net/blog/m5-max-vs-m4-max-local-llm/" class="text-blue-400 hover:underline" target="_blank">llmcheck.net</a></p>
+    <p>13. <strong>M4 Pro Native Compute — LLM Inference Report:</strong> <a href="https://macgpu.com/en/blog/m4-pro-native-compute-benchmark.html" class="text-blue-400 hover:underline" target="_blank">macgpu.com</a></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/10 py-12 text-center text-gray-600 text-sm">
+  <p><strong class="text-gray-500">Proposta elaborada em fase de planejamento</strong> — Delegacia Regional de Patos de Minas / PCMG</p>
+  <p class="mt-2">Março 2026 — Tecnologia Soberana e Código Aberto</p>
+  <p class="mt-1 text-gray-700">Versão consolidada (v4) — Documento único completo</p>
+  <p class="mt-4 text-xs text-gray-700">Este documento foi projetado para fácil edição. Procure os comentários <code class="bg-gray-800 px-1 rounded">&lt;!-- EDITAR --&gt;</code> no código-fonte para identificar os pontos de personalização.</p>
+</footer>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+// Tab switching — funciona para qualquer grupo de abas
+function showTab(tabId, group) {
+  document.querySelectorAll('.tab-panel.' + group).forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn.' + group).forEach(btn => btn.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// Smooth scroll for nav links
+document.querySelectorAll('nav a[href^="#"]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// Fade-in on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade').forEach(el => {
+  el.style.animationPlayState = 'paused';
+  observer.observe(el);
+});
+
+// Mobile tooltip support — toggle on tap
+document.querySelectorAll('.termo').forEach(el => {
+  el.setAttribute('tabindex', '0');
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    el.focus();
+  });
+});
+</script>
+</body>
+</html>
