@@ -183,9 +183,9 @@
 
 ### Melhorias de Experiência
 - [x] **AI Topic Content Engine**: geração de títulos jornalísticos e insights/tabelas estruturadas baseadas em evidências para os tópicos
-- [ ] **QR Code para delegacias**: gerar QR imprimível que leva ao Tira-Voz, para mural da delegacia
-- [ ] **Templates de relato**: modelos prontos para problemas comuns (falta de viatura, efetivo, sistema)
-- [ ] **Redirect canais formais**: botão visível "Denúncia formal" → Corregedoria/Ouvidoria/MP
+- [x] **QR Code para delegacias**: gerar QR imprimível que leva ao Tira-Voz, para mural da delegacia
+- [x] **Templates de relato**: modelos prontos para problemas comuns (falta de viatura, efetivo, sistema)
+- [x] **Redirect canais formais**: botão visível "Denúncia formal" → Corregedoria/Ouvidoria/MP
 - [ ] **PWA/Offline**: instalar como app no celular, funcionar offline com sync posterior
 - [ ] **Acessibilidade**: tamanho de fonte ajustável, alto contraste, suporte a leitor de tela
 - [ ] **Notificação por email**: quando tópico que você votou recebe atividade
@@ -205,7 +205,7 @@
 - [x] Harden `/start` compartilhado: System Map, module roots, workflows e deploy surface como ativação mandatória
 - [x] Eliminar warnings SSR do Recharts no build do /dashboard
 - [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
-- [ ] Refinar OG image para proporção 1200x630 real
+- [x] Refinar OG image para proporção real 1200x630
 - [x] Decompose `chat/page.tsx` (~450 lines), extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [x] CI/CD pipeline (lint + build + smoke on push/PR)
 - [x] Consolidar package manager (remover vestígios de bun, manter npm)

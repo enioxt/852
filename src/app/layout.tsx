@@ -5,6 +5,8 @@ import HotTopicsMarquee from "@/components/HotTopicsMarquee";
 import LgpdBanner from "@/components/LgpdBanner";
 import MobileNav from "@/components/MobileNav";
 import SiteHeader from "@/components/SiteHeader";
+import AccessibilityFAB from "@/components/AccessibilityFAB";
+import type { Viewport } from "next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +18,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://852.egos.ia.br"),
@@ -38,8 +47,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/brand/og-banner.png",
-        width: 512,
-        height: 512,
+        width: 1200,
+        height: 630,
         alt: "Tira-Voz: o radar da base",
       },
     ],
@@ -71,6 +80,7 @@ export default function RootLayout({
           {children}
         </div>
         <LgpdBanner />
+        <AccessibilityFAB />
         <MobileNav />
       </body>
     </html>
