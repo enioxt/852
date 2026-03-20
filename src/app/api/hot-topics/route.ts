@@ -38,14 +38,16 @@ export async function GET(req: Request) {
       return Response.json({ topics: [], total: 0 });
     }
 
-    const scored: HotTopic[] = data.map((issue) => {
-      const ageMs = Date.now() - new Date(issue.created_at).getTime();
-      return {
-        ...issue,
-        score: computeScore(issue as IssueRecord),
-        age_hours: Math.round(ageMs / (1000 * 60 * 60)),
-      } as HotTopic;
-    });
+    const scored: HotTopic[] = data
+      .filter((issue) => (issue.votes || 0) > 0)
+      .map((issue) => {
+        const ageMs = Date.now() - new Date(issue.created_at).getTime();
+        return {
+          ...issue,
+          score: computeScore(issue as IssueRecord),
+          age_hours: Math.round(ageMs / (1000 * 60 * 60)),
+        } as HotTopic;
+      });
 
     scored.sort((a, b) => b.score - a.score);
     const topics = scored.slice(0, limit);

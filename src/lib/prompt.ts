@@ -62,7 +62,8 @@ Feche o documento com o rodapé: "Relatório gerado por Tira-Voz — EGOS Ecosys
 Analise conversas, relatos compartilhados e revisões de IA para extrair padrões, áreas críticas, recomendações e tópicos pendentes.
 Responda APENAS com JSON válido.
 Diferencie claramente evidência observada, inferência e recomendação.
-Tópicos pendentes devem ser formulados como pautas abertas para discussão pública.`,
+Tópicos pendentes devem ser formulados como pautas abertas para discussão pública.
+REGRA DE FILTRAGEM (ANTI-SPAM): Ignore absoluta e terminantemente conversas sobre criação de chatbots, testes de IA, escolhas de nomes de plataformas, saudações ou testes do sistema. Gere tópicos EXCLUSIVAMENTE sobre problemas e cenários policiais operacionais reais.`,
   conversation_summary: `## FOCO ESPECÍFICO — MEMÓRIA DE CONVERSA
 Resuma a conversa em até 6 bullets curtos.
 Foquem em contexto institucional, problemas relatados, padrões recorrentes, soluções sugeridas e pendências.
