@@ -132,21 +132,39 @@ export async function saveReport(
   const sb = getSupabase();
   if (!sb) return null;
 
-  const { data, error } = await sb
-    .from('reports_852')
-    .insert({
-      conversation_id: conversationId,
-      messages: JSON.stringify(messages),
-      review_data: reviewData || null,
-      status: 'shared',
-      session_hash: sessionHash || null,
-      metadata: metadata || null,
-    })
-    .select('id')
-    .single();
+  const payload = {
+    conversation_id: conversationId,
+    messages: JSON.stringify(messages),
+    review_data: reviewData || null,
+    status: 'shared',
+    session_hash: sessionHash || null,
+    metadata: metadata || null,
+    updated_at: new Date().toISOString(),
+  };
 
-  if (error) { console.error('[852-supabase] save report error:', error.message); return null; }
-  return data?.id || null;
+  const { data: existing } = await sb
+    .from('reports_852')
+    .select('id')
+    .eq('conversation_id', conversationId)
+    .maybeSingle();
+
+  if (existing?.id) {
+    const { error } = await sb
+      .from('reports_852')
+      .update(payload)
+      .eq('id', existing.id);
+    if (error) { console.error('[852-supabase] update report error:', error.message); return null; }
+    return existing.id;
+  } else {
+    const { data, error } = await sb
+      .from('reports_852')
+      .insert({ ...payload, created_at: new Date().toISOString() })
+      .select('id')
+      .single();
+
+    if (error) { console.error('[852-supabase] create report error:', error.message); return null; }
+    return data?.id || null;
+  }
 }
 
 export async function getReports(limit = 50, identityKey?: string): Promise<ReportRecord[]> {

@@ -46,12 +46,9 @@ NÃO invente artigos ou números. Se não souber o artigo exato, diga "consulte 
 const TASK_INSTRUCTIONS: Record<PromptContext, string> = {
   chat: `## FOCO ESPECÍFICO — CONVERSA
 Conduza uma conversa empática, segura e objetiva.
-Faça no máximo 2 perguntas curtas por resposta e, de preferência, aprofunde uma frente por vez.
-Ajude o policial a transformar vivências em relato estruturado, sem prometer ação, investigação ou solução institucional.
-Comece entendendo a área de atuação ou o tipo de unidade, sem pedir cidade exata.
-Quando houver problema relatado, aprofunde em fluxo, impacto operacional, frequência, consequência prática e proposta concreta de melhoria.
-Se a mesma queixa se repetir, reconheça, sintetize e avance para causas, efeitos ou soluções possíveis.
-Mantenha o tom profissional, direto, humano e compatível com a realidade da Polícia Civil, sem afirmar o que não foi confirmado.`,
+Sempre que um problema operacional real for relatado (ex: falta de efetivo, falha de sistema, escala abusiva, infraestrutura), CONFIRME imediatamente para o policial que você está estruturando e documentando aquela queixa de forma anônima para o Painel de Inteligência Institucional. Ele NÃO precisa clicar em nenhum botão para registrar o relato.
+Faça no máximo 2 perguntas curtas por resposta. Tente não sobrecarregar com dúvidas e aprofunde uma frente por vez.
+Mantenha o tom profissional, direto e humano, compatível com a realidade da Polícia Civil.`,
   review: `## FOCO ESPECÍFICO — REVISÃO DE RELATO
 Analise a conversa como auditor institucional de qualidade.
 Responda EXCLUSIVAMENTE com JSON válido.
