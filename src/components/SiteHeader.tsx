@@ -63,7 +63,7 @@ export default function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-800/80 bg-neutral-950/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-white/[0.05] bg-neutral-950/70 backdrop-blur-md transition-all duration-300">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
         <Link href="/" className="flex min-w-0 items-center gap-3">
           <Image
@@ -71,7 +71,7 @@ export default function SiteHeader() {
             alt="Tira-Voz"
             width={40}
             height={40}
-            className="h-10 w-10 rounded-xl border border-neutral-800 object-contain bg-neutral-950/70 p-1"
+            className="h-10 w-10 rounded-xl border border-white/[0.08] object-contain bg-neutral-900/50 p-1 shadow-sm transition-transform duration-300 group-hover:scale-105"
           />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-white">Tira-Voz</p>
@@ -79,7 +79,7 @@ export default function SiteHeader() {
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-1 rounded-full border border-neutral-800 bg-neutral-900/70 p-1 md:flex">
+        <nav className="hidden items-center gap-1 rounded-full border border-white/[0.08] bg-neutral-900/40 p-1 shadow-inner md:flex backdrop-blur-sm">
           {navItems.map((item) => {
             const active = isActive(pathname, item.href);
             return (
@@ -113,7 +113,7 @@ export default function SiteHeader() {
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 rounded-full border border-neutral-800 px-4 py-2 text-sm text-neutral-400 transition hover:border-neutral-700 hover:bg-neutral-900 hover:text-white"
+                className="flex items-center gap-2 rounded-full border border-white/[0.08] px-4 py-2 text-sm text-neutral-400 transition-all hover:border-neutral-700 hover:bg-white/[0.02] hover:text-white active:scale-95"
               >
                 <LogOut className="h-4 w-4" />
                 Sair
@@ -123,13 +123,13 @@ export default function SiteHeader() {
             <>
               <Link
                 href="/conta?auth=login"
-                className="rounded-full px-4 py-2 text-sm text-neutral-300 transition hover:bg-neutral-800 hover:text-white"
+                className="rounded-full px-4 py-2 text-sm text-neutral-400 transition-all hover:bg-white/[0.05] hover:text-white active:scale-95"
               >
                 Entrar
               </Link>
               <Link
                 href="/conta?auth=register"
-                className="rounded-full bg-amber-500 px-4 py-2 text-sm font-medium text-black transition hover:bg-amber-400"
+                className="rounded-full bg-amber-500/90 px-4 py-2 text-sm font-medium text-black shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all hover:bg-amber-400 hover:shadow-[0_0_25px_rgba(245,158,11,0.5)] active:scale-95"
               >
                 Criar conta
               </Link>
