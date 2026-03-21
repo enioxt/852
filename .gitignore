@@ -51,3 +51,15 @@ next-env.d.ts
 .guarani/philosophy/
 .guarani/prompts/
 .guarani/refinery/
+
+# Python & Local Scratch Files
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+venv_test/
+.venv/
+env/
+test_pipeline.ts
+test_upload.mjs
+test_report.*
