@@ -41,7 +41,7 @@ export default function SiteHeader() {
     if (shouldHide) return;
 
     const syncAuth = () => {
-      fetch('/api/auth/me')
+      fetch('/api/auth/me', { cache: 'no-store' })
         .then((response) => response.json())
         .then((data) => setCurrentUser(data.user || null))
         .catch(() => setCurrentUser(null));

@@ -168,7 +168,7 @@ export async function saveReport(
   }
 }
 
-export async function getReports(limit = 50, identityKey?: string, statusFilter?: string[]): Promise<ReportRecord[]> {
+export async function getReports(limit = 50, identityKey?: string, statusFilter?: string[], category?: string): Promise<ReportRecord[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
@@ -185,6 +185,11 @@ export async function getReports(limit = 50, identityKey?: string, statusFilter?
 
   if (identityKey) {
     query = query.eq('session_hash', identityKey);
+  }
+
+  if (category && category.toLowerCase() !== 'all') {
+    // Reports might not have a hard category column, but we can search for the term in the JSON messages
+    query = query.ilike('messages', `%${category}%`);
   }
 
   const { data, error } = await query;
@@ -304,7 +309,8 @@ export async function createIssue(
   aiReportId?: string,
   parentId?: string,
   versionAuthorId?: string,
-  versionReason?: string
+  versionReason?: string,
+  authorId?: string
 ): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
@@ -362,6 +368,7 @@ export async function createIssue(
     parent_id: parentId || null,
     version_author_id: versionAuthorId || null,
     version_reason: versionReason || null,
+    author_id: authorId || null,
   };
 
   const { data, error } = await sb
@@ -379,7 +386,8 @@ export async function getIssues(
   limit = 50,
   sortBy: 'votes' | 'created_at' = 'created_at',
   aiReportId?: string,
-  includeChildren = false
+  includeChildren = false,
+  category?: string
 ): Promise<(IssueRecord & { downvotes?: number })[]> {
   const sb = getSupabase();
   if (!sb) return [];
@@ -388,6 +396,9 @@ export async function getIssues(
   if (status) query = query.eq('status', status);
   if (aiReportId) query = query.eq('ai_report_id', aiReportId);
   if (!includeChildren) query = query.is('parent_id', null);
+  if (category && category.toLowerCase() !== 'all') {
+    query = query.eq('category', category.toLowerCase());
+  }
   query = query.order(sortBy, { ascending: false });
 
   const { data, error } = await query;
@@ -509,14 +520,15 @@ export async function voteIssue(
 export async function addIssueComment(
   issueId: string,
   body: string,
-  isAi: boolean = false
+  isAi: boolean = false,
+  userId?: string
 ): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
 
   const { data, error } = await sb
     .from('issue_comments_852')
-    .insert({ issue_id: issueId, body, is_ai: isAi })
+    .insert({ issue_id: issueId, body, is_ai: isAi, user_id: userId || null })
     .select('id')
     .single();
 
@@ -592,12 +604,11 @@ export async function getAIReports(limit = 10): Promise<AIReportRecord[]> {
     .select('*')
     .order('created_at', { ascending: false })
     .limit(limit);
-
   if (error) return [];
   return data || [];
 }
 
-export async function getAIReportsWithIssues(limit = 10): Promise<AIReportWithIssues[]> {
+export async function getAIReportsWithIssues(limit = 10, category?: string): Promise<AIReportWithIssues[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
@@ -605,19 +616,27 @@ export async function getAIReportsWithIssues(limit = 10): Promise<AIReportWithIs
   if (reports.length === 0) return [];
 
   const reportIds = reports.map((report) => report.id);
-  const { data: issues } = await sb
+  let query = sb
     .from('issues_852')
     .select('*')
     .in('ai_report_id', reportIds)
     .order('votes', { ascending: false });
 
+  if (category && category.toLowerCase() !== 'all') {
+    query = query.eq('category', category.toLowerCase());
+  }
+
+  const { data: issues } = await query;
+
   const relatedIssues = issues || [];
 
-  return reports.map((report) => ({
-    ...report,
-    issue_count: relatedIssues.filter((issue) => issue.ai_report_id === report.id).length,
-    related_issues: relatedIssues.filter((issue) => issue.ai_report_id === report.id),
-  }));
+  return reports
+    .map((report) => ({
+      ...report,
+      issue_count: relatedIssues.filter((issue) => issue.ai_report_id === report.id).length,
+      related_issues: relatedIssues.filter((issue) => issue.ai_report_id === report.id),
+    }))
+    .filter((report) => !category || category.toLowerCase() === 'all' || report.related_issues.length > 0);
 }
 
 export async function getLatestAIReport(): Promise<AIReportRecord | null> {

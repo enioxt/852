@@ -35,7 +35,7 @@ export default function Sidebar({ isOpen, onToggle, activeConversationId, onSele
 
   useEffect(() => {
     const syncAuth = () => {
-      fetch('/api/auth/me').then(r => r.json()).then(d => setCurrentUser(d.user || null)).catch(() => setCurrentUser(null));
+      fetch('/api/auth/me', { cache: 'no-store' }).then(r => r.json()).then(d => setCurrentUser(d.user || null)).catch(() => setCurrentUser(null));
     };
     syncAuth();
     window.addEventListener('852-auth-changed', syncAuth);

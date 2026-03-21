@@ -61,7 +61,7 @@ export default function ReportReview({ messages, conversationId, serverConversat
   const [currentUser, setCurrentUser] = useState<{ masp?: string; validation_status?: string } | null>(null);
 
   useEffect(() => {
-    fetch('/api/auth/me')
+    fetch('/api/auth/me', { cache: 'no-store' })
       .then((response) => response.json())
       .then((data) => setCurrentUser(data.user || null))
       .catch(() => setCurrentUser(null));

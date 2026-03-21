@@ -250,11 +250,12 @@ export async function deleteReportFromServer(serverId: string): Promise<boolean>
   return res.ok;
 }
 
-export async function loadAllPublicReports(sessionHash: string): Promise<Report[]> {
+export async function loadAllPublicReports(sessionHash: string, category?: string): Promise<Report[]> {
+  const catParam = category && category !== 'all' ? `&category=${encodeURIComponent(category)}` : '';
   const [allRes, ownRes] = await Promise.all([
-    fetch('/api/reports/server'),
+    fetch(`/api/reports/server?${catParam}`.replace('?&', '?')),
     sessionHash
-      ? fetch(`/api/reports/server?ownOnly=true&sessionHash=${encodeURIComponent(sessionHash)}`)
+      ? fetch(`/api/reports/server?ownOnly=true&sessionHash=${encodeURIComponent(sessionHash)}${catParam}`)
       : Promise.resolve(new Response(JSON.stringify({ reports: [] }))),
   ]);
 

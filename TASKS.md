@@ -193,6 +193,13 @@
 - [x] **Document Pipeline (Mensagens Longas & Anexos)**: Colapso UX visual no front, parsing 100% no backend com chunking e Atrian estruturado (`[NOME_REDACTED]`).
 - [x] **Verdade Versionada (The EGOS Principle)**: Histórico editável em *múltiplas versões* no `/issues` garantindo autoria em edições (cada contestação vira uma Branch identificável).
 
+## ✅ P1 - Sprint v8.1 (Authentication Cache & SSOT Audit, 2026-03-20)
+
+- [x] Correção genuína de Cache-Control no endpoint `/api/auth/me` para evitar "sessão fantasma" e deslogamento prematuro
+- [x] Otimização `{ cache: 'no-store' }` em todas as chamadas de Client Components para checagem de auth
+- [x] Deep Audit da Arquitetura (Mapeamento de endpoints e rotas ativas)
+- [x] Atualização de `AGENTS.md` e `README.md` com as novas rotas (`/conta`, `/ethik`, `/privacidade`, etc.)
+
 ## ⏭️ Backlog
 
 - [x] Dashboard UI com métricas reais Recharts (substituir mock data no /dashboard)

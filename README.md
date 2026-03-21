@@ -91,6 +91,8 @@ src/
 |   |-- api/report/route.ts       # POST /api/report -- AI HTML report gen
 |   |-- api/issues/route.ts       # GET/POST /api/issues -- forum topics
 |   |-- api/telemetry/route.ts    # GET  /api/telemetry -- stats
+|   |-- api/conversations/route.ts# GET  /api/conversations -- chat history
+|   |-- api/extract/route.ts      # POST /api/extract -- AI content extraction
 |   |-- chat/page.tsx             # Chat UI
 |   |-- sugestao/page.tsx         # Free-text suggestion + correlation
 |   |-- papo-de-corredor/page.tsx # Trending community topics
@@ -98,6 +100,8 @@ src/
 |   |-- issues/page.tsx           # Discussion board
 |   |-- reports/page.tsx          # Shared reports + AI reports
 |   |-- dashboard/page.tsx        # Insights dashboard
+|   |-- conta/page.tsx            # User account / admin masquerade
+|   |-- ethik/page.tsx            # ATRiAN compliance overview
 |   '-- page.tsx                  # Landing page
 |-- components/
 |   |-- chat/Sidebar.tsx          # History + nav

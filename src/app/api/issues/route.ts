@@ -24,10 +24,11 @@ export async function GET(req: Request) {
 
   const status = searchParams.get('status') || undefined;
   const aiReportId = searchParams.get('aiReportId') || undefined;
+  const category = searchParams.get('category') || undefined;
   const sortBy = (searchParams.get('sort') as 'votes' | 'created_at') || 'votes';
   const limit = parseInt(searchParams.get('limit') || '50', 10);
 
-  const issues = await getIssues(status, limit, sortBy, aiReportId);
+  const issues = await getIssues(status, limit, sortBy, aiReportId, false, category);
   return Response.json({ issues });
 }
 
@@ -88,7 +89,7 @@ export async function POST(req: Request) {
         return Response.json({ error: 'Seu MASP precisa estar validado para comentar.', needsValidation: true }, { status: 403 });
       }
       if (!issueId || !commentBody) return Response.json({ error: 'issueId e body obrigatórios' }, { status: 400 });
-      const id = await addIssueComment(issueId, commentBody);
+      const id = await addIssueComment(issueId, commentBody, false, user?.id);
       return Response.json({ commentId: id });
     }
 
@@ -104,9 +105,14 @@ export async function POST(req: Request) {
     if (!title) return Response.json({ error: 'Título obrigatório' }, { status: 400 });
 
     let versionAuthorId: string | undefined = undefined;
+    let authorId: string | undefined = undefined;
+
+    const user = await getCurrentUser();
+    if (user?.id) {
+      authorId = user.id;
+    }
 
     if (parentId) {
-      const user = await getCurrentUser();
       if (!isAuthenticatedParticipant(user)) {
         return Response.json({ error: 'Você precisa estar logado para divergir ou evoluir um insight.', needsAuth: true }, { status: 403 });
       }
@@ -119,7 +125,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const id = await createIssue(title, issueBody, category, 'user', undefined, parentId, versionAuthorId, versionReason);
+    const id = await createIssue(title, issueBody, category, 'user', undefined, parentId, versionAuthorId, versionReason, authorId);
     if (!id) return Response.json({ error: 'Falha ao criar' }, { status: 500 });
 
     recordEvent({ event_type: 'issue_created', metadata: { issueId: id, source: 'user', isBranch: !!parentId } });

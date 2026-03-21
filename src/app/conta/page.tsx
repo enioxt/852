@@ -120,7 +120,7 @@ function AccountPageContent() {
 
   const syncAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', { cache: 'no-store' });
       const data = await response.json();
       const user = data.user || null;
       setCurrentUser(user);

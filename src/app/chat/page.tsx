@@ -112,7 +112,7 @@ function ChatPageClient() {
 
   useEffect(() => {
     const syncAuth = () => {
-      fetch('/api/auth/me')
+      fetch('/api/auth/me', { cache: 'no-store' })
         .then(r => r.json())
         .then(d => setCurrentUserId(d.user?.id || null))
         .catch(() => setCurrentUserId(null));

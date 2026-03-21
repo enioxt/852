@@ -61,7 +61,11 @@ interface CurrentUser {
   validation_status?: string | null;
 }
 
-export function IssuesFeed() {
+interface IssuesFeedProps {
+  category?: string;
+}
+
+export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
   const [aiReportId, setAiReportId] = useState<string | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +99,7 @@ export function IssuesFeed() {
       setFilter('all');
     }
     const syncAuth = () => {
-      fetch('/api/auth/me')
+      fetch('/api/auth/me', { cache: 'no-store' })
         .then(r => r.json())
         .then(d => setCurrentUser((d.user as CurrentUser) || null))
         .catch(() => setCurrentUser(null));
@@ -111,6 +115,7 @@ export function IssuesFeed() {
       const params = new URLSearchParams({ sort });
       if (filter !== 'all') params.set('status', filter);
       if (aiReportId) params.set('aiReportId', aiReportId);
+      if (category && category !== 'all') params.set('category', category);
       const res = await fetch(`/api/issues?${params}`);
       const data = await res.json();
       setIssues(data.issues || []);
@@ -267,7 +272,9 @@ export function IssuesFeed() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 max-w-sm w-full space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-white">Validação necessária</h2>
+              <h2 className="text-base font-semibold text-white">
+                {loginNoticeMode === 'auth' ? 'Sessão Expirada ou Ausente' : 'Validação de MASP'}
+              </h2>
               <button onClick={() => setShowLoginNotice(false)} className="text-neutral-500 hover:text-white"><X className="w-4 h-4" /></button>
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed">
@@ -292,7 +299,7 @@ export function IssuesFeed() {
                 onClick={() => setShowLoginNotice(false)}
                 className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium text-center transition"
               >
-                Entrar / Cadastrar
+                {loginNoticeMode === 'auth' ? 'Entrar / Cadastrar' : 'Validar MASP'}
               </Link>
               <button
                 onClick={() => setShowLoginNotice(false)}

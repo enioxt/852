@@ -79,10 +79,11 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const sessionHash = searchParams.get('sessionHash');
   const ownOnly = searchParams.get('ownOnly') === 'true';
+  const category = searchParams.get('category') || undefined;
   const identityKey = ownOnly ? getIdentityKey(sessionHash, user?.id) : null;
   const statusFilter = ownOnly ? undefined : ['published', 'shared'];
   
-  const reports = await getReports(100, identityKey || undefined, statusFilter);
+  const reports = await getReports(100, identityKey || undefined, statusFilter, category);
   return Response.json({ reports });
 }
 

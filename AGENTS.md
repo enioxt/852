@@ -58,6 +58,8 @@
 │   ├── api/review/route.ts           # POST /api/review — AI conversation analysis
 │   ├── api/report/route.ts           # POST /api/report — AI HTML report generation
 │   ├── api/correlate/route.ts        # POST /api/correlate — AI tag extraction + issue/report search
+│   ├── api/conversations/route.ts    # GET  /api/conversations — conversation history persistence
+│   ├── api/extract/route.ts          # POST /api/extract — AI topic content extraction
 │   ├── api/hot-topics/route.ts       # GET  /api/hot-topics — trending topics by engagement score
 │   ├── api/telemetry/route.ts        # GET  /api/telemetry — stats from Supabase
 │   ├── chat/page.tsx                 # Main chat UI (orchestrator, delegates to components)
@@ -67,6 +69,11 @@
 │   ├── reports/page.tsx              # Shared reports + AI report generator (tabs)
 │   ├── dashboard/page.tsx            # Insights dashboard (Recharts)
 │   ├── admin/telemetry/page.tsx      # Admin telemetry + ATRiAN violations dashboard
+│   ├── conta/page.tsx                # Centralized User Account + Admin Portal
+│   ├── ethik/page.tsx                # ATRiAN compliance overview
+│   ├── privacidade/page.tsx          # Privacy policy (LGPD)
+│   ├── qr/page.tsx                   # QR Code generator
+│   ├── verificar-email/page.tsx      # Email verification
 │   ├── layout.tsx                    # Root layout (metadata, Clarity, fonts)
 │   └── page.tsx                      # Landing page
 │

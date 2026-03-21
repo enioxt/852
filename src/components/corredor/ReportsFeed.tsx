@@ -41,7 +41,11 @@ const EXAMPLE_PROMPTS = [
   'Relatório de engajamento da plataforma Tira-Voz - métricas do mês',
 ];
 
-export function ReportsFeed() {
+interface ReportsFeedProps {
+  category?: string;
+}
+
+export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
   const [requestedReportId, setRequestedReportId] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('shared');
@@ -64,7 +68,7 @@ export function ReportsFeed() {
 
     const loadServerReports = async () => {
       try {
-        const serverReports = await loadAllPublicReports(sessionHash);
+        const serverReports = await loadAllPublicReports(sessionHash, category);
         if (serverReports.length > 0) {
           setReports(prevLocal => {
             const serverIds = new Set(serverReports.map(r => r.id));
@@ -79,12 +83,13 @@ export function ReportsFeed() {
     };
 
     void loadServerReports();
-  }, [sessionHash]);
+  }, [sessionHash, category]);
 
   useEffect(() => {
     const loadIntelligenceReports = async () => {
       try {
-        const res = await fetch('/api/ai-reports?limit=12');
+        const catParam = category && category !== 'all' ? `&category=${encodeURIComponent(category)}` : '';
+        const res = await fetch(`/api/ai-reports?limit=12${catParam}`.replace('?&', '?'));
         if (!res.ok) return;
         const data = await res.json();
         setIntelReports(Array.isArray(data.reports) ? data.reports : []);
@@ -94,7 +99,7 @@ export function ReportsFeed() {
     };
 
     void loadIntelligenceReports();
-  }, []);
+  }, [category]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -124,7 +129,7 @@ export function ReportsFeed() {
     setExpandedReport(null);
     if (sessionHash) {
       try {
-        const refreshed = await loadAllPublicReports(sessionHash);
+        const refreshed = await loadAllPublicReports(sessionHash, category);
         setReports(refreshed);
       } catch {
         setReports(prev => prev.filter(r => r.id !== id));

@@ -43,6 +43,9 @@ export default function TelemetryDashboard() {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(7);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [aiType, setAiType] = useState('general');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -64,6 +67,28 @@ export default function TelemetryDashboard() {
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' });
     router.push('/admin/login');
+  };
+
+  const generateAIInsight = async (type: string) => {
+    setLoadingAI(true);
+    setAiType(type);
+    try {
+      const res = await fetch('/api/admin/telemetry/ai-insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysisType: type, days }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setAiInsight(json.insight);
+      } else {
+        setAiInsight('Erro ao gerar análise.');
+      }
+    } catch {
+      setAiInsight('Falha na comunicação com API IA.');
+    } finally {
+      setLoadingAI(false);
+    }
   };
 
   useEffect(() => { load(); }, [load]);
@@ -206,6 +231,47 @@ export default function TelemetryDashboard() {
                 )}
               </div>
             )}
+
+            {/* AI Insights Panel */}
+            <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-xl p-6 mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-purple-400" />
+                  <h2 className="font-semibold text-gray-100">AI Observability Analytics</h2>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => generateAIInsight('general')}
+                    disabled={loadingAI}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${aiType === 'general' ? 'bg-purple-600' : 'bg-neutral-800'}`}
+                  >Geral</button>
+                  <button
+                    onClick={() => generateAIInsight('errors')}
+                    disabled={loadingAI}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${aiType === 'errors' ? 'bg-purple-600' : 'bg-neutral-800'}`}
+                  >Erros</button>
+                  <button
+                    onClick={() => generateAIInsight('security')}
+                    disabled={loadingAI}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${aiType === 'security' ? 'bg-purple-600' : 'bg-neutral-800'}`}
+                  >Segurança</button>
+                </div>
+              </div>
+              {loadingAI ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+                  <span className="ml-2 text-neutral-400 text-sm">Analisando logs com IA...</span>
+                </div>
+              ) : aiInsight ? (
+                <div className="bg-neutral-900/50 p-4 rounded-lg border border-neutral-800">
+                  <div className="whitespace-pre-wrap text-sm text-neutral-300 leading-relaxed">
+                    {aiInsight}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-neutral-500 text-sm text-center py-4">Escolha um modo acima para gerar insights analíticos</p>
+              )}
+            </div>
 
             {/* Recent Events */}
             <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 overflow-hidden">

@@ -8,6 +8,7 @@ import { ReportsFeed } from '@/components/corredor/ReportsFeed';
 
 export default function PapoDeCorredorMasterPage() {
   const [activeTab, setActiveTab] = useState<'hot' | 'issues' | 'reports'>('hot');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   useEffect(() => {
     // If URL has ?tab=discussoes or ?tab=relatos or ?aiReportId or ?id (for issues), auto-focus that tab
@@ -19,6 +20,17 @@ export default function PapoDeCorredorMasterPage() {
       else if (params.has('aiReportId') || params.has('id')) setActiveTab('issues');
     }
   }, []);
+
+  const CATEGORIES = [
+    { id: 'all', label: 'Todos' },
+    { id: 'efetivo', label: 'Efetivo' },
+    { id: 'infraestrutura', label: 'Infraestrutura' },
+    { id: 'assedio', label: 'Assédio / Saúde' },
+    { id: 'plantao', label: 'Plantão' },
+    { id: 'carreira', label: 'Carreira' },
+    { id: 'tecnologia', label: 'Tecnologia' },
+    { id: 'outro', label: 'Outros' }
+  ];
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
@@ -32,6 +44,23 @@ export default function PapoDeCorredorMasterPage() {
             <h1 className="text-2xl font-bold text-white">O Corredor</h1>
             <p className="text-sm text-neutral-400">Hub central de inteligência, pautas e tendências da corporação.</p>
           </div>
+        </div>
+
+        {/* Categories (New Hub V2) */}
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-6 pb-2">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition border ${
+                activeCategory === cat.id
+                  ? 'bg-amber-600 border-amber-500 text-white'
+                  : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
 
         {/* Master Tabs */}
@@ -73,8 +102,8 @@ export default function PapoDeCorredorMasterPage() {
       {/* Render Active Feed Component */}
       <div className="w-full pb-20">
         {activeTab === 'hot' && <HotTopicsFeed />}
-        {activeTab === 'issues' && <IssuesFeed />}
-        {activeTab === 'reports' && <ReportsFeed />}
+        {activeTab === 'issues' && <IssuesFeed category={activeCategory} />}
+        {activeTab === 'reports' && <ReportsFeed category={activeCategory} />}
       </div>
     </div>
   );
