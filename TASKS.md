@@ -200,8 +200,9 @@
 - [x] Deep Audit da Arquitetura (Mapeamento de endpoints e rotas ativas)
 - [x] Atualização de `AGENTS.md` e `README.md` com as novas rotas (`/conta`, `/ethik`, `/privacidade`, etc.)
 
-## ⏭️ Backlog
 
+
+## ⏭️ Backlog
 - [x] Dashboard UI com métricas reais Recharts (substituir mock data no /dashboard)
 - [x] Migrar report-store de localStorage para Supabase (dual write: local + server)
 - [x] Session hashing: cada interação gera um hash único rastreável

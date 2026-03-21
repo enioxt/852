@@ -1,0 +1,27 @@
+{
+  "role": "leaf",
+  "version": "1.0.0",
+  "surfaces": {
+    "agent_runtime": false,
+    "shared_packages": false,
+    "governance_dna": true,
+    "meta_prompts": true,
+    "mycelium_graph": true,
+    "model_router": true,
+    "activation_check": true,
+    "session_guard": false,
+    "gem_hunter": false,
+    "report_generator": true,
+    "web_dashboard": true,
+    "telegram_bot": true,
+    "worker_queue": false,
+    "supabase_db": true
+  },
+  "governance": {
+    "check_command": "npm run governance:check",
+    "sync_command": "npm run governance:sync",
+    "activation_command": "npm run smoke:local"
+  },
+  "parent_kernel": "/home/enio/egos",
+  "shared_home": "/home/enio/.egos"
+}
