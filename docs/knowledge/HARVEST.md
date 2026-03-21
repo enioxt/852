@@ -1,22 +1,21 @@
-# HARVEST — 852 Inteligência
+# Knowledge Harvest — 852 & EGOS Ecosystem
 
-*Knowledge base para padrões recorrentes, decisões arquiteturais e gotchas do projeto.*
+## Record: 2026-03-21 | Arquitetura de Monetização (Agente ETHIK) e Chaves GCP Efêmeras
 
-## 2026-03-20 | P1 Sprint - Inteligência e Moderação Orgânica
+### 1. O Problema
+Monetizar APIs (ex: `/api/chat` Qwen/Gemini) mantendo o acesso às LLMs estritamente controlado. Evitar vazamento de chaves perenes e overbilling (fat billing failure) no Google Cloud Console / Alibaba DashScope.
 
-### 1. Espiral de Escuta (AI Feedback Loop Trigger)
-**Padrão Arquitetural**: O sistema implementou o trigger da "Espiral de Escuta". Em vez de cron jobs pesados reavaliando todo o banco, optamos por um trigger atrelado ao próprio endpoint de votação (`/api/issues`). Se a taxa de aprovação (*Approval Rating*) cair abaixo de 85% com um quorum mínimo (5 votos explícitos, agora suportando downvotes), a rota despacha um background fetch "fire-and-forget" para `/api/issues/reanalyze`.
-**Gotcha**: A chamada fetch em background usa o origin dinâmico para evitar bloqueios de domínio no deploy Caddy local. `fetch(url).catch()` garante que a UI não seja bloqueada pela IA reavaliando o tópico no Supabase. O modelo instruído foi o `qwen-max` agindo com "escuta ativa" (`buildEspiralDeEscutaPrompt`).
+### 2. A Solução: Gateway Dinâmico
+O Agente ETHIK intercepta chamadas não autenticadas em rotas comerciais. Quando o cliente paga via **x402 protocol** (USDC on-chain, instant settlement), o Gateway valida a TX e, usando o Service Account do GCP, chama a API de *API Keys* (`apikeys.googleapis.com`) para gerar uma **chave temporária, restrita e com quota injetada (ex: quota de apenas $0.05 ou 50 requests)**. 
 
-### 2. Fluxo Multi-Camada (Moderação Institucional)
-**Decisão:** Foi introduzido o status `pending_human` para a tabela `reports_852`. 
-- Isso previne que spams, doxxing ou material inadequado (que tenha bypassado o PII scanner) polua o board público automaticamente.
-- Relatos são postados inicialmente como `pending_human`.
-- O dashboard administrativo (`/admin/curadoria`) é a interface única para transicionar para `published`. Só então a `createIssue` (Fórum Público) é engatilhada.
-**Padrão**: Reutilização dos pacotes e cards do painel de `validations` para criar a `curadoria`, mantendo a linguagem visual dos administradores intacta.
+Essa chave é devolvida ao cliente, garantindo que o teto de gastos do cliente na infra do GCP jamais exceda o que ele acabou de pagar via USDC/PIX.
 
-### 3. In-Chat Correlation Engine
-**Padrão Arquitetural**: Para remover as bolhas de chat isoladas, a UI do `/chat` monitora o `onFinish` do AI SDK pipeline. Quando a IA envia a mensagem completa, extraímos palavras-chave do texto renderizado e disparamos um debounced background fetch `useQuery` injetando cartões "Relacionados na Corporação" usando `CorrelationPanel` logo abaixo da resposta da IA. 
+### 3. O Fluxo de Interconexão (A Tríade)
+- **Agente ETHIK (Tokenomics e Gateway)**: Libera o acesso via pagamentos e distribui Pontos EGOS (Série Fibonacci).
+- **Agente ATRiAN (Compliance)**: Intercepta o request legitimado pela chave e avalia a ética das intenções antes de usar os tokens GCP/Alibaba.
+- **Agente Mycelium (Auditoria e Malha)**: Recebe os logs semânticos (`gcp.key.issued`, `atrian.pass`, etc) para gerar relatórios de transparência.
 
-### 4. Dual-Write Remote Drafts
-**Padrão**: Local Storage atua com precedência MÁXIMA para velocidade; writes em cloud ocorrem num debounce assíncrono para usuários atestados. Isso salva recursos pesados de escrita e protege os relatórios parciais.
+### 4. Meta-Prompt & Autonomia
+Essas arquiteturas só funcionam porque os meta-prompts do ATRiAN (`prompt.ts`) têm **autoridade atômica**. Ele age como o *Kill Switch* final. O Agente ETHIK apenas viabiliza recursos financeiros—o ATRiAN viabiliza a conduta moral do uso dessas chaves.
+
+---

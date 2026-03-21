@@ -1,0 +1,15 @@
+{
+  "name": "@egos/atrian",
+  "version": "1.0.0",
+  "description": "Validation Engine for Ethical Output (ATRiAN Axioms)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["ai", "ethics", "validation", "egos", "atrian"],
+  "author": "Enio Rocha",
+  "license": "MIT",
+  "dependencies": {}
+}

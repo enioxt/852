@@ -17,6 +17,18 @@ if [ $? -ne 0 ]; then
   echo "⚠️  Lint warnings/errors. Proceeding anyway (soft gate)."
 fi
 
+# ATRiAN Ethical Validation
+echo "→ ATRiAN Ethical Scanner..."
+if [ -f "scripts/atrian-check.ts" ]; then
+  npx tsx scripts/atrian-check.ts 2>/dev/null
+  if [ $? -ne 0 ]; then
+    echo "❌ ATRiAN: Ethical violations detected. Fix before committing."
+    exit 1
+  fi
+else
+  echo "⚠️  ATRiAN scanner not found. Skipping ethical validation."
+fi
+
 # Check .env not committed
 if git diff --cached --name-only | grep -q "^\.env$"; then
   echo "❌ BLOCKED: .env file must NOT be committed!"

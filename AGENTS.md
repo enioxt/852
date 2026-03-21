@@ -172,6 +172,9 @@
 | 47 | AI Topic Content Engine (Journalistic Titles & Structural Insights) | `api/extract/route.ts` | Active |
 | 48 | Anti-Spam Intelligence Filter (blocks trivial chats) | `api/review/route.ts` + `prompt.ts` | Active |
 | 49 | Centralized Vibe Coding User Account + Admin Portal | `conta/page.tsx` | Active |
+| 50 | ETHIK Agent: x402 Payment Gateway & Tokenomics Engine | `src/lib/ethik-agent.ts` | Active |
+| 51 | GCP Dynamic API Keys (Quota-restricted Ephmeral Keys) | `src/lib/gcp-keys.ts` | Active |
+| 52 | ATRiAN CLI Scanner & Standalone Engine | `packages/atrian/` | Active |
 
 ## Agent 852 — Roadmap
 
