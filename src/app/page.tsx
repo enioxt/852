@@ -247,22 +247,61 @@ export default function Home() {
             </p>
           </div>
 
-          {/* ═══════════ CTA BIBLIOTECA JURIDICA ═══════════ */}
-          <Link
-            href="/legislacao"
-            className="mt-6 w-full group flex items-center gap-4 rounded-2xl border border-blue-800/30 bg-blue-950/20 p-5 hover:border-blue-700/50 hover:bg-blue-950/30 transition-all active:scale-[0.98]"
-          >
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-              <Scale className="w-6 h-6 text-blue-400" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-base font-semibold text-white">Biblioteca Juridica</h3>
-              <p className="text-sm text-neutral-400 mt-0.5">
-                27+ leis, sumulas e normativas para o policial civil. Constituicao, CPP, Lei Organica, Maria da Penha e mais.
-              </p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-blue-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
-          </Link>
+          {/* ═══════════ DESTAQUE DOS RELATORIOS DE IA ═══════════ */}
+          {stats?.latestAIReport && (
+            <Link href="/reports" className="mt-6 w-full block group">
+              <div className="rounded-3xl border border-violet-700/40 bg-gradient-to-br from-violet-950/30 via-neutral-950 to-neutral-900/80 p-6 sm:p-7 shadow-[0_0_0_1px_rgba(139,92,246,0.08),0_20px_60px_rgba(0,0,0,0.35)] hover:border-violet-500/60 hover:bg-violet-950/35 transition-all active:scale-[0.99]">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-violet-500/10 flex items-center justify-center flex-shrink-0 border border-violet-500/20">
+                    <Bot className="w-7 h-7 text-violet-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="text-xs px-2 py-1 rounded-full bg-violet-500/15 text-violet-200 border border-violet-500/20 font-medium">
+                        Relatorio de IA em destaque
+                      </span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700">
+                        {stats.latestAIReport.conversation_count} conversas
+                      </span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700">
+                        {stats.latestAIReport.report_count} relatos
+                      </span>
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white leading-tight">
+                      Ultimo relatorio de inteligencia: o que ja apareceu com mais força
+                    </h3>
+                    <p className="mt-2 text-sm text-neutral-400">
+                      {new Date(stats.latestAIReport.created_at).toLocaleDateString('pt-BR')} · Gerado por IA e pronto para leitura completa.
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-violet-300 group-hover:translate-x-1 transition-transform flex-shrink-0 mt-1" />
+                </div>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
+                    <p className="text-xs uppercase tracking-wide text-neutral-500">Resumo</p>
+                    <p className="mt-2 text-sm text-neutral-200 leading-relaxed line-clamp-4">
+                      {stats.latestAIReport.content_summary || 'Resumo indisponivel no momento.'}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
+                    <p className="text-xs uppercase tracking-wide text-neutral-500">Principais achados</p>
+                    <ul className="mt-2 space-y-2 text-sm text-neutral-300">
+                      <li>· Déficit de efetivo e sobrecarga operacional</li>
+                      <li>· Atrasos de carreira e publicações</li>
+                      <li>· Problemas com sistemas e proteção ao denunciante</li>
+                    </ul>
+                  </div>
+                  <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
+                    <p className="text-xs uppercase tracking-wide text-neutral-500">Abertura</p>
+                    <p className="mt-2 text-sm text-neutral-300 leading-relaxed">
+                      Clique para ler o relatório completo, ver a síntese técnica e acessar os tópicos ligados a ele.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          )}
 
           {/* ═══════════ COMO A INFORMACAO FLUI ═══════════ */}
           <div id="como-funciona" className="mt-10 w-full space-y-3">
@@ -344,45 +383,6 @@ export default function Home() {
             ) : null}
           </div>
 
-          {/* ═══════════ ULTIMO RELATORIO DE INTELIGENCIA ═══════════ */}
-          {stats?.latestAIReport && (
-            <Link href="/reports" className="mt-6 w-full block group">
-              <div className="rounded-2xl border border-purple-800/30 bg-purple-950/20 p-6 hover:border-purple-700/50 hover:bg-purple-950/30 transition-all active:scale-[0.98]">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-purple-900/40 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-6 h-6 text-purple-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-white">Ultimo relatorio de inteligencia</h3>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-neutral-400 flex-wrap">
-                      <span>Gerado por IA</span>
-                      <span>·</span>
-                      <span>{stats.latestAIReport.conversation_count} conversas analisadas</span>
-                      <span>·</span>
-                      <span>{new Date(stats.latestAIReport.created_at).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                  </div>
-                </div>
-                {stats.latestAIReport.content_summary && (
-                  <p className="text-base text-neutral-300 leading-relaxed line-clamp-3">
-                    {stats.latestAIReport.content_summary}
-                  </p>
-                )}
-                {stats.latestAIReport.pending_topics && stats.latestAIReport.pending_topics.length > 0 && (
-                  <div className="mt-3 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                    <span className="text-sm text-amber-400/80">
-                      {stats.latestAIReport.pending_topics.length} topicos pendentes identificados
-                    </span>
-                  </div>
-                )}
-                <div className="mt-4 flex items-center gap-2 text-base text-purple-400 group-hover:text-purple-300 transition font-medium">
-                  Ver relatorio completo <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-          )}
-
           {/* ═══════════ FEATURES GRID ═══════════ */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10 w-full">
             {[
@@ -453,6 +453,23 @@ export default function Home() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+
+          {/* ═══════════ BIBLIOTECA JURIDICA ═══════════ */}
+          <Link
+            href="/legislacao"
+            className="mt-8 w-full group flex items-center gap-4 rounded-2xl border border-blue-800/30 bg-blue-950/20 p-5 hover:border-blue-700/50 hover:bg-blue-950/30 transition-all active:scale-[0.98]"
+          >
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+              <Scale className="w-6 h-6 text-blue-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-semibold text-white">Biblioteca Juridica</h3>
+              <p className="text-sm text-neutral-400 mt-0.5">
+                27+ leis, sumulas e normativas para consulta rápida, agora posicionada mais abaixo na pagina.
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-blue-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+          </Link>
 
           {/* ═══════════ FAQ COMPLETA ═══════════ */}
           <div className="mt-12 w-full">

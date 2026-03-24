@@ -173,6 +173,31 @@ ssh contabo "cd /opt/852 && docker compose build --no-cache && docker compose up
 curl -I https://852.egos.ia.br
 ```
 
+## Comprehensive Intelligence Reports
+
+Generate deep analysis reports using multi-AI pipeline:
+
+```bash
+# Generate comprehensive report
+npm run report:comprehensive
+
+# Or directly
+./scripts/run-comprehensive-report.sh
+```
+
+**Pipeline stages:**
+1. **AI Analysis** (OpenRouter Gemini 2.0 Flash): Extract patterns, insights, critical areas
+2. **External Context** (Exa MCP): Validate against benchmarks (placeholder)
+3. **Technical Review** (Codex): Validate accuracy (placeholder)
+4. **Final Synthesis**: Generate HTML report + save to database
+
+**Output:**
+- HTML report with dark mode design
+- Saved to `ai_reports_852` table
+- Accessible at `/papo-de-corredor?view=relatorios`
+
+**Standards:** See `.guarani/COMPREHENSIVE_REPORT_STANDARDS.md`
+
 ## Roadmap
 
 | Priority | Feature |
@@ -184,6 +209,8 @@ curl -I https://852.egos.ia.br
 | **P2** | ATRiAN v2: NeMo Guardrails integration |
 | **P2** | Voice input (speech-to-text) |
 | **P2** | Cross-conversation insight aggregation |
+| **P2** | Exa MCP integration for comprehensive reports |
+| **P2** | Codex integration for comprehensive reports |
 | **P3** | Tool use: web search for institutional data |
 | **P3** | BYOK: users plug own API keys |
 

@@ -17,7 +17,8 @@
     "smoke:ci": "bash scripts/smoke_852.sh ci",
     "verify:local-prod": "bash scripts/verify_local_prod.sh",
     "smoke:rate-limit": "python3 scripts/verify_rate_limit.py http://127.0.0.1:3100",
-    "release:prod": "bash scripts/release_contabo.sh"
+    "release:prod": "bash scripts/release_contabo.sh",
+    "report:comprehensive": "bash scripts/run-comprehensive-report.sh"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
