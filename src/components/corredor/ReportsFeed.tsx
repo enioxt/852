@@ -182,7 +182,7 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
 
   return (
     <div className="w-full text-neutral-200 flex flex-col">
-      <div className="mx-auto flex w-full max-w-4xl items-start justify-end px-4 pt-4 sm:px-6">
+      <div className="mx-auto flex w-full max-w-4xl items-start justify-end px-4 pt-3 sm:px-6">
         {html && tab === 'generator' && (
           <button onClick={downloadHtml} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition text-sm">
             <Download className="w-4 h-4" /> Baixar HTML
@@ -191,11 +191,11 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
       </div>
 
       {/* Tabs */}
-      <div className="mt-4 border-b border-neutral-800 bg-neutral-950">
-        <div className="max-w-4xl mx-auto flex">
+      <div className="mt-3 border-b border-neutral-800 bg-neutral-950">
+        <div className="max-w-4xl mx-auto flex gap-1 px-4 sm:px-6 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setTab('shared')}
-            className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${
               tab === 'shared'
                 ? 'border-blue-500 text-blue-400'
                 : 'border-transparent text-neutral-500 hover:text-neutral-300'
@@ -209,7 +209,7 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
           </button>
           <button
             onClick={() => setTab('generator')}
-            className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${
               tab === 'generator'
                 ? 'border-purple-500 text-purple-400'
                 : 'border-transparent text-neutral-500 hover:text-neutral-300'
@@ -220,7 +220,7 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
           </button>
           <button
             onClick={() => setTab('intelligence')}
-            className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${
               tab === 'intelligence'
                 ? 'border-emerald-500 text-emerald-400'
                 : 'border-transparent text-neutral-500 hover:text-neutral-300'
@@ -235,7 +235,7 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
         </div>
       </div>
 
-      <main className="flex-1 p-4 max-w-4xl mx-auto w-full space-y-4">
+      <main className="flex-1 p-4 max-w-4xl mx-auto w-full space-y-3">
         {/* ═══ Shared Reports Tab ═══ */}
         {tab === 'shared' && (
           <>
@@ -304,7 +304,7 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
                     {expandedReport === report.id && (
                       <div className="border-t border-neutral-800 p-4 space-y-3">
                         {(report.reporterTypeLabel || report.tags?.length || report.summary) && (
-                          <div className="space-y-2 rounded-xl border border-neutral-800 bg-neutral-950/60 p-4">
+                          <div className="space-y-2 rounded-xl border border-neutral-800 bg-neutral-950/60 p-3.5">
                             {report.reporterTypeLabel && (
                               <p className="text-[11px] text-neutral-500">{report.reporterTypeLabel}</p>
                             )}
@@ -424,7 +424,7 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
                           </div>
                         )}
 
-                        <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+                        <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
                           <div className="space-y-2">
                             <div className="flex items-center gap-2 text-sm text-neutral-400">
                               <Eye className="w-4 h-4" /> Preview do relatório
@@ -440,7 +440,7 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
                           </div>
 
                           <div className="space-y-3">
-                            <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-4 space-y-3">
+                            <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-3.5 space-y-3">
                               <div className="flex items-center gap-2 text-sm text-white">
                                 <AlertCircle className="w-4 h-4 text-amber-400" /> Issues geradas
                               </div>
