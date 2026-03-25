@@ -15,9 +15,15 @@ export default function PapoDeCorredorMasterPage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('view');
-      if (tabParam === 'discussoes') setActiveTab('issues');
-      else if (tabParam === 'relatos') setActiveTab('reports');
-      else if (params.has('aiReportId') || params.has('id')) setActiveTab('issues');
+      if (tabParam === 'discussoes') {
+        queueMicrotask(() => setActiveTab('issues'));
+      }
+      else if (tabParam === 'relatos') {
+        queueMicrotask(() => setActiveTab('reports'));
+      }
+      else if (params.has('aiReportId') || params.has('id')) {
+        queueMicrotask(() => setActiveTab('issues'));
+      }
     }
   }, []);
 

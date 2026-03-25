@@ -33,7 +33,7 @@ export default function ChatInputArea({ input, onInputChange, onSubmit, isLoadin
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        setHasSpeechSupport(false);
+        queueMicrotask(() => setHasSpeechSupport(false));
         return;
       }
       

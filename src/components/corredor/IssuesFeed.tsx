@@ -121,7 +121,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
       setIssues(data.issues || []);
     } catch { setIssues([]); }
     finally { setLoading(false); }
-  }, [aiReportId, filter, sort]);
+  }, [aiReportId, category, filter, sort]);
 
   useEffect(() => { loadIssues(); }, [loadIssues]);
 
@@ -385,7 +385,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
               <div className="bg-red-900/20 border border-red-900/40 rounded-xl p-3 mb-4">
                 <p className="text-xs text-red-400">
                   <strong className="block mb-1">Princípio da Verdade Versionada</strong>
-                  Você está criando uma nova "Branch" deste insight. A autoria desta evolução ficará vinculada ao seu MASP, permitindo que a corporação debata sua versão alternativa sem apagar o histórico original.
+                  Você está criando uma nova &quot;Branch&quot; deste insight. A autoria desta evolução ficará vinculada ao seu MASP, permitindo que a corporação debata sua versão alternativa sem apagar o histórico original.
                 </p>
               </div>
             )}
