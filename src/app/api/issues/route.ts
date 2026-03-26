@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     }
 
     if (action === 'comment') {
-      const { issueId, commentBody } = body;
+      const { issueId, commentBody, parentCommentId } = body;
       const user = await getCurrentUser();
       if (!isAuthenticatedParticipant(user)) {
         return Response.json({ error: 'Entre com sua conta para comentar.', needsAuth: true }, { status: 403 });
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
         return Response.json({ error: 'Seu MASP precisa estar validado para comentar.', needsValidation: true }, { status: 403 });
       }
       if (!issueId || !commentBody) return Response.json({ error: 'issueId e body obrigatórios' }, { status: 400 });
-      const id = await addIssueComment(issueId, commentBody, false, user?.id);
+      const id = await addIssueComment(issueId, commentBody, false, user?.id, parentCommentId);
       return Response.json({ commentId: id });
     }
 
@@ -97,7 +97,27 @@ export async function POST(req: Request) {
       const { issueId } = body;
       if (!issueId) return Response.json({ error: 'issueId obrigatório' }, { status: 400 });
       const comments = await getIssueComments(issueId);
-      return Response.json({ comments });
+      // Build threaded structure
+      const commentMap = new Map();
+      const rootComments = [];
+      
+      // First pass: create map
+      for (const c of comments) {
+        commentMap.set(c.id, { ...c, replies: [] });
+      }
+      
+      // Second pass: build tree
+      for (const c of comments) {
+        const comment = commentMap.get(c.id);
+        if ((c as any).parent_comment_id && commentMap.has((c as any).parent_comment_id)) {
+          const parent = commentMap.get((c as any).parent_comment_id);
+          parent.replies.push(comment);
+        } else {
+          rootComments.push(comment);
+        }
+      }
+      
+      return Response.json({ comments: rootComments, flat: comments });
     }
 
     // Default: create issue

@@ -15,7 +15,14 @@ interface Issue {
   body: string | null;
   status: string;
   votes: number;
-  downvotes?: number;
+  downvotes: number;
+  quality_score?: number;
+  content_metrics?: {
+    word_count: number;
+    complexity_tier: string;
+    has_examples: boolean;
+    has_proposed_solution: boolean;
+  };
   ai_report_id: string | null;
   category: string;
   source: string;
@@ -28,6 +35,9 @@ interface Comment {
   created_at: string;
   body: string;
   is_ai: boolean;
+  replies?: Comment[];
+  parent_comment_id?: string | null;
+  depth?: number;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -76,6 +86,8 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [versions, setVersions] = useState<Record<string, Issue[]>>({});
   const [commentText, setCommentText] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
   const [newTitle, setNewTitle] = useState('');
   const [newBody, setNewBody] = useState('');
   const [newCategory, setNewCategory] = useState('outro');
@@ -189,8 +201,9 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
       .then(data => setVersions(prev => ({ ...prev, [issueId]: data.versions || [] })));
   };
 
-  const handleComment = async (issueId: string) => {
-    if (!commentText.trim()) return;
+  const handleComment = async (issueId: string, parentCommentId?: string) => {
+    const text = parentCommentId ? replyText : commentText;
+    if (!text.trim()) return;
     if (!currentUser?.id) {
       setLoginNoticeMode('auth');
       setShowLoginNotice(true);
@@ -199,21 +212,22 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
     const res = await fetch('/api/issues', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'comment', issueId, commentBody: commentText }),
+      body: JSON.stringify({ action: 'comment', issueId, commentBody: text, parentCommentId }),
     });
-    const data = await res.json();
-    if (!res.ok && data?.needsAuth) {
-      setLoginNoticeMode('auth');
-      setShowLoginNotice(true);
-      return;
+    if (res.ok) {
+      if (parentCommentId) {
+        setReplyText('');
+        setReplyingTo(null);
+      } else {
+        setCommentText('');
+      }
+      // Refresh comments
+      fetch('/api/issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'comments', issueId }),
+      }).then(r => r.json()).then(data => setComments(data.comments || []));
     }
-    if (!res.ok && data?.needsValidation) {
-      setLoginNoticeMode('validation');
-      setShowLoginNotice(true);
-      return;
-    }
-    setCommentText('');
-    // Reload comments
     handleExpand(issueId);
     setIssues(prev => prev.map(i => i.id === issueId ? { ...i, comment_count: i.comment_count + 1 } : i));
   };
@@ -263,6 +277,62 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
     setNewCategory(issue.category || 'outro');
     setNewBody(issue.body || '');
     setVersionReason('');
+  };
+
+  // Render threaded comments recursively
+  const renderCommentThread = (commentList: Comment[], issueId: string, depth = 0) => {
+    return commentList.map((comment) => (
+      <div key={comment.id} className={`${depth > 0 ? 'ml-6 pl-3 border-l border-neutral-800' : ''}`}>
+        <div className="flex items-start gap-2">
+          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${comment.is_ai ? 'bg-purple-900/30' : 'bg-neutral-800'}`}>
+            {comment.is_ai ? <Bot className="w-3 h-3 text-purple-400" /> : <User className="w-3 h-3 text-neutral-500" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-neutral-300">{comment.body}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[10px] text-neutral-600">
+                {new Date(comment.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                {comment.is_ai && ' · Agente IA'}
+              </span>
+              {!comment.is_ai && (
+                <button
+                  onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                  className="text-[10px] text-blue-400 hover:text-blue-300 transition"
+                >
+                  {replyingTo === comment.id ? 'Cancelar' : 'Responder'}
+                </button>
+              )}
+            </div>
+            
+            {/* Reply input */}
+            {replyingTo === comment.id && (
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder="Escreva sua resposta..."
+                  className="flex-1 h-8 px-2 bg-neutral-950 border border-neutral-800 rounded text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-green-700"
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleComment(issueId, comment.id)}
+                />
+                <button
+                  onClick={() => handleComment(issueId, comment.id)}
+                  disabled={!replyText.trim()}
+                  className="p-1.5 bg-green-600 hover:bg-green-500 disabled:bg-neutral-800 rounded transition"
+                >
+                  <Send className="w-3 h-3 text-white" />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        {/* Render replies recursively */}
+        {comment.replies && comment.replies.length > 0 && (
+          <div className="mt-2">
+            {renderCommentThread(comment.replies, issueId, depth + 1)}
+          </div>
+        )}
+      </div>
+    ));
   };
 
   return (
@@ -481,23 +551,30 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
                 className={`rounded-xl border bg-neutral-900/50 hover:border-neutral-700/70 transition ${issue.id === focusId ? 'border-blue-700/60 ring-1 ring-blue-800/30' : 'border-neutral-800'}`}
               >
                 <div className="flex items-start gap-3 p-4">
-                  {/* Vote */}
-                  <div className="flex flex-col items-center gap-1 pt-0.5 min-w-[40px]">
+                  {/* Vote - Improved UI with tooltips */}
+                  <div className="flex flex-col items-center gap-1 pt-0.5 min-w-[48px] bg-neutral-950/50 rounded-lg p-2 border border-neutral-800/50">
                     <button
                       onClick={() => handleVote(issue.id, 'up')}
-                      className="flex flex-col items-center group"
-                      title="Aprovar"
+                      className="flex flex-col items-center group relative"
                     >
-                      <ChevronUp className="w-5 h-5 text-neutral-600 group-hover:text-green-400 transition" />
-                      <span className="text-sm font-semibold text-neutral-400 group-hover:text-green-400 transition leading-none">{issue.votes}</span>
+                      <ChevronUp className="w-5 h-5 text-neutral-500 group-hover:text-green-400 group-hover:scale-110 transition-all" />
+                      <span className="text-sm font-bold text-neutral-300 group-hover:text-green-400 transition leading-none mt-0.5">{issue.votes}</span>
+                      {/* Tooltip */}
+                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-neutral-800 text-[10px] text-neutral-300 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">
+                        Aprovar — ajuda a calibrar o sentimento
+                      </span>
                     </button>
+                    <div className="w-full h-px bg-neutral-800 my-1" />
                     <button
                       onClick={() => handleVote(issue.id, 'down')}
-                      className="flex flex-col items-center group mt-1"
-                      title="Rejeitar"
+                      className="flex flex-col items-center group relative"
                     >
-                      <span className="text-[10px] font-semibold text-neutral-500 group-hover:text-red-400 transition leading-none mb-0.5">{issue.downvotes || 0}</span>
-                      <ChevronDown className="w-4 h-4 text-neutral-600 group-hover:text-red-400 transition" />
+                      <span className="text-xs font-semibold text-neutral-500 group-hover:text-red-400 transition leading-none mb-0.5">{issue.downvotes || 0}</span>
+                      <ChevronDown className="w-4 h-4 text-neutral-500 group-hover:text-red-400 group-hover:scale-110 transition-all" />
+                      {/* Tooltip */}
+                      <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-neutral-800 text-[10px] text-neutral-300 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10">
+                        Rejeitar — discordar do conteúdo
+                      </span>
                     </button>
                   </div>
 
@@ -589,31 +666,34 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
                       </button>
                     </div>
 
+                    {/* Quality Indicator (when no votes) */}
+                    {issue.quality_score && issue.votes === 0 && issue.comment_count === 0 && (
+                      <div className="flex items-center gap-2 px-3 py-2 bg-amber-900/20 border border-amber-800/30 rounded-lg">
+                        <span className="text-[10px] text-amber-400">
+                          Qualidade do conteúdo: {issue.quality_score}/100
+                          {issue.content_metrics?.complexity_tier === 'complex' && ' · Relato completo'}
+                          {issue.content_metrics?.has_proposed_solution && ' · Com solução proposta'}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Comments Thread */}
                     {comments.length === 0 ? (
                       <p className="text-xs text-neutral-600 text-center py-2">Nenhum comentário ainda. Seja o primeiro!</p>
                     ) : (
-                      comments.map(c => (
-                        <div key={c.id} className="flex items-start gap-2">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${c.is_ai ? 'bg-purple-900/30' : 'bg-neutral-800'}`}>
-                            {c.is_ai ? <Bot className="w-3 h-3 text-purple-400" /> : <User className="w-3 h-3 text-neutral-500" />}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs text-neutral-300">{c.body}</p>
-                            <span className="text-[10px] text-neutral-600">
-                              {new Date(c.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                              {c.is_ai && ' · Agente IA'}
-                            </span>
-                          </div>
-                        </div>
-                      ))
+                      <div className="space-y-3">
+                        {renderCommentThread(comments, issue.id)}
+                      </div>
                     )}
-                    <div className="flex items-center gap-2">
+                    
+                    {/* Main comment input */}
+                    <div className="flex items-center gap-2 pt-2 border-t border-neutral-800/30">
                       <input
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
                         placeholder="Adicionar comentário com sua conta protegida..."
                         className="flex-1 h-9 px-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-green-700 transition"
-                        onKeyDown={(e) => e.key === 'Enter' && handleComment(issue.id)}
+                        onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleComment(issue.id)}
                       />
                       <button
                         onClick={() => handleComment(issue.id)}

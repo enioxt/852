@@ -521,14 +521,26 @@ export async function addIssueComment(
   issueId: string,
   body: string,
   isAi: boolean = false,
-  userId?: string
+  userId?: string,
+  parentCommentId?: string
 ): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
 
+  const insertData: Record<string, unknown> = { 
+    issue_id: issueId, 
+    body, 
+    is_ai: isAi, 
+    user_id: userId || null 
+  };
+  
+  if (parentCommentId) {
+    insertData.parent_comment_id = parentCommentId;
+  }
+
   const { data, error } = await sb
     .from('issue_comments_852')
-    .insert({ issue_id: issueId, body, is_ai: isAi, user_id: userId || null })
+    .insert(insertData)
     .select('id')
     .single();
 

@@ -9,12 +9,27 @@ export interface HotTopic extends IssueRecord {
 
 function computeScore(issue: IssueRecord): number {
   const votes = issue.votes || 0;
+  const downvotes = (issue as any).downvotes || 0;
   const comments = issue.comment_count || 0;
+  const qualityScore = (issue as any).quality_score || 0;
+  const engagementPotential = (issue as any).engagement_potential || 0;
+  
   const ageMs = Date.now() - new Date(issue.created_at).getTime();
   const ageHours = ageMs / (1000 * 60 * 60);
-  // Decay: recent issues get a boost, older ones decay
-  const recencyBonus = Math.max(0, 100 - ageHours * 0.5);
-  return votes * 3 + comments * 2 + recencyBonus;
+  
+  // If has engagement (votes or comments), use traditional scoring
+  if (votes > 0 || comments > 0 || downvotes > 0) {
+    const recencyBonus = Math.max(0, 100 - ageHours * 0.5);
+    const voteScore = votes * 3 + downvotes * (-1) + comments * 2;
+    return voteScore + recencyBonus;
+  }
+  
+  // No engagement yet - use quality-based scoring
+  // Quality score (0-100) + engagement potential (0-150) + recency decay
+  const recencyDecay = Math.max(0, 50 - ageHours * 0.8); // Faster decay for new unvoted content
+  const baseScore = qualityScore + engagementPotential * 0.5;
+  
+  return baseScore + recencyDecay;
 }
 
 export async function GET(req: Request) {
@@ -39,7 +54,6 @@ export async function GET(req: Request) {
     }
 
     const scored: HotTopic[] = data
-      .filter((issue) => (issue.votes || 0) > 0)
       .map((issue) => {
         const ageMs = Date.now() - new Date(issue.created_at).getTime();
         return {

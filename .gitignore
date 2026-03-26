@@ -63,3 +63,6 @@ env/
 test_pipeline.ts
 test_upload.mjs
 test_report.*
+.idea/
+__pycache__/
+venv/
