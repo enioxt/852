@@ -18,7 +18,15 @@
     "verify:local-prod": "bash scripts/verify_local_prod.sh",
     "smoke:rate-limit": "python3 scripts/verify_rate_limit.py http://127.0.0.1:3100",
     "release:prod": "bash scripts/release_contabo.sh",
-    "report:comprehensive": "bash scripts/run-comprehensive-report.sh"
+    "report:comprehensive": "bash scripts/run-comprehensive-report.sh",
+    "test:impact": "npx tsx tests/dependency-analyzer/analyze.ts",
+    "test:impact:fast": "npx tsx tests/dependency-analyzer/fast-analyze.ts",
+    "test:impact:benchmark": "npx tsx tests/dependency-analyzer/fast-analyze.ts --benchmark",
+    "test:impact:all": "npx tsx tests/dependency-analyzer/test-all-presets.ts",
+    "orchestrator:logs": "npx tsx scripts/orchestrator/log-analyzer.ts",
+    "orchestrator:health": "npx tsx scripts/orchestrator/health-monitor.ts",
+    "orchestrator:db": "npx tsx scripts/orchestrator/database-auditor.ts",
+    "orchestrator:fix": "npx tsx scripts/orchestrator/auto-fix-agent.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
