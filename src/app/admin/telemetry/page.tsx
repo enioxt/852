@@ -6,15 +6,38 @@ import { useRouter } from 'next/navigation';
 import {
   BarChart3, Activity, MessageSquare, AlertTriangle,
   RefreshCw, Loader2, DollarSign, Zap, ShieldAlert,
-  ArrowLeft, Clock, LogOut, Shield,
+  ArrowLeft, Clock, LogOut, Shield, Filter, Download,
+  ChevronDown, ChevronUp, Search, X, FileJson
 } from 'lucide-react';
+
+interface AtrianViolation {
+  id: string;
+  created_at: string;
+  score: number;
+  categories: string[];
+  level: string;
+  message?: string;
+  metadata?: Record<string, unknown>;
+}
 
 interface AtrianStats {
   totalViolations: number;
   byCategory: Record<string, number>;
   byLevel: Record<string, number>;
   avgScore: number;
-  recentViolations: Array<Record<string, unknown>>;
+  recentViolations: AtrianViolation[];
+}
+
+interface TelemetryEvent {
+  id: string;
+  created_at: string;
+  event_type: string;
+  model_id?: string;
+  tokens_in?: number;
+  tokens_out?: number;
+  cost_usd?: number;
+  error_message?: string;
+  metadata?: Record<string, unknown>;
 }
 
 interface TelemetryStats {
@@ -27,7 +50,7 @@ interface TelemetryStats {
   errors: number;
   byModel: Record<string, number>;
   byProvider: Record<string, number>;
-  recentEvents: Array<Record<string, unknown>>;
+  recentEvents: TelemetryEvent[];
   atrian?: AtrianStats;
 }
 
@@ -46,6 +69,36 @@ export default function TelemetryDashboard() {
   const [aiInsight, setAiInsight] = useState<string | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiType, setAiType] = useState('general');
+
+  // New state for filters and drill-down
+  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [eventFilter, setEventFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    atrian: false,
+    events: false
+  });
+  const [atrianFilter, setAtrianFilter] = useState<{ category?: string, level?: string }>({});
+
+  const toggleSection = (key: string) => {
+    setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const exportData = () => {
+    if (!data?.stats) return;
+    const exportObj = {
+      timestamp: new Date().toISOString(),
+      days,
+      stats: data.stats
+    };
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `telemetry-${days}d-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -110,6 +163,15 @@ export default function TelemetryDashboard() {
           >
             Validações
           </Link>
+          <button
+            onClick={exportData}
+            disabled={!data?.stats}
+            className="h-10 px-3 inline-flex items-center gap-2 rounded-xl border border-neutral-800 text-sm text-neutral-300 hover:bg-neutral-900 transition disabled:opacity-50"
+            title="Exportar dados"
+          >
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Exportar</span>
+          </button>
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
@@ -164,12 +226,40 @@ export default function TelemetryDashboard() {
 
         {data?.configured && data.stats && (
           <>
-            {/* KPI Cards */}
+            {/* KPI Cards — Clickable with drill-down */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              <KPICard icon={MessageSquare} label="Conversas" value={data.stats.totalChats} color="blue" />
-              <KPICard icon={Zap} label="Tokens" value={`${((data.stats.totalTokensIn + data.stats.totalTokensOut) / 1000).toFixed(1)}k`} color="purple" />
-              <KPICard icon={DollarSign} label="Custo Total" value={`$${data.stats.totalCostUsd.toFixed(4)}`} color="green" />
-              <KPICard icon={ShieldAlert} label="Rate Limits" value={data.stats.rateLimitHits} color="amber" />
+              <ClickableKPICard
+                icon={MessageSquare}
+                label="Conversas"
+                value={data.stats.totalChats}
+                color="blue"
+                onClick={() => setSelectedMetric(selectedMetric === 'chats' ? null : 'chats')}
+                isActive={selectedMetric === 'chats'}
+              />
+              <ClickableKPICard
+                icon={Zap}
+                label="Tokens"
+                value={`${((data.stats.totalTokensIn + data.stats.totalTokensOut) / 1000).toFixed(1)}k`}
+                color="purple"
+                onClick={() => setSelectedMetric(selectedMetric === 'tokens' ? null : 'tokens')}
+                isActive={selectedMetric === 'tokens'}
+              />
+              <ClickableKPICard
+                icon={DollarSign}
+                label="Custo Total"
+                value={`$${data.stats.totalCostUsd.toFixed(4)}`}
+                color="green"
+                onClick={() => setSelectedMetric(selectedMetric === 'cost' ? null : 'cost')}
+                isActive={selectedMetric === 'cost'}
+              />
+              <ClickableKPICard
+                icon={ShieldAlert}
+                label="Rate Limits"
+                value={data.stats.rateLimitHits}
+                color="amber"
+                onClick={() => setSelectedMetric(selectedMetric === 'rateLimits' ? null : 'rateLimits')}
+                isActive={selectedMetric === 'rateLimits'}
+              />
             </div>
 
             {/* Secondary Stats */}
@@ -213,11 +303,10 @@ export default function TelemetryDashboard() {
                         const score = typeof meta.score === 'number' ? meta.score : '—';
                         return (
                           <div key={i} className="px-4 py-2 flex items-center gap-3 text-xs">
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${
-                              typeof meta.score === 'number' && meta.score < 50
-                                ? 'bg-red-900/40 text-red-400 border-red-800/40'
-                                : 'bg-orange-900/40 text-orange-400 border-orange-800/40'
-                            }`}>{score}</span>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${typeof meta.score === 'number' && meta.score < 50
+                              ? 'bg-red-900/40 text-red-400 border-red-800/40'
+                              : 'bg-orange-900/40 text-orange-400 border-orange-800/40'
+                              }`}>{score}</span>
                             <span className="text-neutral-400">{cats}</span>
                             <span className="text-neutral-600 flex items-center gap-1 ml-auto">
                               <Clock className="w-3 h-3" />
@@ -273,29 +362,129 @@ export default function TelemetryDashboard() {
               )}
             </div>
 
-            {/* Recent Events */}
-            <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 overflow-hidden">
-              <div className="px-4 py-3 border-b border-neutral-800 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-neutral-500" />
-                <h3 className="text-sm font-semibold text-white">Eventos Recentes</h3>
+            {/* Metric Drill-Down Panel */}
+            {selectedMetric && (
+              <div className="mb-8 rounded-xl border border-blue-800/30 bg-blue-900/10 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-blue-300">
+                    Detalhes: {selectedMetric === 'chats' ? 'Conversas' : selectedMetric === 'tokens' ? 'Tokens' : selectedMetric === 'cost' ? 'Custo' : 'Rate Limits'}
+                  </h3>
+                  <button onClick={() => setSelectedMetric(null)} className="text-neutral-400 hover:text-white">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="text-sm text-neutral-300">
+                  {selectedMetric === 'chats' && (
+                    <div className="space-y-2">
+                      <p>Total de conversas: <strong>{data.stats.totalChats}</strong></p>
+                      <p>Média por dia: <strong>{(data.stats.totalChats / days).toFixed(1)}</strong></p>
+                    </div>
+                  )}
+                  {selectedMetric === 'tokens' && (
+                    <div className="space-y-2">
+                      <p>Tokens entrada: <strong>{data.stats.totalTokensIn.toLocaleString()}</strong></p>
+                      <p>Tokens saída: <strong>{data.stats.totalTokensOut.toLocaleString()}</strong></p>
+                      <p>Total: <strong>{(data.stats.totalTokensIn + data.stats.totalTokensOut).toLocaleString()}</strong></p>
+                    </div>
+                  )}
+                  {selectedMetric === 'cost' && (
+                    <div className="space-y-2">
+                      <p>Custo total: <strong>${data.stats.totalCostUsd.toFixed(4)}</strong></p>
+                      <p>Média por conversa: <strong>${data.stats.totalChats > 0 ? (data.stats.totalCostUsd / data.stats.totalChats).toFixed(4) : '0'}</strong></p>
+                    </div>
+                  )}
+                  {selectedMetric === 'rateLimits' && (
+                    <div className="space-y-2">
+                      <p>Rate limits atingidos: <strong>{data.stats.rateLimitHits}</strong></p>
+                      <p className="text-amber-400">
+                        {data.stats.rateLimitHits > 10 ? '⚠️ Alto número de rate limits - verificar quotas' : '✓ Rate limits sob controle'}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="divide-y divide-neutral-800/50 max-h-96 overflow-y-auto">
-                {data.stats.recentEvents.map((ev, i) => (
-                  <div key={i} className="px-4 py-2.5 flex items-center gap-3 text-xs hover:bg-neutral-800/30 transition">
-                    <EventBadge type={String(ev.event_type || '')} />
-                    <span className="text-neutral-400 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {new Date(String(ev.created_at)).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                    {typeof ev.model_id === 'string' && <span className="text-neutral-500">{ev.model_id}</span>}
-                    {typeof ev.tokens_in === 'number' && <span className="text-neutral-600">{ev.tokens_in}→{String(ev.tokens_out ?? 0)} tok</span>}
-                    {typeof ev.cost_usd === 'number' && <span className="text-green-500/70">${ev.cost_usd.toFixed(5)}</span>}
-                    {typeof ev.error_message === 'string' && <span className="text-red-400 truncate max-w-xs">{ev.error_message}</span>}
-                  </div>
-                ))}
+            )}
+
+            {/* Recent Events with Filters */}
+            <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 overflow-hidden mb-8">
+              <div className="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-neutral-500" />
+                  <h3 className="text-sm font-semibold text-white">Eventos Recentes</h3>
+                  <span className="text-xs text-neutral-500">({data.stats.recentEvents.length})</span>
+                </div>
+                <button
+                  onClick={() => toggleSection('events')}
+                  className="text-neutral-400 hover:text-white transition"
+                >
+                  {expandedSections.events ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {/* Filters */}
+              <div className="px-4 py-3 border-b border-neutral-800/50 bg-neutral-900/30 flex flex-wrap gap-3">
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-neutral-500" />
+                  <input
+                    type="text"
+                    placeholder="Buscar eventos..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs text-neutral-200 w-40"
+                  />
+                </div>
+                <select
+                  value={eventFilter}
+                  onChange={(e) => setEventFilter(e.target.value)}
+                  className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-1.5 text-xs text-neutral-200"
+                >
+                  <option value="all">Todos os tipos</option>
+                  <option value="chat_completion">Chat</option>
+                  <option value="chat_error">Erros</option>
+                  <option value="rate_limit_hit">Rate Limits</option>
+                  <option value="atrian_violation">ATRiAN</option>
+                </select>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="text-xs text-neutral-400 hover:text-white flex items-center gap-1"
+                  >
+                    <X className="w-3 h-3" /> Limpar
+                  </button>
+                )}
+              </div>
+
+              <div className={`divide-y divide-neutral-800/50 overflow-y-auto transition-all ${expandedSections.events ? 'max-h-96' : 'max-h-48'}`}>
+                {data.stats.recentEvents
+                  .filter(ev => {
+                    const matchesType = eventFilter === 'all' || ev.event_type === eventFilter;
+                    const matchesSearch = searchQuery === '' ||
+                      JSON.stringify(ev).toLowerCase().includes(searchQuery.toLowerCase());
+                    return matchesType && matchesSearch;
+                  })
+                  .map((ev, i) => (
+                    <div key={i} className="px-4 py-2.5 flex items-center gap-3 text-xs hover:bg-neutral-800/30 transition">
+                      <EventBadge type={String(ev.event_type || '')} />
+                      <span className="text-neutral-400 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {new Date(String(ev.created_at)).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {typeof ev.model_id === 'string' && <span className="text-neutral-500">{ev.model_id}</span>}
+                      {typeof ev.tokens_in === 'number' && <span className="text-neutral-600">{ev.tokens_in}→{String(ev.tokens_out ?? 0)} tok</span>}
+                      {typeof ev.cost_usd === 'number' && <span className="text-green-500/70">${ev.cost_usd.toFixed(5)}</span>}
+                      {typeof ev.error_message === 'string' && <span className="text-red-400 truncate max-w-xs">{ev.error_message}</span>}
+                    </div>
+                  ))}
                 {data.stats.recentEvents.length === 0 && (
                   <div className="px-4 py-8 text-center text-neutral-500 text-sm">Nenhum evento registrado no período.</div>
                 )}
+                {data.stats.recentEvents.length > 0 && data.stats.recentEvents.filter(ev => {
+                  const matchesType = eventFilter === 'all' || ev.event_type === eventFilter;
+                  const matchesSearch = searchQuery === '' || JSON.stringify(ev).toLowerCase().includes(searchQuery.toLowerCase());
+                  return matchesType && matchesSearch;
+                }).length === 0 && (
+                    <div className="px-4 py-8 text-center text-neutral-500 text-sm">Nenhum evento corresponde aos filtros.</div>
+                  )}
               </div>
             </div>
           </>
@@ -321,6 +510,36 @@ function KPICard({ icon: Icon, label, value, color }: { icon: React.ComponentTyp
       </div>
       <p className="text-2xl font-bold text-white">{value}</p>
     </div>
+  );
+}
+
+function ClickableKPICard({ icon: Icon, label, value, color, onClick, isActive }: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string | number;
+  color: string;
+  onClick: () => void;
+  isActive: boolean;
+}) {
+  const colors: Record<string, string> = {
+    blue: 'text-blue-400 bg-blue-900/20 border-blue-800/30 hover:bg-blue-900/30',
+    green: 'text-green-400 bg-green-900/20 border-green-800/30 hover:bg-green-900/30',
+    amber: 'text-amber-400 bg-amber-900/20 border-amber-800/30 hover:bg-amber-900/30',
+    purple: 'text-purple-400 bg-purple-900/20 border-purple-800/30 hover:bg-purple-900/30',
+    red: 'text-red-400 bg-red-900/20 border-red-800/30 hover:bg-red-900/30',
+  };
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-xl border p-4 text-left transition-all ${colors[color] || colors.blue} ${isActive ? 'ring-2 ring-white/20' : ''}`}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <Icon className="w-4 h-4" />
+        <span className="text-xs font-medium opacity-80">{label}</span>
+      </div>
+      <p className="text-2xl font-bold text-white">{value}</p>
+      {isActive && <span className="text-[10px] text-neutral-400 mt-1 block">Clique para fechar</span>}
+    </button>
   );
 }
 
