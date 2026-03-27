@@ -239,3 +239,14 @@
 - [x] Conta Simplificada e Administrativa: `/conta` centralizada, sem label 'Provedor', com links de Telemetria (ATRiAN) limitados ao root admin.
 - [x] IA Anti-Spam (Qwen): Ajuste imperativo de prompt `isTrivial` bloqueando relatórios vindo de conversas curtas.
 - [x] Deploy VPS: Zero-Downtime roll out efetuado na branch contabo.
+
+## ✅ P1 - Sprint v9 (Security Hardening — CVE Mitigation, 2026-03-27)
+
+- [x] **CVE-2026-3910 (Chromium/V8) mitigated**: CVSS 8.8 — Updated Dockerfile base image from `node:20-alpine` to `node:22-alpine`
+- [x] **CVE-2026-3909 (Skia) mitigated**: CVSS 8.5 — Same base image update resolves Skia vulnerability
+- [x] **Security check script**: `scripts/security-check.sh` for continuous security verification (runs npm audit, checks Dockerfile base image)
+- [x] **SecOps report updated**: `docs/gem-hunter/secops-2026-03-21.md` marked as mitigated
+- [x] **CRCDM hooks**: Pre/post-commit and pre/post-push hooks installed for cross-repo change detection
+- [x] **Push completed**: Security changes deployed to main branch (commit 1c57608)
+
+## ⏭️ Backlog
