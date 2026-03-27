@@ -9,8 +9,13 @@ import {
   ArrowRight,
   Bot,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Download,
+  Eye,
   FileText,
+  HelpCircle,
+  Info,
   Loader2,
   Mic,
   Paperclip,
@@ -59,6 +64,87 @@ function compactText(value: string) {
   return value.replace(/\s+/g, ' ').trim();
 }
 
+const TEXT_PREVIEW_LINES = 10;
+
+function getTextPreview(text: string, maxLines: number = TEXT_PREVIEW_LINES): string {
+  const lines = text.split('\n');
+  if (lines.length <= maxLines) return text;
+  return lines.slice(0, maxLines).join('\n') + `\n\n[... ${lines.length - maxLines} linhas restantes]`;
+}
+
+function countLines(text: string): number {
+  return text.split('\n').length;
+}
+
+function toggleAttachmentExpanded(name: string, expanded: Set<string>, setExpanded: React.Dispatch<React.SetStateAction<Set<string>>>) {
+  const newSet = new Set(expanded);
+  if (newSet.has(name)) {
+    newSet.delete(name);
+  } else {
+    newSet.add(name);
+  }
+  setExpanded(newSet);
+}
+
+function Tooltip({ children, text }: { children: React.ReactNode; text: string }) {
+  const [show, setShow] = useState(false);
+  return (
+    <span className="relative inline-block">
+      <span
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        className="cursor-help"
+      >
+        {children}
+      </span>
+      {show && (
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 text-xs bg-neutral-900 border border-neutral-700 rounded-xl text-neutral-300 z-50 shadow-xl">
+          {text}
+          <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-neutral-900" />
+        </span>
+      )}
+    </span>
+  );
+}
+
+function ProcessStep({
+  number,
+  title,
+  description,
+  status,
+}: {
+  number: number;
+  title: string;
+  description: string;
+  status: 'pending' | 'running' | 'completed' | 'error';
+}) {
+  const statusColors = {
+    pending: 'bg-neutral-800 border-neutral-700 text-neutral-500',
+    running: 'bg-amber-950/30 border-amber-700 text-amber-400 animate-pulse',
+    completed: 'bg-emerald-950/30 border-emerald-700 text-emerald-400',
+    error: 'bg-rose-950/30 border-rose-700 text-rose-400',
+  };
+
+  const iconStatus = {
+    pending: <span className="text-neutral-600">○</span>,
+    running: <Loader2 className="h-4 w-4 animate-spin" />,
+    completed: <CheckCircle2 className="h-4 w-4" />,
+    error: <AlertTriangle className="h-4 w-4" />,
+  };
+
+  return (
+    <div className={`flex items-start gap-3 rounded-xl border p-3 ${statusColors[status]}`}>
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-current text-xs font-bold">
+        {iconStatus[status]}
+      </div>
+      <div>
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs opacity-80 mt-0.5">{description}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function SugestaoPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [draftId, setDraftId] = useState<string | null>(null);
@@ -88,11 +174,16 @@ export default function SugestaoPage() {
 
   const [tagsInput, setTagsInput] = useState('');
   const [attachments, setAttachments] = useState<ParsedAttachment[]>([]);
+  const [expandedAttachments, setExpandedAttachments] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState('');
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
+  const [reviewStatus, setReviewStatus] = useState<'idle' | 'running' | 'completed' | 'error'>('idle');
+  const [showReviewDiff, setShowReviewDiff] = useState(false);
+  const [originalContent, setOriginalContent] = useState('');
+  const [showProcessInfo, setShowProcessInfo] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState('');
   const [publishNotice, setPublishNotice] = useState('');
@@ -104,7 +195,7 @@ export default function SugestaoPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [hasSpeechSupport, setHasSpeechSupport] = useState(true);
   const recognitionRef = useRef<any>(null);
-  
+
   const currentBodyRef = useRef(body);
   useEffect(() => {
     currentBodyRef.current = body;
@@ -117,7 +208,7 @@ export default function SugestaoPage() {
         setHasSpeechSupport(false);
         return;
       }
-      
+
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = false;
@@ -130,7 +221,7 @@ export default function SugestaoPage() {
             newTranscript += event.results[i][0].transcript;
           }
         }
-        
+
         if (newTranscript) {
           const current = currentBodyRef.current.trim();
           const nextVal = current ? current + ' ' + newTranscript.trim() : newTranscript.trim();
@@ -290,6 +381,10 @@ export default function SugestaoPage() {
 
     setReviewLoading(true);
     setReviewError('');
+    setReviewStatus('running');
+    setOriginalContent(body);
+    setShowReviewDiff(false);
+
     try {
       const res = await fetch('/api/extract', {
         method: 'POST',
@@ -298,23 +393,33 @@ export default function SugestaoPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Falha na revisão.');
-      
-      if (data.title && !title.trim()) setTitle(data.title);
-      if (data.category && CATEGORIES.some(c => c.value === data.category)) setCategory(data.category);
-      if (Array.isArray(data.tags) && !tagsInput.trim()) {
-        setTagsInput(data.tags.join(', '));
+
+      const newTitle = data.title || '';
+      const newCategory = data.category || '';
+      const newTags = Array.isArray(data.tags) ? data.tags : [];
+
+      if (newTitle && !title.trim()) setTitle(newTitle);
+      if (newCategory && CATEGORIES.some(c => c.value === newCategory)) setCategory(newCategory);
+      if (newTags.length > 0 && !tagsInput.trim()) {
+        setTagsInput(newTags.join(', '));
       }
 
       setReviewData({
-        titulo: data.title || '',
+        titulo: newTitle,
         completude: data.completude || 0,
         impacto: data.impacto || 'Médio',
         resumo: data.resumo || '',
         sugestoes: data.sugestoes || [],
-        insights_estruturais: data.insights_estruturais || []
+        insights_estruturais: data.insights_estruturais || [],
+        temas: newTags,
+        pontosCegos: data.sugestoes || [],
       } as ReviewData);
+
+      setReviewStatus('completed');
+      setShowReviewDiff(true);
     } catch (error) {
       setReviewError(error instanceof Error ? error.message : 'Falha na revisão.');
+      setReviewStatus('error');
     } finally {
       setReviewLoading(false);
     }
@@ -356,11 +461,11 @@ export default function SugestaoPage() {
       tags.length > 0 ? `## Tags livres\n${tags.map((tag) => `- ${tag}`).join('\n')}` : '',
       reviewData
         ? [
-            '## Revisão automática',
-            `- Completude: ${reviewData.completude}/10`,
-            `- Resumo: ${reviewData.resumo}`,
-            reviewData.sugestoes?.length ? `- Sugestões: ${reviewData.sugestoes.join(' | ')}` : '',
-          ].filter(Boolean).join('\n')
+          '## Revisão automática',
+          `- Completude: ${reviewData.completude}/10`,
+          `- Resumo: ${reviewData.resumo}`,
+          reviewData.sugestoes?.length ? `- Sugestões: ${reviewData.sugestoes.join(' | ')}` : '',
+        ].filter(Boolean).join('\n')
         : '',
       `## Validação\n- PII removido: ${piiFindings.length}\n- ATRiAN: ${atrianResult.score}/100`,
     ].filter(Boolean).join('\n\n');
@@ -462,7 +567,7 @@ export default function SugestaoPage() {
                     </button>
                   )}
                 </div>
-                
+
                 <div className="mb-4">
                   <p className="text-xs text-neutral-500 mb-2">Bússola e Modelos (opcional):</p>
                   <div className="flex flex-wrap gap-2">
@@ -510,18 +615,44 @@ export default function SugestaoPage() {
               {uploadError ? <p className="mt-3 text-sm text-rose-400">{uploadError}</p> : null}
               {attachments.length > 0 ? (
                 <div className="mt-4 space-y-2">
-                  {attachments.map((item) => (
-                    <div key={`${item.name}-${item.charCount}`} className="flex items-center gap-3 rounded-2xl border border-neutral-800 bg-neutral-900/70 px-4 py-3 text-sm">
-                      <Paperclip className="h-4 w-4 text-blue-400" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-white">{item.name}</p>
-                        <p className="text-xs text-neutral-500">{item.extension.toUpperCase()} · {item.charCount} caracteres{item.truncated ? ' · trecho truncado' : ''}</p>
+                  {attachments.map((item) => {
+                    const isExpanded = expandedAttachments.has(item.name);
+                    const lineCount = countLines(item.text);
+                    const shouldTruncate = lineCount > TEXT_PREVIEW_LINES;
+                    const displayText = isExpanded || !shouldTruncate
+                      ? item.text
+                      : getTextPreview(item.text, TEXT_PREVIEW_LINES);
+
+                    return (
+                      <div key={`${item.name}-${item.charCount}`} className="rounded-2xl border border-neutral-800 bg-neutral-900/70 overflow-hidden">
+                        <div className="flex items-center gap-3 px-4 py-3 text-sm">
+                          <Paperclip className="h-4 w-4 text-blue-400 shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-white">{item.name}</p>
+                            <p className="text-xs text-neutral-500">{item.extension.toUpperCase()} · {item.charCount} caracteres · {lineCount} linhas</p>
+                          </div>
+                          {shouldTruncate && (
+                            <button
+                              onClick={() => toggleAttachmentExpanded(item.name, expandedAttachments, setExpandedAttachments)}
+                              className="flex items-center gap-1 px-2 py-1 text-xs rounded-lg bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition"
+                            >
+                              {isExpanded ? <><ChevronUp className="h-3 w-3" /> Reduzir</> : <><ChevronDown className="h-3 w-3" /> Expandir</>}
+                            </button>
+                          )}
+                          <button onClick={() => setAttachments((current) => current.filter((entry) => entry !== item))} className="rounded-xl p-2 text-neutral-500 transition hover:bg-neutral-800 hover:text-white">
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                        {shouldTruncate && (
+                          <div className="px-4 pb-3">
+                            <pre className="text-xs text-neutral-400 bg-neutral-950/50 rounded-xl p-3 overflow-x-auto max-h-48 overflow-y-auto">
+                              {displayText}
+                            </pre>
+                          </div>
+                        )}
                       </div>
-                      <button onClick={() => setAttachments((current) => current.filter((entry) => entry !== item))} className="rounded-xl p-2 text-neutral-500 transition hover:bg-neutral-800 hover:text-white">
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : null}
             </div>
@@ -529,35 +660,120 @@ export default function SugestaoPage() {
 
           <div className="grid gap-4 lg:grid-cols-3">
             <div className="rounded-3xl border border-neutral-800 bg-neutral-900/60 p-5">
-              <div className="flex items-center gap-2 text-sm font-medium text-white"><Shield className="h-4 w-4 text-emerald-400" /> PII</div>
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
+                <Tooltip text="Identificação e remoção automática de dados pessoais (CPF, telefone, email, MASP, placas, etc.) para proteger sua identidade.">
+                  <HelpCircle className="h-4 w-4 text-neutral-500 hover:text-emerald-400 transition cursor-help" />
+                </Tooltip>
+                <Shield className="h-4 w-4 text-emerald-400" /> PII
+              </div>
               <p className="mt-3 text-sm leading-relaxed text-neutral-400">{getPIISummary(piiFindings)}</p>
             </div>
             <div className={`rounded-3xl border p-5 ${atrianResult.passed ? 'border-emerald-800/40 bg-emerald-950/20' : 'border-amber-800/40 bg-amber-950/20'}`}>
-              <div className="flex items-center gap-2 text-sm font-medium text-white"><Sparkles className="h-4 w-4 text-amber-400" /> ATRiAN</div>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-400">Score {atrianResult.score}/100 · {atrianResult.violations.length} alerta(s) de linguagem e integridade.</p>
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
+                <Tooltip text="Validação ética ATRiAN (Accuracy, Truth, Reversibility, Impact, Accountability, Neutrality). Garante linguagem apropriada e integridade do relato.">
+                  <HelpCircle className="h-4 w-4 text-neutral-500 hover:text-amber-400 transition cursor-help" />
+                </Tooltip>
+                <Sparkles className="h-4 w-4 text-amber-400" /> ATRiAN
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-400">
+                <span className={atrianResult.passed ? 'text-emerald-400 font-medium' : 'text-amber-400 font-medium'}>
+                  Score {atrianResult.score}/100
+                </span>
+                <span className="block mt-1">{atrianResult.violations.length} alerta(s) de linguagem e integridade</span>
+              </p>
             </div>
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-900/60 p-5">
-              <div className="flex items-center gap-2 text-sm font-medium text-white"><Bot className="h-4 w-4 text-blue-400" /> Revisão opcional</div>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-400">Peça uma leitura automática antes de publicar para ganhar resumo, completude e perguntas de aprofundamento.</p>
+            <div className={`rounded-3xl border p-5 ${reviewStatus === 'completed' ? 'border-emerald-800/40 bg-emerald-950/20' : reviewStatus === 'running' ? 'border-amber-800/40 bg-amber-950/20' : 'border-neutral-800 bg-neutral-900/60'}`}>
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
+                <Tooltip text="Análise inteligente por IA que extrai título, categoria, tags e sugere melhorias. Obrigatória antes da publicação.">
+                  <HelpCircle className="h-4 w-4 text-neutral-500 hover:text-blue-400 transition cursor-help" />
+                </Tooltip>
+                <Bot className={`h-4 w-4 ${reviewStatus === 'completed' ? 'text-emerald-400' : reviewStatus === 'running' ? 'text-amber-400' : 'text-blue-400'}`} />
+                Revisão IA
+                {reviewStatus === 'completed' && <CheckCircle2 className="h-4 w-4 text-emerald-400 ml-1" />}
+                {reviewStatus === 'running' && <Loader2 className="h-4 w-4 text-amber-400 ml-1 animate-spin" />}
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-400">
+                {reviewStatus === 'idle' && 'Aguardando análise. Clique em "Revisar com IA" para extrair tópicos e sugerir melhorias.'}
+                {reviewStatus === 'running' && 'Analisando documento com IA... Extraindo título, categoria, tags e tópicos.'}
+                {reviewStatus === 'completed' && '✓ Análise concluída! Título, categoria, tags e sugestões extraídos com sucesso.'}
+                {reviewStatus === 'error' && '❌ Falha na análise. Tente novamente ou revise o conteúdo.'}
+              </p>
             </div>
           </div>
 
           <div className="rounded-3xl border border-neutral-800 bg-neutral-900/60 p-6 sm:p-8">
-            <div className="flex flex-wrap gap-3">
-              <button onClick={() => void runReview()} disabled={reviewLoading} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 text-sm font-semibold text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60">
-                {reviewLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
-                Revisar com IA
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap gap-3">
+                <button onClick={() => void runReview()} disabled={reviewLoading} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 text-sm font-semibold text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60">
+                  {reviewLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+                  {reviewStatus === 'completed' ? 'Revisar novamente' : 'Revisar com IA'}
+                </button>
+                <button onClick={exportMarkdown} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-neutral-700 bg-neutral-900 px-5 text-sm font-medium text-neutral-200 transition hover:bg-neutral-800">
+                  <Download className="h-4 w-4" /> Exportar MD
+                </button>
+                <button onClick={exportPdf} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-neutral-700 bg-neutral-900 px-5 text-sm font-medium text-neutral-200 transition hover:bg-neutral-800">
+                  <FileText className="h-4 w-4" /> Exportar PDF
+                </button>
+                <button
+                  onClick={() => void publishSuggestion()}
+                  disabled={publishing || reviewStatus !== 'completed'}
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-blue-800/40 bg-blue-950/40 px-5 text-sm font-semibold text-blue-300 transition hover:bg-blue-950/60 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                  Publicar no fórum
+                </button>
+              </div>
+
+              {reviewStatus !== 'completed' && (
+                <div className="flex items-start gap-2 rounded-xl border border-amber-800/30 bg-amber-950/20 p-3 text-sm text-amber-300">
+                  <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>Revisão com IA é obrigatória antes de publicar. Clique em "Revisar com IA" para analisar seu documento.</span>
+                </div>
+              )}
+
+              <button
+                onClick={() => setShowProcessInfo(!showProcessInfo)}
+                className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-300 transition"
+              >
+                {showProcessInfo ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {showProcessInfo ? 'Ocultar' : 'Como funciona o processo de publicação?'}
               </button>
-              <button onClick={exportMarkdown} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-neutral-700 bg-neutral-900 px-5 text-sm font-medium text-neutral-200 transition hover:bg-neutral-800">
-                <Download className="h-4 w-4" /> Exportar MD
-              </button>
-              <button onClick={exportPdf} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-neutral-700 bg-neutral-900 px-5 text-sm font-medium text-neutral-200 transition hover:bg-neutral-800">
-                <FileText className="h-4 w-4" /> Exportar PDF
-              </button>
-              <button onClick={() => void publishSuggestion()} disabled={publishing} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-blue-800/40 bg-blue-950/40 px-5 text-sm font-semibold text-blue-300 transition hover:bg-blue-950/60 disabled:cursor-not-allowed disabled:opacity-60">
-                {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-                Publicar no fórum
-              </button>
+
+              {showProcessInfo && (
+                <div className="rounded-2xl border border-neutral-800 bg-neutral-950/50 p-4 space-y-3">
+                  <p className="text-xs text-neutral-400">Seu relato passa por estas etapas antes de virar um relatório público:</p>
+                  <ProcessStep
+                    number={1}
+                    title="Upload e Análise de Anexos"
+                    description="Extração de texto de PDF, DOC, DOCX, TXT, MD. Preview truncado para arquivos grandes (>10 linhas)."
+                    status={attachments.length > 0 ? 'completed' : 'pending'}
+                  />
+                  <ProcessStep
+                    number={2}
+                    title="Sanitização PII"
+                    description="Remoção automática de CPF, telefone, email, MASP, placas, nomes próprios para proteger sua identidade."
+                    status={piiFindings.length >= 0 ? 'completed' : 'pending'}
+                  />
+                  <ProcessStep
+                    number={3}
+                    title="Validação ATRiAN"
+                    description="Verificação ética: Accuracy, Truth, Reversibility, Impact, Accountability, Neutrality."
+                    status={atrianResult.score > 0 ? 'completed' : 'pending'}
+                  />
+                  <ProcessStep
+                    number={4}
+                    title="Análise Inteligente (IA)"
+                    description="Extração automática de: título sugerido, categoria, tags, tópicos, completude, impacto."
+                    status={reviewStatus === 'completed' ? 'completed' : reviewStatus === 'running' ? 'running' : 'pending'}
+                  />
+                  <ProcessStep
+                    number={5}
+                    title="Publicação no Fórum"
+                    description="Transforma seu relato em um relatório estruturado no Tira-Voz (/issues), pronto para engajamento da comunidade."
+                    status='pending'
+                  />
+                </div>
+              )}
             </div>
             {reviewError ? <p className="mt-4 text-sm text-rose-400">{reviewError}</p> : null}
             {publishError ? <p className="mt-4 text-sm text-rose-400">{publishError}</p> : null}
@@ -572,15 +788,132 @@ export default function SugestaoPage() {
           />
 
           <div className="rounded-3xl border border-neutral-800 bg-neutral-900/60 p-6 sm:p-8">
-            <div className="flex items-center gap-2 text-sm font-medium text-white"><CheckCircle2 className="h-4 w-4 text-emerald-400" /> Preview sanitizado</div>
-            <pre className="mt-4 whitespace-pre-wrap rounded-3xl border border-neutral-800 bg-neutral-950 p-4 text-sm leading-relaxed text-neutral-300">{sanitizedBody || 'O texto sanitizado aparecera aqui assim que voce escrever ou anexar algum documento.'}</pre>
-            {reviewData ? (
-              <div className="mt-5 rounded-3xl border border-blue-800/30 bg-blue-950/20 p-4 text-sm text-neutral-300">
-                <p className="font-medium text-white">Resumo automático</p>
-                <p className="mt-2 leading-relaxed">{reviewData.resumo}</p>
-                <p className="mt-3 text-neutral-400">Completude: {reviewData.completude}/10 · Impacto: {reviewData.impacto}</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-medium text-white">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                {showReviewDiff && reviewData ? 'Revisão da IA - Comparativo' : 'Preview sanitizado'}
               </div>
-            ) : null}
+              {showReviewDiff && reviewData && (
+                <button
+                  onClick={() => setShowReviewDiff(false)}
+                  className="text-xs text-neutral-400 hover:text-white transition"
+                >
+                  Ocultar comparativo
+                </button>
+              )}
+            </div>
+
+            {showReviewDiff && originalContent && reviewData ? (
+              <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                <div className="rounded-2xl border border-neutral-800 bg-neutral-950/50 p-4">
+                  <p className="text-xs text-neutral-500 mb-2">Original (antes da revisão)</p>
+                  <pre className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-400 max-h-96 overflow-y-auto">{originalContent.slice(0, 1000)}{originalContent.length > 1000 && '...'}</pre>
+                </div>
+                <div className="rounded-2xl border border-emerald-800/30 bg-emerald-950/10 p-4">
+                  <p className="text-xs text-emerald-400 mb-2 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" /> Revisado pela IA
+                  </p>
+                  <div className="space-y-3">
+                    {reviewData.titulo && (
+                      <div className="rounded-xl bg-neutral-950/50 p-3">
+                        <p className="text-xs text-neutral-500">Título sugerido:</p>
+                        <p className="text-sm font-medium text-white">{reviewData.titulo}</p>
+                      </div>
+                    )}
+                    <div className="rounded-xl bg-neutral-950/50 p-3">
+                      <p className="text-xs text-neutral-500">Resumo:</p>
+                      <p className="text-sm text-neutral-300">{reviewData.resumo}</p>
+                    </div>
+                    {reviewData.temas && reviewData.temas.length > 0 && (
+                      <div className="rounded-xl bg-neutral-950/50 p-3">
+                        <p className="text-xs text-neutral-500">Tópicos extraídos:</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {reviewData.temas.map((tema: string, idx: number) => (
+                            <span key={idx} className="px-2 py-0.5 text-xs rounded-full bg-blue-900/50 text-blue-300 border border-blue-800/30">
+                              {tema}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 text-xs">
+                      <span className="px-2 py-1 rounded-lg bg-neutral-800 text-neutral-300">
+                        Completude: {reviewData.completude}/10
+                      </span>
+                      <span className="px-2 py-1 rounded-lg bg-neutral-800 text-neutral-300">
+                        Impacto: {reviewData.impacto}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <pre className="mt-4 whitespace-pre-wrap rounded-3xl border border-neutral-800 bg-neutral-950 p-4 text-sm leading-relaxed text-neutral-300">{sanitizedBody || 'O texto sanitizado aparecera aqui assim que voce escrever ou anexar algum documento.'}</pre>
+                {reviewData && (
+                  <div className="mt-5 rounded-3xl border border-blue-800/30 bg-blue-950/20 p-4 text-sm text-neutral-300">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="font-medium text-white flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-blue-400" />
+                        Resultado da Análise IA
+                      </p>
+                      <button
+                        onClick={() => setShowReviewDiff(true)}
+                        className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                      >
+                        <Eye className="h-3 w-3" /> Ver comparativo
+                      </button>
+                    </div>
+
+                    {reviewData.titulo && (
+                      <div className="mb-3 p-3 rounded-xl bg-neutral-950/30 border border-neutral-800">
+                        <p className="text-xs text-neutral-500 mb-1">Título sugerido para o relatório:</p>
+                        <p className="text-base font-semibold text-white">{reviewData.titulo}</p>
+                      </div>
+                    )}
+
+                    <p className="leading-relaxed">{reviewData.resumo}</p>
+
+                    {reviewData.temas && reviewData.temas.length > 0 && (
+                      <div className="mt-3">
+                        <p className="text-xs text-neutral-500 mb-2">Tópicos identificados:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {reviewData.temas.map((tema: string, idx: number) => (
+                            <button
+                              key={idx}
+                              onClick={() => handleAddTag(tema)}
+                              className="px-3 py-1 text-xs rounded-full bg-blue-900/30 text-blue-300 border border-blue-800/30 hover:bg-blue-900/50 transition"
+                            >
+                              + {tema}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {reviewData.insights_estruturais && reviewData.insights_estruturais.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-neutral-800">
+                        <p className="text-xs text-neutral-500 mb-2">Insights estruturais:</p>
+                        <ul className="space-y-1">
+                          {reviewData.insights_estruturais.map((insight: string, idx: number) => (
+                            <li key={idx} className="text-xs text-neutral-400 flex items-start gap-2">
+                              <span className="text-amber-400">▸</span> {insight}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    <div className="mt-3 flex items-center gap-3 text-neutral-400 text-xs">
+                      <span>Completude: <span className="text-white font-medium">{reviewData.completude}/10</span></span>
+                      <span>·</span>
+                      <span>Impacto: <span className="text-white font-medium">{reviewData.impacto}</span></span>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
             {!atrianResult.passed && atrianResult.violations.length > 0 ? (
               <div className="mt-5 rounded-3xl border border-amber-800/30 bg-amber-950/20 p-4 text-sm text-amber-200">
                 <div className="flex items-center gap-2 font-medium text-white"><AlertTriangle className="h-4 w-4 text-amber-400" /> Ajustes recomendados</div>
@@ -644,7 +977,7 @@ export default function SugestaoPage() {
 
           <div className="rounded-3xl border border-rose-900/40 bg-rose-950/10 p-5 mt-4">
             <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-rose-400">
-              <AlertTriangle className="h-4 w-4" /> 
+              <AlertTriangle className="h-4 w-4" />
               Vias Institucionais
             </div>
             <p className="text-xs text-neutral-400 mb-4 leading-relaxed">
@@ -664,14 +997,14 @@ export default function SugestaoPage() {
         </aside>
       </main>
 
-      <GuidedWizardModal 
-        isOpen={wizardOpen} 
-        onClose={() => setWizardOpen(false)} 
+      <GuidedWizardModal
+        isOpen={wizardOpen}
+        onClose={() => setWizardOpen(false)}
         onComplete={(data) => {
           setCategory(data.category as any);
           setTitle(data.title);
           setBody(data.body);
-        }} 
+        }}
       />
     </div>
   );
