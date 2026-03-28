@@ -2,6 +2,7 @@ import { generateText } from 'ai';
 import { getModelConfig } from '@/lib/ai-provider';
 import { recordEvent } from '@/lib/telemetry';
 import { buildIntelligenceReportPrompt } from '@/lib/prompt';
+import { applyInsightWeighting } from '@/lib/insight-weighting';
 import {
   getSupabase,
   saveAIReport,
@@ -118,6 +119,26 @@ export async function POST(req: Request) {
     } catch {
       console.error('[852-ai-report] JSON parse failed, raw:', result.text.slice(0, 200));
       return Response.json({ error: 'Falha ao parsear resposta da IA' }, { status: 500 });
+    }
+
+    // Apply category-based weighting to insights (Feature 2)
+    // This prioritizes critical issues: assédio > efetivo > infraestrutura > ...
+    if (Array.isArray(reportJson.insights) && reportJson.insights.length > 0) {
+      try {
+        const weightedInsights = applyInsightWeighting(reportJson.insights);
+        // Include weight metadata in insights (for debugging/transparency)
+        reportJson.insights = weightedInsights.map(i => ({
+          ...i,
+          _weight_metadata: {
+            category_weight: i.weight,
+            severity_score: i.severidade_score,
+            final_score: i.final_score
+          }
+        }));
+      } catch (error) {
+        console.error('[852-ai-report] Weighting failed:', error);
+        // Continue without weighting if it fails
+      }
     }
 
     // Calculate cost
