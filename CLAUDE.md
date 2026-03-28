@@ -73,6 +73,43 @@ git pull && docker compose up -d --build
 Supabase (`lhscgsqhiooyatkebose`). RLS sempre ativado. Tabelas principais:
 `telemetry_852`, `reports_852`, `conversations_852`, `issues_852`, `ai_reports_852`, `user_accounts_852`, `auth_codes_852`
 
+## LGPD Compliance
+
+**Status:** Baseline compliance active; healthcare extensions in progress
+
+**Enforcement:**
+- ✅ CPF/PII masking system-wide (lib/pii-scanner.ts)
+- ✅ Audit logs (telemetry_events) recording all actions
+- ✅ RLS (Row-Level Security) on all user-scoped data
+- ⚠️ Healthcare data handling: See `../egos/frozen-zones/lgpd-health.md` if integrating with hospitals
+- ⚠️ Pre-deploy LGPD checklist: Required for any health-related features
+
+**Key Documents:**
+- **Policy:** `../egos/frozen-zones/lgpd-health.md` (immutable frozen zone)
+- **Checklist:** `../egos/frozen-zones/lgpd-health-checklist.md` (15-item compliance verification)
+- **Incident Playbook:** `../egos/docs/INCIDENT_RESPONSE_HEALTH.md` (5+ breach scenarios)
+
+**Healthcare Integration Rules** (if applicable):
+1. Raw conversations deleted within 1 hour (0 retention)
+2. Clinical extracts encrypted (AES-256) + RLS enforced
+3. Telemetry pseudonymized (SHA256 + separate salt)
+4. Consent log append-only + audit-protected
+5. Incident response timeline: Hospital notified within 2h; ANPD within 3 days
+
+**Pre-Deployment:**
+- [ ] No raw phone numbers in logs (auto-check in CI)
+- [ ] No test/real CPF in code (auto-check in CI)
+- [ ] Retention windows defined (.env)
+- [ ] Delete cron job confirmed (raw conversations)
+- [ ] RLS policies enforced (DB)
+- [ ] Encryption at rest enabled
+- [ ] TLS 1.3+ enforced
+- [ ] Incident playbook accessible
+- [ ] DPA signed (if hospital integration)
+- [ ] Hospital IT trained
+
+See `.github/workflows/lgpd-compliance-check.yml` for CI/CD automation.
+
 ---
 
 ## Regra: Próxima Task
