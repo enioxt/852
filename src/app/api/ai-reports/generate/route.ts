@@ -16,6 +16,20 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const forceGenerate = body.force === true;
 
+    // Parse date window from query params or request body
+    // Supported: 7, 14, 30 days (default: 7)
+    const windowDays = (() => {
+      const param = body.window || new URL(req.url).searchParams.get('window');
+      const parsed = parseInt(param || '7', 10);
+      return [7, 14, 30].includes(parsed) ? parsed : 7;
+    })();
+
+    // Calculate date range
+    const now = new Date();
+    const startDate = new Date(now.getTime() - windowDays * 24 * 60 * 60 * 1000);
+    const startDateISO = startDate.toISOString();
+    const endDateISO = now.toISOString();
+
     // Check if we should generate (every 5 shared reports)
     if (!forceGenerate) {
       const count = await getSharedReportCountSinceLastAIReport();
@@ -33,25 +47,34 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Supabase não configurado' }, { status: 503 });
     }
 
-    // Fetch recent conversations and reports for analysis
+    // Fetch conversations within date window (instead of LIMIT 20)
     const { data: conversations } = await sb
       .from('conversations_852')
       .select('messages, title, created_at, message_count')
-      .order('created_at', { ascending: false })
-      .limit(20);
+      .gte('created_at', startDateISO)
+      .lte('created_at', endDateISO)
+      .order('created_at', { ascending: false });
 
+    // Fetch reports within date window
     const { data: reports } = await sb
       .from('reports_852')
       .select('messages, review_data, created_at')
       .neq('status', 'deleted')
-      .order('created_at', { ascending: false })
-      .limit(20);
+      .gte('created_at', startDateISO)
+      .lte('created_at', endDateISO)
+      .order('created_at', { ascending: false });
 
     const convoList = conversations || [];
     const reportList = reports || [];
 
     if (convoList.length === 0) {
-      return Response.json({ generated: false, reason: 'Sem conversas para analisar' });
+      return Response.json({
+        generated: false,
+        reason: `Sem conversas para analisar no período dos últimos ${windowDays} dias`,
+        window_days: windowDays,
+        window_start: startDateISO,
+        window_end: endDateISO,
+      });
     }
 
     // Build analysis context
@@ -70,7 +93,7 @@ export async function POST(req: Request) {
         return `--- REVISÃO IA ${i + 1} ---\nResumo: ${rd.resumo || 'N/A'}\nTemas: ${Array.isArray(rd.temas) ? rd.temas.join(', ') : 'N/A'}\nSugestões: ${Array.isArray(rd.sugestoes) ? rd.sugestoes.map((s: { texto?: string }) => s.texto).join('; ') : 'N/A'}\nPontos Cegos: ${Array.isArray(rd.pontosCegos) ? rd.pontosCegos.join('; ') : 'N/A'}`;
       }).join('\n\n');
 
-    const userMessage = `Analise as seguintes ${convoList.length} conversas e ${reportList.length} relatórios:\n\n## CONVERSAS BRUTAS\n${convoText}\n\n## REVISÕES DA IA (sugestões que podem não ter sido seguidas)\n${reviewText || 'Nenhuma revisão disponível'}\n\nGere o relatório completo em JSON.`;
+    const userMessage = `Analise as seguintes ${convoList.length} conversas e ${reportList.length} relatórios (período: últimos ${windowDays} dias, ${startDate.toLocaleDateString('pt-BR')} a ${now.toLocaleDateString('pt-BR')}):\n\n## CONVERSAS BRUTAS\n${convoText}\n\n## REVISÕES DA IA (sugestões que podem não ter sido seguidas)\n${reviewText || 'Nenhuma revisão disponível'}\n\nGere o relatório completo em JSON.`;
 
     const { provider, modelId, providerLabel, pricing } = getModelConfig('intelligence_report');
     const startTime = Date.now();
