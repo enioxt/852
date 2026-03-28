@@ -1,6 +1,7 @@
 'use client';
 
-import { X, Shield, Lock, FileText, MessageSquare, Share2, AlertTriangle } from 'lucide-react';
+import { X, Shield, Lock, FileText, MessageSquare, Share2, AlertTriangle, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 interface FAQModalProps {
   onClose: () => void;
@@ -9,13 +10,13 @@ interface FAQModalProps {
 const faqs = [
   {
     icon: Shield,
-    q: 'Este canal é realmente anônimo?',
-    a: 'Sim. Não coletamos nomes, CPFs, IPs, nem identificamos quem está usando. Suas conversas não são armazenadas em servidores, ficam apenas no seu navegador.',
+    q: 'O que é o Tira-Voz?',
+    a: 'É um canal digital seguro e anônimo onde policiais civis de Minas Gerais podem relatar problemas do dia a dia, sugerir melhorias e construir pautas coletivas para a categoria. Funciona como um radar: capta o que acontece na base e organiza para que chegue onde precisa.',
   },
   {
     icon: Lock,
-    q: 'O que acontece com o que eu escrevo?',
-    a: 'No chat, suas mensagens são processadas em tempo real pela IA. Se preferir escrever sem conversar, use a página de sugestão direta: ela aceita anexos, mostra preview sanitizado e só publica no fórum quando você confirmar.',
+    q: 'É realmente anônimo?',
+    a: 'Sim. Não coletamos nomes, CPFs, IPs nem identificamos quem está usando. O cadastro é opcional e usa codinomes aleatórios (ex: Falcão Noturno, Águia de Ferro). Suas conversas ficam no seu navegador, não em servidores.',
   },
   {
     icon: AlertTriangle,
@@ -67,10 +68,18 @@ export default function FAQModal({ onClose }: FAQModalProps) {
             </div>
           ))}
         </div>
-        <div className="p-4 border-t border-neutral-800 bg-neutral-900/80">
+        <div className="p-4 border-t border-neutral-800 bg-neutral-900/80 space-y-3">
           <p className="text-[10px] text-neutral-500 text-center">
             Tira-Voz: o radar da base · Canal de inteligência institucional para os 852 municípios de MG
           </p>
+          <Link
+            href="/"
+            onClick={onClose}
+            className="flex items-center justify-center gap-2 text-xs text-amber-400 hover:text-amber-300 transition"
+          >
+            Ver FAQ completo na página inicial
+            <ExternalLink className="w-3 h-3" />
+          </Link>
         </div>
       </div>
     </div>

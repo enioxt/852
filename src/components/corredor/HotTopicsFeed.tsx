@@ -12,7 +12,9 @@ import {
   Tag,
   TrendingUp,
 } from 'lucide-react';
+import { ReportPreviewTooltip } from './ReportPreviewTooltip';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 interface HotTopic {
   id: string;
   title: string;
@@ -25,6 +27,10 @@ interface HotTopic {
   created_at: string;
   score: number;
   age_hours: number;
+  ai_report_id?: string | null;
+  ai_report_summary?: string | null;
+  ai_report_conversation_count?: number;
+  ai_report_report_count?: number;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -139,39 +145,61 @@ export function HotTopicsFeed() {
             {/* Top 3 - Featured */}
             {topThree.length > 0 && (
               <div className="grid gap-4 sm:grid-cols-3">
-                {topThree.map((topic, index) => (
-                  <Link
-                    key={topic.id}
-                    href={`/issues?id=${topic.id}`}
-                    className="group relative rounded-2xl border border-neutral-800 bg-gradient-to-b from-neutral-900/80 to-neutral-950/80 p-5 hover:border-neutral-700 transition"
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                        index === 0
+                {topThree.map((topic, index) => {
+                  const CardContent = (
+                    <div className="group relative rounded-2xl border border-neutral-800 bg-gradient-to-b from-neutral-900/80 to-neutral-950/80 p-5 hover:border-neutral-700 transition cursor-pointer">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${index === 0
                           ? 'bg-amber-500/20 text-amber-400'
                           : index === 1
                             ? 'bg-neutral-700 text-neutral-300'
                             : 'bg-amber-900/20 text-amber-600'
-                      }`}>
-                        {index + 1}
-                      </span>
-                      <Flame className={`h-4 w-4 ${index === 0 ? 'text-orange-400' : 'text-neutral-600'}`} />
+                          }`}>
+                          {index + 1}
+                        </span>
+                        <Flame className={`h-4 w-4 ${index === 0 ? 'text-orange-400' : 'text-neutral-600'}`} />
+                        {topic.ai_report_id && (
+                          <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-emerald-900/30 text-emerald-400">
+                            IA
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-sm font-semibold text-white group-hover:text-blue-400 transition line-clamp-3 min-h-[3.5rem]">
+                        {topic.title}
+                      </h3>
+                      {topic.category && (
+                        <span className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${CATEGORY_COLORS[topic.category] || CATEGORY_COLORS.outro}`}>
+                          {topic.category}
+                        </span>
+                      )}
+                      <div className="mt-3 flex items-center gap-3 text-[10px] text-neutral-500">
+                        <span className="flex items-center gap-1"><ChevronUp className="h-3 w-3" />{topic.votes}</span>
+                        <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{topic.comment_count}</span>
+                        <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatAge(topic.age_hours)}</span>
+                      </div>
                     </div>
-                    <h3 className="text-sm font-semibold text-white group-hover:text-blue-400 transition line-clamp-3 min-h-[3.5rem]">
-                      {topic.title}
-                    </h3>
-                    {topic.category && (
-                      <span className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${CATEGORY_COLORS[topic.category] || CATEGORY_COLORS.outro}`}>
-                        {topic.category}
-                      </span>
-                    )}
-                    <div className="mt-3 flex items-center gap-3 text-[10px] text-neutral-500">
-                      <span className="flex items-center gap-1"><ChevronUp className="h-3 w-3" />{topic.votes}</span>
-                      <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{topic.comment_count}</span>
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatAge(topic.age_hours)}</span>
-                    </div>
-                  </Link>
-                ))}
+                  );
+
+                  return topic.ai_report_id ? (
+                    <ReportPreviewTooltip
+                      key={topic.id}
+                      reportId={topic.ai_report_id}
+                      title={`Relatório: ${topic.title}`}
+                      summary={topic.ai_report_summary || topic.body || undefined}
+                      conversationCount={topic.ai_report_conversation_count}
+                      reportCount={topic.ai_report_report_count}
+                      createdAt={topic.created_at}
+                    >
+                      <Link href={`/issues?id=${topic.id}`}>
+                        {CardContent}
+                      </Link>
+                    </ReportPreviewTooltip>
+                  ) : (
+                    <Link key={topic.id} href={`/issues?id=${topic.id}`}>
+                      {CardContent}
+                    </Link>
+                  );
+                })}
               </div>
             )}
 

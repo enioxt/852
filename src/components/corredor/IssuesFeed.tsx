@@ -150,7 +150,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
     })
       .then(r => r.json())
       .then(d => setComments(d.comments || []))
-      .catch(() => {});
+      .catch(() => { });
     setTimeout(() => {
       focusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 150);
@@ -187,7 +187,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
   const handleExpand = async (issueId: string) => {
     if (expandedIssue === issueId) { setExpandedIssue(null); return; }
     setExpandedIssue(issueId);
-    
+
     // Fetch comments
     fetch('/api/issues', {
       method: 'POST',
@@ -239,9 +239,9 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
       await fetch('/api/issues', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          title: newTitle, 
-          body: newBody, 
+        body: JSON.stringify({
+          title: newTitle,
+          body: newBody,
           category: newCategory,
           parentId: branchingIssue?.id,
           versionReason: branchingIssue ? versionReason : undefined
@@ -251,7 +251,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
       setNewBody('');
       setVersionReason('');
       setShowCreate(false);
-      
+
       if (branchingIssue) {
         handleExpand(branchingIssue.id); // reload expanded to fetch new version
         setBranchingIssue(null);
@@ -260,7 +260,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
       }
     } finally { setCreating(false); }
   };
-  
+
   const handleOpenBranching = (issue: Issue) => {
     if (!currentUser?.id) {
       setLoginNoticeMode('auth');
@@ -303,7 +303,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
                 </button>
               )}
             </div>
-            
+
             {/* Reply input */}
             {replyingTo === comment.id && (
               <div className="flex items-center gap-2 mt-2">
@@ -383,23 +383,42 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
       )}
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
-        <div className="mb-4 flex items-start justify-between gap-4">
+        {/* Header Explicativo */}
+        <div className="mb-6 rounded-2xl border border-neutral-800 bg-gradient-to-r from-neutral-900/80 to-neutral-950/80 p-4 sm:p-5">
           <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-green-900/20 p-3">
+            <div className="rounded-2xl bg-green-900/20 p-2.5 flex-shrink-0">
               <AlertCircle className="w-5 h-5 text-green-400" />
             </div>
-            <div>
-              <h1 className="text-lg font-semibold text-white">Tópicos em Discussão</h1>
-              <p className="text-sm text-neutral-400">Leitura aberta. Voto e comentários com conta protegida.</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-base sm:text-lg font-semibold text-white">Tópicos em Discussão</h1>
+              <p className="text-xs sm:text-sm text-neutral-400 mt-1 leading-relaxed">
+                Pautas abertas para debate coletivo. Vote nos temas mais importantes e adicione sua perspectiva.
+                <span className="text-neutral-500">Tópicos marcados com</span>
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-purple-900/30 text-purple-400 mx-1">
+                  <Bot className="w-2.5 h-2.5 inline mr-0.5" />IA
+                </span>
+                <span className="text-neutral-500">foram gerados automaticamente pelos relatórios de inteligência.</span>
+              </p>
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                <span className="text-[10px] px-2 py-1 rounded-full bg-green-900/30 text-green-400 border border-green-800/40">
+                  Leitura aberta
+                </span>
+                <span className="text-[10px] px-2 py-1 rounded-full bg-blue-900/30 text-blue-400 border border-blue-800/40">
+                  Voto com conta
+                </span>
+                <span className="text-[10px] px-2 py-1 rounded-full bg-amber-900/30 text-amber-400 border border-amber-800/40">
+                  Comentários anônimos
+                </span>
+              </div>
             </div>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-3 py-2 rounded-xl text-sm font-medium transition flex-shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Novo Tópico</span>
+            </button>
           </div>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Novo Tópico</span>
-          </button>
         </div>
 
         {aiReportId && (
@@ -418,17 +437,16 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
         {/* Filters */}
         <div className="mb-4 rounded-2xl border border-neutral-800 bg-neutral-900/40 p-3">
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-          {['all', 'open', 'in_discussion', 'resolved', 'closed'].map(s => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition border ${
-                filter === s ? 'bg-neutral-800 text-white' : 'text-neutral-500 hover:text-neutral-300'
-              }`}
-            >
-              {s === 'all' ? 'Todos' : STATUS_LABELS[s]}
-            </button>
-          ))}
+            {['all', 'open', 'in_discussion', 'resolved', 'closed'].map(s => (
+              <button
+                key={s}
+                onClick={() => setFilter(s)}
+                className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition border ${filter === s ? 'bg-neutral-800 text-white' : 'text-neutral-500 hover:text-neutral-300'
+                  }`}
+              >
+                {s === 'all' ? 'Todos' : STATUS_LABELS[s]}
+              </button>
+            ))}
           </div>
 
           <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -457,7 +475,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
                 <X className="w-4 h-4 text-neutral-500" />
               </button>
             </div>
-            
+
             {branchingIssue && (
               <div className="bg-red-900/20 border border-red-900/40 rounded-xl p-3 mb-4">
                 <p className="text-xs text-red-400">
@@ -474,7 +492,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
               className="w-full h-10 px-4 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-green-700 transition"
               autoFocus
             />
-            
+
             {branchingIssue && (
               <textarea
                 value={versionReason}
@@ -631,7 +649,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
                 {/* Expanded: Comments & Versions */}
                 {expandedIssue === issue.id && (
                   <div className="border-t border-neutral-800/50 p-4 space-y-4">
-                    
+
                     {/* Versions/Branches Section */}
                     {versions[issue.id]?.length > 0 && (
                       <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-3 space-y-2 mb-4">
@@ -654,10 +672,10 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Action Bar */}
                     <div className="flex justify-end border-b border-neutral-800/50 pb-3">
-                      <button 
+                      <button
                         onClick={() => handleOpenBranching(issue)}
                         className="text-xs flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition px-3 py-1.5 rounded-lg bg-blue-900/20 border border-blue-800/30"
                       >
@@ -685,7 +703,7 @@ export function IssuesFeed({ category = 'all' }: IssuesFeedProps) {
                         {renderCommentThread(comments, issue.id)}
                       </div>
                     )}
-                    
+
                     {/* Main comment input */}
                     <div className="flex items-center gap-2 pt-2 border-t border-neutral-800/30">
                       <input

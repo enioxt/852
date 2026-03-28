@@ -9,6 +9,7 @@ import {
 import { listSharedReports, deleteReport, type Report, loadAllPublicReports, deleteReportFromServer } from '@/lib/report-store';
 import { getOrCreateSessionHash } from '@/lib/session';
 import MarkdownMessage from '@/components/chat/MarkdownMessage';
+import { IntelligenceReportCard } from './IntelligenceReportCard';
 
 type Tab = 'shared' | 'intelligence' | 'generator';
 
@@ -195,11 +196,10 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
         <div className="max-w-4xl mx-auto flex gap-1 px-4 sm:px-6 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setTab('shared')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${
-              tab === 'shared'
-                ? 'border-blue-500 text-blue-400'
-                : 'border-transparent text-neutral-500 hover:text-neutral-300'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${tab === 'shared'
+              ? 'border-blue-500 text-blue-400'
+              : 'border-transparent text-neutral-500 hover:text-neutral-300'
+              }`}
           >
             <Users className="w-4 h-4" />
             Relatos Compartilhados
@@ -209,22 +209,20 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
           </button>
           <button
             onClick={() => setTab('generator')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${
-              tab === 'generator'
-                ? 'border-purple-500 text-purple-400'
-                : 'border-transparent text-neutral-500 hover:text-neutral-300'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${tab === 'generator'
+              ? 'border-purple-500 text-purple-400'
+              : 'border-transparent text-neutral-500 hover:text-neutral-300'
+              }`}
           >
             <Sparkles className="w-4 h-4" />
             Gerador de Relatórios
           </button>
           <button
             onClick={() => setTab('intelligence')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${
-              tab === 'intelligence'
-                ? 'border-emerald-500 text-emerald-400'
-                : 'border-transparent text-neutral-500 hover:text-neutral-300'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition whitespace-nowrap ${tab === 'intelligence'
+              ? 'border-emerald-500 text-emerald-400'
+              : 'border-transparent text-neutral-500 hover:text-neutral-300'
+              }`}
           >
             <Bot className="w-4 h-4" />
             Inteligência
@@ -331,9 +329,8 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
                           ) : (
                             report.sanitizedMessages.map((m, i) => (
                               <div key={i} className={`flex gap-2 ${m.role === 'user' ? '' : 'opacity-60'}`}>
-                                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
-                                  m.role === 'user' ? 'bg-blue-900/30 text-blue-400' : 'bg-neutral-800 text-neutral-500'
-                                }`}>
+                                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${m.role === 'user' ? 'bg-blue-900/30 text-blue-400' : 'bg-neutral-800 text-neutral-500'
+                                  }`}>
                                   {m.role === 'user' ? 'Policial' : '852-IA'}
                                 </span>
                                 <p className="text-xs text-neutral-400 leading-relaxed flex-1">{m.content}</p>
@@ -374,109 +371,28 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
                 <div className="text-center space-y-2">
                   <h3 className="text-lg font-semibold text-neutral-400">Nenhum relatório de inteligência ainda</h3>
                   <p className="text-sm text-neutral-600 max-w-xl">
-                    Esses relatórios agregam conversas, relatos compartilhados e tópicos pendentes para gerar issues automaticamente.
+                    Esses relatórios agregam conversas, relatos compartilhados e tópicos pendentes para gerar insights automaticamente.
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-neutral-500">
-                    {intelReports.length} relatório(s) de inteligência • SSOT para temas que viraram issues automaticamente
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-1">
+                  <p className="text-xs sm:text-sm text-neutral-500">
+                    {intelReports.length} relatório(s) de inteligência • Cards com preview de 5 linhas
                   </p>
                 </div>
 
-                {intelReports.map((report) => (
-                  <div key={report.id} className="rounded-xl border border-neutral-800 bg-neutral-900/50 overflow-hidden">
-                    <button
-                      onClick={() => setExpandedIntelReport(expandedIntelReport === report.id ? null : report.id)}
-                      className="w-full flex items-center justify-between p-4 text-left hover:bg-neutral-800/30 transition"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-emerald-900/20 flex items-center justify-center">
-                          <Bot className="w-4 h-4 text-emerald-400" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-white">
-                            Relatório de inteligência • {report.issue_count} issue(s) vinculada(s)
-                          </p>
-                          <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                            <span className="flex items-center gap-1 text-[10px] text-neutral-500">
-                              <Clock className="w-3 h-3" /> {new Date(report.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-900/30 text-emerald-400">
-                              {report.conversation_count} conversas
-                            </span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-900/30 text-purple-400">
-                              {Array.isArray(report.pending_topics) ? report.pending_topics.length : 0} tópicos pendentes
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <Eye className="w-4 h-4 text-neutral-600" />
-                    </button>
-
-                    {expandedIntelReport === report.id && (
-                      <div className="border-t border-neutral-800 p-4 space-y-4">
-                        {report.content_summary && (
-                          <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-4">
-                            <p className="text-xs text-neutral-300 leading-relaxed">{report.content_summary}</p>
-                          </div>
-                        )}
-
-                        <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-sm text-neutral-400">
-                              <Eye className="w-4 h-4" /> Preview do relatório
-                            </div>
-                            <div className="border border-neutral-700 rounded-xl overflow-hidden bg-white">
-                              <iframe
-                                srcDoc={report.content_html}
-                                className="w-full min-h-[420px] border-0"
-                                title={`AI Report ${report.id}`}
-                                sandbox="allow-same-origin"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-3">
-                            <div className="rounded-xl border border-neutral-800 bg-neutral-950/60 p-3.5 space-y-3">
-                              <div className="flex items-center gap-2 text-sm text-white">
-                                <AlertCircle className="w-4 h-4 text-amber-400" /> Issues geradas
-                              </div>
-                              {report.related_issues.length === 0 ? (
-                                <p className="text-xs text-neutral-500">Nenhuma issue vinculada a este relatório.</p>
-                              ) : (
-                                <div className="space-y-2">
-                                  {report.related_issues.map((issue) => (
-                                    <Link
-                                      key={issue.id}
-                                      href={`/issues?aiReportId=${report.id}`}
-                                      className="block rounded-lg border border-neutral-800 p-3 hover:border-neutral-700 hover:bg-neutral-900/50 transition"
-                                    >
-                                      <p className="text-xs font-medium text-white">{issue.title}</p>
-                                      <div className="mt-1 flex items-center gap-2 text-[10px] text-neutral-500 flex-wrap">
-                                        <span>{issue.votes} voto(s)</span>
-                                        <span>{issue.status}</span>
-                                        {issue.category && <span>{issue.category}</span>}
-                                      </div>
-                                    </Link>
-                                  ))}
-                                </div>
-                              )}
-                              <Link
-                                href={`/issues?aiReportId=${report.id}`}
-                                className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 transition"
-                              >
-                                Ver issues deste relatório <ArrowRight className="w-3 h-3" />
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                <div className="grid gap-4">
+                  {intelReports.map((report) => (
+                    <IntelligenceReportCard
+                      key={report.id}
+                      report={report}
+                      isExpanded={expandedIntelReport === report.id}
+                      onToggle={() => setExpandedIntelReport(expandedIntelReport === report.id ? null : report.id)}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </>
