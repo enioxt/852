@@ -58,3 +58,61 @@ Em ambientes policiais, credibilidade é construída com:
 > "Nunca overpromise. Baseline primeiro. Recursos garantidos. Governança sólida. Resultados antes de visibilidade."
 
 ---
+
+## Record: 2026-03-28 | UI/UX Design Research — Scrollbar & Button Best Practices
+
+### 1. O Contexto
+Sessão de pesquisa profunda para melhorar a interface de relatórios no 852 (papo-de-corredor), focando em scrollbar dark mode, integração fluida de modal, e design de botões.
+
+### 2. Problemas Identificados
+- **Scrollbar branca** em dark mode — contrasta mal, precisa ser escura
+- **Relatório desconectado** — visualmente separado da página, falta integração
+- **Botões sem hierarquia** — affordance ruim, shadows ausentes
+
+### 3. Research Findings
+
+#### Scrollbar Styling (MDN + Chrome Dev)
+```css
+/* CSS Scrollbars Module Level 1 */
+scrollbar-width: thin;
+scrollbar-color: #404040 #171717; /* thumb track */
+
+/* Webkit fallback */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #171717; }
+::-webkit-scrollbar-thumb { background: #404040; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #525252; }
+```
+
+**Princípios:**
+- Contraste suficiente (WCAG 2.1)
+- Hover states para interatividade
+- Tamanho mínimo 8px
+
+#### Modal Integration (Eleken + NN/G)
+- Overlay escuro com backdrop-blur
+- Animações suaves (Framer Motion)
+- Manter design system consistente
+- Full-screen em mobile quando necessário
+
+#### Button Design (LogRocket + MagicUI + Balsamiq)
+- Touch target: 48px (Google) / 44px (WCAG)
+- Corner radius: ~30% da altura
+- Drop shadows: X:0, Y:30%, Blur:50%, Spread:-30%
+- Padding horizontal: ~50% da altura
+- Hierarquia: Primary (sólido), Secondary (outline), Tertiary (ghost)
+- Estados: default, hover (+10% brightness), active (scale 0.98)
+
+### 4. Implementation Plan
+1. **Scrollbar styling** no container do iframe
+2. **Framer Motion** para transições suaves
+3. **Button redesign** com shadows, hover states
+4. **Visual integration** com border highlight e shadow elevado
+
+### 5. Arquivo Criado
+- `.windsurf/workflows/stitch-design-report-ui.md` — Meta-prompt para cloud execution
+
+### 6. Sources
+MDN Web Docs, Chrome Developers, LogRocket, Eleken UX, NN/G, MagicUI, Balsamiq
+
+---
