@@ -1,6 +1,7 @@
 import { createOpenAI } from '@ai-sdk/openai';
 
 export const PRICING: Record<string, { input: number; output: number; free?: boolean }> = {
+  'qwen-turbo': { input: 0.0001, output: 0.0002 },
   'qwen-plus': { input: 0.0008, output: 0.002 },
   'qwen-max': { input: 0.0016, output: 0.007 },
   'google/gemini-2.0-flash-001': { input: 0, output: 0, free: false },
@@ -14,7 +15,8 @@ export type ModelTask =
   | 'intelligence_report'
   | 'conversation_summary'
   | 'name_validation'
-  | 'correlation';
+  | 'correlation'
+  | 'news_summarization';
 
 export interface ModelConfig {
   modelId: string;
@@ -109,6 +111,19 @@ export function getModelConfig(task: ModelTask = 'chat'): ModelConfig {
         providerLabel: 'Alibaba DashScope',
         pricing: PRICING[modelId] || PRICING['qwen-plus'],
         routingReason: 'Validação de nome via DashScope (fallback).',
+      };
+    }
+  }
+
+  // news_summarization: use qwen-turbo (fast + cheap ~$0.0001/1K tokens)
+  if (task === 'news_summarization') {
+    if (hasDashScope()) {
+      return {
+        modelId: 'qwen-turbo',
+        provider: createDashScopeProvider(),
+        providerLabel: 'Alibaba DashScope (qwen-turbo)',
+        pricing: PRICING['qwen-turbo'],
+        routingReason: 'Sumarização de notícias usa qwen-turbo — rápido e econômico (~$0.0001/1K tokens).',
       };
     }
   }
