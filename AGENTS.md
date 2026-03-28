@@ -252,8 +252,7 @@ Landing (/)
 
 | Layer | Value |
 |------|-------|
-| **VPS** | Contabo |
-| **IP** | `217.216.95.126` |
+| **VPS** | Hetzner (204.168.217.125) |
 | **Reverse Proxy** | Caddy |
 | **App Path (VPS)** | `/opt/852` |
 | **Container Port** | `3000` |

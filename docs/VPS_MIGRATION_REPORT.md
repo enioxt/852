@@ -1,7 +1,7 @@
-# 📊 Relatório Completo VPS Contabo - Migração Hetzner
+# 📊 Relatório Completo VPS Hetzner - Migração
 
 **Data:** 27/03/2026  
-**VPS Atual:** Contabo (217.216.95.126)  
+**VPS Atual:** Hetzner (204.168.217.125)  
 **Disco:** 484GB total / 157GB usado (33%)  
 **RAM:** 24GB  
 
