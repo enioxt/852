@@ -23,6 +23,7 @@
 
 import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import type { TelegramAdminReport } from '@/services/telegram/core';
 
 const ORCHESTRATOR_DIR = join(process.cwd(), 'scripts', 'orchestrator');
 const STATE_FILE = join(ORCHESTRATOR_DIR, 'health-monitor-state.json');
@@ -297,7 +298,6 @@ async function sendTelegramAlerts(report: HealthReport, isTest: boolean): Promis
 
   try {
     const { sendTelegramAdminReport } = await import('@/services/telegram/core');
-    import type { TelegramAdminReport } from '@/services/telegram/core';
 
     const alert: TelegramAdminReport = {
       title: `🚨 API Health Alert: ${report.summary.failing} endpoints failing`,

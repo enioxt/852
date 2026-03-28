@@ -18,6 +18,7 @@
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { createHash } from 'crypto';
+import type { TelegramAdminReport } from '@/services/telegram/core';
 
 const LOG_FILE = join(process.cwd(), 'error.log');
 const ORCHESTRATOR_DIR = join(process.cwd(), 'scripts', 'orchestrator');
@@ -326,7 +327,7 @@ async function sendTelegramNotification(report: AnalysisReport, isTest: boolean)
   const { sendTelegramAdminReport } = await import('@/services/telegram/core');
 
   const alert: TelegramAdminReport = {
-    title: `🚨 API Health Alert: ${report.summary.failing} endpoints failing`,
+    title: `🚨 API Health Alert: ${report.summary.total} errors found`,
     priority: 'critical',
     category: 'orchestrator',
     intro: `Log analyzer found ${report.summary.total} errors`,
