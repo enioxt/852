@@ -92,7 +92,9 @@ export default function HotTopicsMarquee() {
     ];
 
     if (combined.length === 0) return [];
-    return [...combined, ...combined];
+    // Só duplica se houver itens suficientes para preencher a tela (evita duplicação visual)
+    const shouldDuplicate = combined.length >= 5;
+    return shouldDuplicate ? [...combined, ...combined] : combined;
   }, [topics, reports]);
 
   if (marqueeItems.length === 0) return null;
@@ -113,11 +115,10 @@ export default function HotTopicsMarquee() {
               <Link
                 key={`${item.kind}-${item.id}-${index}`}
                 href={item.kind === 'report' ? `/reports?tab=intelligence&reportId=${item.id}` : '/papo-de-corredor'}
-                className={`inline-flex min-h-[40px] shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm transition hover:text-white ${
-                  item.kind === 'report'
+                className={`inline-flex min-h-[40px] shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm transition hover:text-white ${item.kind === 'report'
                     ? 'border border-violet-700/40 bg-violet-950/45 text-violet-200 hover:border-violet-500 hover:bg-violet-900/50'
                     : 'border border-neutral-800 bg-neutral-900/80 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800'
-                }`}
+                  }`}
               >
                 {item.kind === 'report' ? (
                   <>
