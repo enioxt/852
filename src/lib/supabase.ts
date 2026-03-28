@@ -425,7 +425,7 @@ export async function voteIssue(
   sessionHash: string,
   userId?: string,
   voteType: 'up' | 'down' = 'up'
-): Promise<{ voted: boolean; issue?: { id: string; title: string | null; votes: number; downvotes: number } }> {
+): Promise<{ voted: boolean; issue?: { id: string; title: string | null; category: string | null; votes: number; downvotes: number } }> {
   const sb = getSupabase();
   if (!sb) return { voted: false };
 
@@ -485,7 +485,7 @@ export async function voteIssue(
   if (error) return { voted: false };
 
   // Increment vote count (manual since no RPC function)
-  const { data: issueData } = await sb.from('issues_852').select('title, votes, downvotes').eq('id', issueId).single();
+  const { data: issueData } = await sb.from('issues_852').select('title, category, votes, downvotes').eq('id', issueId).single();
   if (issueData) {
     if (voteType === 'up') {
       const updatedVotes = (issueData.votes || 0) + 1;
@@ -495,6 +495,7 @@ export async function voteIssue(
         issue: {
           id: issueId,
           title: issueData.title || null,
+          category: issueData.category || null,
           votes: updatedVotes,
           downvotes: issueData.downvotes || 0,
         },
@@ -507,6 +508,7 @@ export async function voteIssue(
         issue: {
           id: issueId,
           title: issueData.title || null,
+          category: issueData.category || null,
           votes: issueData.votes || 0,
           downvotes: updatedDownvotes,
         },

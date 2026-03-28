@@ -37,7 +37,8 @@ export type TelemetryEventType =
   | 'feedback_submitted'
   | 'espiral_de_escuta_triggered'
   | 'issue_commented'
-  | 'news_summarization';
+  | 'news_summarization'
+  | 'issue_vote_emails_sent';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;

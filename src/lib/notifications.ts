@@ -1,5 +1,6 @@
 import { scanForPII, sanitizeText } from '@/lib/pii-scanner';
 import { recordEvent } from '@/lib/telemetry';
+import { sendIssueVoteEmails, type IssueVoteNotificationPayload } from '@/lib/notifications-email';
 
 type IssueNotificationKind = 'issue_created' | 'issue_voted';
 
@@ -8,6 +9,9 @@ interface IssueNotificationPayload {
   title?: string | null;
   category?: string | null;
   votes?: number;
+  downvotes?: number;
+  voteType?: 'up' | 'down';
+  votedByUserId?: string;
 }
 
 function getPublicBaseUrl() {
@@ -126,6 +130,25 @@ export async function notifyIssueEvent(kind: IssueNotificationKind, payload: Iss
       channels.push('telegram');
     } catch (error) {
       errors.push(error instanceof Error ? error.message : 'Telegram error');
+    }
+  }
+
+  // Send email notifications for issue votes (if enabled and user has preferences)
+  if (kind === 'issue_voted' && payload.voteType) {
+    try {
+      const emailPayload: IssueVoteNotificationPayload = {
+        issueId: payload.issueId,
+        title: payload.title,
+        category: payload.category,
+        votes: payload.votes,
+        downvotes: payload.downvotes,
+        voteType: payload.voteType,
+        votedByUserId: payload.votedByUserId,
+      };
+      await sendIssueVoteEmails(emailPayload);
+      channels.push('email');
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : 'Email notification error');
     }
   }
 

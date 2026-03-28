@@ -56,7 +56,11 @@ export async function POST(req: Request) {
         queueIssueNotification('issue_voted', {
           issueId,
           title: result.issue?.title,
+          category: result.issue?.category,
           votes: result.issue?.votes,
+          downvotes: result.issue?.downvotes,
+          voteType,
+          votedByUserId: user?.id,
         });
 
         // Espiral de Escuta (AI Feedback Loop Trigger)

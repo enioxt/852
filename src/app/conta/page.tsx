@@ -7,6 +7,7 @@ import { ArrowRight, BadgeCheck, Flame, KeyRound, Loader2, Lock, LogOut, Mail, R
 import GoogleIdentityButton from '@/components/auth/GoogleIdentityButton';
 import { migrateConversationScope } from '@/lib/chat-store';
 import { getIdentityKey, getOrCreateSessionHash } from '@/lib/session';
+import { NotificationPreferencesForm } from '@/components/account/NotificationPreferencesForm';
 
 type CurrentUser = {
   id: string;
@@ -971,6 +972,8 @@ function AccountPageContent() {
               </div>
               <p className="mt-2 text-sm text-white">{currentUser.email_verified_at ? 'Confirmado' : 'Pendente'}</p>
             </div>
+
+            <NotificationPreferencesForm />
 
             <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-4">
               <div className="flex items-center gap-2 text-neutral-300">
