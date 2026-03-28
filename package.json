@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
-    "@ai-sdk/react": "^1.1.25",
+    "@ai-sdk/react": "^3.0.143",
     "@ducanh2912/next-pwa": "^10.2.6",
     "@google-cloud/apikeys": "^2.2.1",
     "@supabase/ssr": "^0.9.0",
