@@ -31,7 +31,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
     "@ai-sdk/react": "^1.1.25",
-    "@ducanh2912/next-pwa": "^10.2.9",
+    "@ducanh2912/next-pwa": "^10.2.6",
     "@google-cloud/apikeys": "^2.2.1",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.99.0",
@@ -45,7 +45,7 @@
     "jose": "^6.1.0",
     "jspdf": "^4.2.0",
     "lucide-react": "^0.577.0",
-    "next": "16.1.6",
+    "next": "^16.2.1",
     "nodemailer": "^8.0.3",
     "openai": "^6.27.0",
     "pdf-parse": "^1.1.4",
@@ -72,5 +72,8 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "serialize-javascript": ">=7.0.5"
   }
 }
