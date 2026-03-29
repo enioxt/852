@@ -84,7 +84,7 @@ Status: Failed (password not available in environment)
 ### Why This Happened
 
 1. Supabase CLI (v2.20.5) requires explicit database password to connect
-2. Access token (sbp_d827250c882cf4b8be7f86fd9812bfe71c1d60bf) available, but doesn't bypass password requirement in this CLI version
+2. A Supabase personal access token was available locally, but it doesn't bypass password requirement in this CLI version
 3. Database password not stored in project .env or local config
 4. Supabase project correctly linked: `lhscgsqhiooyatkebose`
 
@@ -97,7 +97,7 @@ Status: Failed (password not available in environment)
 4. Run migrations:
 ```bash
 cd /home/enio/852
-export SUPABASE_ACCESS_TOKEN="sbp_d827250c882cf4b8be7f86fd9812bfe71c1d60bf"
+export SUPABASE_ACCESS_TOKEN="YOUR_SUPABASE_ACCESS_TOKEN"
 supabase db push --password "YOUR_NEW_PASSWORD"
 ```
 
