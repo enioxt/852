@@ -32,6 +32,7 @@ const INTEGRATION_CATALOG: IntegrationDef[] = [
   { key: 'DASHSCOPE_API_KEY', name: 'Alibaba DashScope (Qwen)', description: 'Modelo primário qwen-plus / qwen-max', group: 'ai', isSecret: true, isRequired: true, placeholder: 'sk-...', docsUrl: 'https://dashscope.console.aliyun.com/apiKey' },
   { key: 'OPENROUTER_API_KEY', name: 'OpenRouter (Gemini fallback)', description: 'Fallback pago: Gemini 2.0 Flash', group: 'ai', isSecret: true, isRequired: true, placeholder: 'sk-or-...', docsUrl: 'https://openrouter.ai/keys' },
   { key: 'OPENAI_API_KEY', name: 'OpenAI (fallback opcional)', description: 'Terceiro fallback. Opcional.', group: 'ai', isSecret: true, isRequired: false, placeholder: 'sk-...', docsUrl: 'https://platform.openai.com/api-keys' },
+  { key: 'BRAVE_SEARCH_API_KEY', name: 'Brave Search API', description: 'Busca web institucional no chat (leis, normativas, site:planalto/almg/stf). Opcional — sem chave usa apenas a base local.', group: 'ai', isSecret: true, isRequired: false, placeholder: 'BSA...', docsUrl: 'https://brave.com/search/api/' },
   // Email
   { key: 'SMTP_HOST', name: 'SMTP Host', description: 'Ex: smtp.gmail.com | smtp.sendgrid.net', group: 'email', isSecret: false, isRequired: false, placeholder: 'smtp.gmail.com' },
   { key: 'SMTP_PORT', name: 'SMTP Port', description: '587 (TLS) ou 465 (SSL)', group: 'email', isSecret: false, isRequired: false, placeholder: '587' },

@@ -8,6 +8,7 @@ import { getCurrentUser } from '@/lib/user-auth';
 import { getConversationMemory } from '@/lib/conversation-memory';
 import { getIdentityKey } from '@/lib/session';
 import { ensureConfigLoaded } from '@/lib/config-store';
+import { searchLegislationTool } from '@/lib/tools/search-legislation';
 
 export const maxDuration = 60;
 
@@ -150,6 +151,8 @@ export async function POST(req: Request) {
       system: buildAgentPrompt(memoryBlock),
       messages,
       temperature: 0.7,
+      tools: { buscar_legislacao: searchLegislationTool },
+      maxSteps: 3,
       onFinish: async ({ text, usage }) => {
         const inputTokens = usage?.inputTokens || 0;
         const outputTokens = usage?.outputTokens || 0;

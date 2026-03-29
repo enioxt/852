@@ -212,7 +212,7 @@
 - [x] Roteamento inteligente de modelos por tarefa (chat/review/html/intelligence/summary)
 - [x] Harden `/start` compartilhado: System Map, module roots, workflows e deploy surface como ativação mandatória
 - [x] Eliminar warnings SSR do Recharts no build do /dashboard
-- [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
+- [x] Cross-conversation insight aggregation (temas, padrões, regiões)
 - [x] Refinar OG image para proporção real 1200x630
 - [x] Decompose `chat/page.tsx` (~450 lines), extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [x] CI/CD pipeline (lint + build + smoke on push/PR)
@@ -221,10 +221,10 @@
 - [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
 - [x] ATRiAN dashboard: visualizar violations no /admin/telemetry
 - [x] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
-- [ ] Admin view para relatórios compartilhados (autenticado)
-- [ ] Tool use: web search para dados institucionais (AI SDK tools)
+- [x] Admin view para relatórios compartilhados (autenticado)
+- [x] Tool use: web search para dados institucionais (AI SDK tools — buscar_legislacao, maxSteps 3, Brave opcional)
 - [x] Voice input (speech-to-text via Browser API) no chat e na sugestão
-- [ ] Proactive collaboration suggestions (agent sugere temas durante a conversa)
+- [x] Proactive collaboration suggestions (InlineCorrelation após cada resposta da IA em /chat)
 - [x] User-linked conversation persistence (load from Supabase when logged in)
 - [ ] BYOK: usuários plugam próprias API keys, grupos com chave compartilhada
 - [ ] Fórum: notificações, follow-up mode, integração cross-page
