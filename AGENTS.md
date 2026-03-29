@@ -1,6 +1,6 @@
 # AGENTS.md — 852 Inteligência
 
-> **VERSION:** 3.0.0 | **UPDATED:** 2026-03-13
+> **VERSION:** 3.1.0 | **UPDATED:** 2026-03-29
 > **TYPE:** Next.js production chatbot + report sharing + EGOS-governed public repo
 
 ---
@@ -175,6 +175,9 @@
 | 50 | ETHIK Agent: x402 Payment Gateway & Tokenomics Engine | `src/lib/ethik-agent.ts` | Active |
 | 51 | GCP Dynamic API Keys (Quota-restricted Ephmeral Keys) | `src/lib/gcp-keys.ts` | Active |
 | 52 | ATRiAN CLI Scanner & Standalone Engine | `packages/atrian/` | Active |
+| 53 | Email Notification System (vote + comment alerts, SMTP, user prefs) | `notifications-email.ts`, `mailer.ts`, `email-templates/` | Active |
+| 54 | User Notification Preferences (opt-in/out, digest frequency) | `api/auth/notification-preferences/route.ts`, `NotificationPreferencesForm.tsx` | Active |
+| 55 | Landing UX: mini stats + Papo de Corredor preview above fold | `app/page.tsx` | Active |
 
 ## Agent 852 — Roadmap
 
@@ -252,7 +255,7 @@ Landing (/)
 
 | Layer | Value |
 |------|-------|
-| **VPS** | Hetzner (204.168.217.125) |
+| **VPS** | Hetzner `204.168.217.125` (migrado de Contabo em 2026-03-28) |
 | **Reverse Proxy** | Caddy |
 | **App Path (VPS)** | `/opt/852` |
 | **Container Port** | `3000` |

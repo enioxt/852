@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     }
 
     if (action === 'comment') {
-      const { issueId, commentBody, parentCommentId } = body;
+      const { issueId, commentBody, parentCommentId, issueTitle, issueCategory } = body;
       const user = await getCurrentUser();
       if (!isAuthenticatedParticipant(user)) {
         return Response.json({ error: 'Entre com sua conta para comentar.', needsAuth: true }, { status: 403 });
@@ -94,6 +94,13 @@ export async function POST(req: Request) {
       }
       if (!issueId || !commentBody) return Response.json({ error: 'issueId e body obrigatórios' }, { status: 400 });
       const id = await addIssueComment(issueId, commentBody, false, user?.id, parentCommentId);
+      recordEvent({ event_type: 'issue_commented', metadata: { issueId, userId: user?.id || null } });
+      queueIssueNotification('issue_commented', {
+        issueId,
+        title: issueTitle || null,
+        category: issueCategory || null,
+        commentedByUserId: user?.id,
+      });
       return Response.json({ commentId: id });
     }
 

@@ -259,6 +259,18 @@
 - [x] **Papo de Corredor nos links secundários**: Link com ícone `Radio` adicionado
 - [x] **Heading CTA**: "Escolha como participar" → "Como voce quer participar?" — mais ativo
 
+## ✅ P1 - Sprint v9.2 (Email Notifications Completas + Doc Drift Fix, 2026-03-29)
+
+- [x] **Comment notifications wired**: `queueIssueNotification('issue_commented', ...)` adicionado ao `/api/issues/route.ts` quando comentário é criado com sucesso
+- [x] **`sendIssueCommentEmails`**: função completa em `notifications-email.ts` (busca participantes via RPC, respeita preferências, envia SMTP)
+- [x] **Email template comentário**: `src/lib/email-templates/issue-comment-notification.ts` HTML + texto simples com subject dinâmico
+- [x] **`IssueCommentNotificationPayload`**: tipo exportado; `notifications.ts` atualizado com branch `issue_commented`
+- [x] **Doc drift fix**: `.windsurfrules` corrigido — Contabo → Hetzner `204.168.217.125` + release script documentado
+- [x] **AGENTS.md v3.1.0**: capabilities 53-55 adicionados (email notifications, notification prefs, landing UX)
+- [ ] **AÇÃO HUMANA: `npx supabase db push`** — aplicar migrations `20260328000000` (user_notification_preferences_852) e `20260328000001` (get_issue_participants) no Supabase
+- [ ] **AÇÃO HUMANA: VPS .env** — confirmar `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` no `.env` do Hetzner
+- [ ] **AÇÃO HUMANA: `npm run release:prod`** — deploy na máquina com SSH configurado para `hetzner`
+
 ## 🚨 P0 - Governance Follow-up (Pre-commit SSOT Audit, 2026-03-29)
 
 - [x] **852-GOV-201:** Hook único canônico: `~/.egos/hooks/pre-commit` (symlink). `.husky/pre-commit` substituído por stub de redirecionamento. Decisão: CRCDM universal = hook único.

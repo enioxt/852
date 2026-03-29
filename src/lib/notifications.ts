@@ -1,8 +1,8 @@
 import { scanForPII, sanitizeText } from '@/lib/pii-scanner';
 import { recordEvent } from '@/lib/telemetry';
-import { sendIssueVoteEmails, type IssueVoteNotificationPayload } from '@/lib/notifications-email';
+import { sendIssueVoteEmails, sendIssueCommentEmails, type IssueVoteNotificationPayload, type IssueCommentNotificationPayload } from '@/lib/notifications-email';
 
-type IssueNotificationKind = 'issue_created' | 'issue_voted';
+type IssueNotificationKind = 'issue_created' | 'issue_voted' | 'issue_commented';
 
 interface IssueNotificationPayload {
   issueId: string;
@@ -12,6 +12,7 @@ interface IssueNotificationPayload {
   downvotes?: number;
   voteType?: 'up' | 'down';
   votedByUserId?: string;
+  commentedByUserId?: string;
 }
 
 function getPublicBaseUrl() {
@@ -29,22 +30,31 @@ function sanitizeNotificationText(value?: string | null) {
 function buildIssueMessage(kind: IssueNotificationKind, payload: IssueNotificationPayload) {
   const baseUrl = getPublicBaseUrl();
   const title = sanitizeNotificationText(payload.title);
-  const lines = kind === 'issue_created'
-    ? [
-        '🚨 852 — Nova pauta registrada',
-        `Título: ${title}`,
-        `Categoria: ${payload.category || 'outro'}`,
-        `Issue ID: ${payload.issueId}`,
-        `Link: ${baseUrl}/issues`,
-      ]
-    : [
-        '👍 852 — Novo voto registrado',
-        `Pauta: ${title}`,
-        `Votos: ${payload.votes ?? 'n/d'}`,
-        `Issue ID: ${payload.issueId}`,
-        `Link: ${baseUrl}/issues`,
-      ];
-
+  let lines: string[];
+  if (kind === 'issue_created') {
+    lines = [
+      '🚨 852 — Nova pauta registrada',
+      `Título: ${title}`,
+      `Categoria: ${payload.category || 'outro'}`,
+      `Issue ID: ${payload.issueId}`,
+      `Link: ${baseUrl}/papo-de-corredor`,
+    ];
+  } else if (kind === 'issue_commented') {
+    lines = [
+      '💬 852 — Novo comentário em pauta',
+      `Pauta: ${title}`,
+      `Issue ID: ${payload.issueId}`,
+      `Link: ${baseUrl}/papo-de-corredor`,
+    ];
+  } else {
+    lines = [
+      '👍 852 — Novo voto registrado',
+      `Pauta: ${title}`,
+      `Votos: ${payload.votes ?? 'n/d'}`,
+      `Issue ID: ${payload.issueId}`,
+      `Link: ${baseUrl}/papo-de-corredor`,
+    ];
+  }
   return lines.join('\n');
 }
 
@@ -133,7 +143,7 @@ export async function notifyIssueEvent(kind: IssueNotificationKind, payload: Iss
     }
   }
 
-  // Send email notifications for issue votes (if enabled and user has preferences)
+  // Send email notifications for issue votes
   if (kind === 'issue_voted' && payload.voteType) {
     try {
       const emailPayload: IssueVoteNotificationPayload = {
@@ -148,7 +158,23 @@ export async function notifyIssueEvent(kind: IssueNotificationKind, payload: Iss
       await sendIssueVoteEmails(emailPayload);
       channels.push('email');
     } catch (error) {
-      errors.push(error instanceof Error ? error.message : 'Email notification error');
+      errors.push(error instanceof Error ? error.message : 'Email vote notification error');
+    }
+  }
+
+  // Send email notifications for issue comments
+  if (kind === 'issue_commented') {
+    try {
+      const emailPayload: IssueCommentNotificationPayload = {
+        issueId: payload.issueId,
+        title: payload.title,
+        category: payload.category,
+        commentedByUserId: payload.commentedByUserId,
+      };
+      await sendIssueCommentEmails(emailPayload);
+      channels.push('email');
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : 'Email comment notification error');
     }
   }
 

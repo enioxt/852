@@ -10,7 +10,19 @@ import {
   generateIssueVoteEmailText,
   type IssueVoteEmailContext,
 } from '@/lib/email-templates/issue-vote-notification';
+import {
+  generateIssueCommentEmailHtml,
+  generateIssueCommentEmailText,
+  type IssueCommentEmailContext,
+} from '@/lib/email-templates/issue-comment-notification';
 import { recordEvent } from '@/lib/telemetry';
+
+interface IssueCommentNotificationPayload {
+  issueId: string;
+  title?: string | null;
+  category?: string | null;
+  commentedByUserId?: string;
+}
 
 interface IssueVoteNotificationPayload {
   issueId: string;
@@ -169,6 +181,90 @@ export async function sendIssueVoteEmails(payload: IssueVoteNotificationPayload)
 }
 
 /**
+ * Send email notifications to all users who participated in an issue when it receives a new comment
+ * Respects user notification preferences (notify_on_issue_comments)
+ */
+export async function sendIssueCommentEmails(payload: IssueCommentNotificationPayload): Promise<void> {
+  const baseUrl = (process.env.PUBLIC_BASE_URL || 'https://852.egos.ia.br').replace(/\/$/, '');
+
+  try {
+    const supabase = getSupabase();
+    if (!supabase) {
+      console.error('[Email Notifications] Supabase client unavailable');
+      return;
+    }
+
+    const { data: participantIds, error: fetchError } = await supabase.rpc('get_issue_participants', {
+      p_issue_id: payload.issueId,
+    });
+
+    if (fetchError || !participantIds || participantIds.length === 0) {
+      if (fetchError) console.error('[Email Notifications] Failed to fetch participants for comment:', fetchError);
+      return;
+    }
+
+    const { data: userPreferences, error: prefError } = await supabase
+      .from('user_accounts_852')
+      .select('id, email, display_name')
+      .in('id', participantIds)
+      .neq('id', payload.commentedByUserId || '00000000-0000-0000-0000-000000000000');
+
+    if (prefError || !userPreferences || userPreferences.length === 0) return;
+
+    const { data: preferences } = await supabase
+      .from('user_notification_preferences_852')
+      .select('user_id, notify_on_issue_comments, digest_frequency')
+      .in('user_id', userPreferences.map((u) => u.id));
+
+    const prefsMap = new Map(
+      (preferences || []).map((p) => [p.user_id, { notifyOnComments: p.notify_on_issue_comments, frequency: p.digest_frequency }])
+    );
+
+    let sentCount = 0;
+    let errorCount = 0;
+
+    for (const user of userPreferences) {
+      const prefs = prefsMap.get(user.id);
+      const shouldNotify = prefs?.notifyOnComments !== false;
+      const isImmediate = !prefs || prefs.frequency === 'immediate';
+      if (!shouldNotify || !isImmediate) continue;
+
+      try {
+        const emailContext: IssueCommentEmailContext = {
+          recipientName: user.display_name || 'colega',
+          recipientEmail: user.email,
+          issueTitle: payload.title || 'Sem título',
+          issueId: payload.issueId,
+          issueCategory: payload.category,
+          appBaseUrl: baseUrl,
+        };
+        const htmlContent = generateIssueCommentEmailHtml(emailContext);
+        const textContent = generateIssueCommentEmailText(emailContext);
+        await sendEmail({
+          to: user.email,
+          subject: `Novo comentário: "${(payload.title || 'Tópico').slice(0, 50)}..." no Papo de Corredor`,
+          html: htmlContent,
+          text: textContent,
+        });
+        sentCount++;
+      } catch (error) {
+        console.error(`[Email Notifications] Failed to send comment email to ${user.email}:`, error);
+        errorCount++;
+      }
+    }
+
+    if (sentCount > 0 || errorCount > 0) {
+      await recordEvent({
+        event_type: 'issue_comment_emails_sent',
+        metadata: { issueId: payload.issueId, sentCount, errorCount },
+      });
+    }
+  } catch (error) {
+    console.error('[Email Notifications] Unexpected error in comment notifications:', error);
+  }
+}
+
+/**
  * Create a database function to get issue participants if not already exists
  * This should be created via migration or called once during setup
  */
@@ -199,4 +295,4 @@ export async function ensureGetIssueParticipantsFunction(): Promise<void> {
   }
 }
 
-export type { IssueVoteNotificationPayload };
+export type { IssueVoteNotificationPayload, IssueCommentNotificationPayload };
