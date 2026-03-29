@@ -97,7 +97,7 @@
 - [x] Carregamento de conversas do Supabase quando o usuário autenticado entra no `/chat`
 - [x] Pre-commit SSOT: `/home/enio/.egos/hooks/pre-commit` — hook universal para todos os repos EGOS
 - [x] Hook Mesh EGOS: `852`, `carteira-livre`, `forja`, `egos-self`, `policia` com symlink SSOT; `br-acc` e `egos-lab` com wrapper SSOT + hook legado
-- [x] Diagnóstico multi-repo consolidado em `/home/enio/.egos/hooks/HOOK_MIGRATION_STATUS.md`
+- [x] Security audit 2026-03-28: Fixed 15 HIGH + 9 moderate vulnerabilities across 9 repos, added Dependabot to all repos
 - [x] Bootstrap de governança no repo privado `policia`: `AGENTS.md`, `TASKS.md`, `docs/SYSTEM_MAP.md`, `.windsurf/workflows/ovm.md`
 
 ## 🏃 P1 - Sprint v5 (Anonymous Identity + Gamification)
@@ -248,5 +248,13 @@
 - [x] **SecOps report updated**: `docs/gem-hunter/secops-2026-03-21.md` marked as mitigated
 - [x] **CRCDM hooks**: Pre/post-commit and pre/post-push hooks installed for cross-repo change detection
 - [x] **Push completed**: Security changes deployed to main branch (commit 1c57608)
+
+## 🚨 P0 - Governance Follow-up (Pre-commit SSOT Audit, 2026-03-29)
+
+- [ ] **852-GOV-201:** Reconciliar verdade do hook de runtime vs. shadow spec local — hoje o runtime verificado é `.git/hooks/pre-commit -> /home/enio/.egos/hooks/pre-commit`, enquanto `852/.husky/pre-commit` existe como spec local sem `prepare` no `package.json` e sem `core.hooksPath`; decidir um único canônico e remover ambiguidade
+- [ ] **852-GOV-202:** Comparar `~/.egos/hooks/pre-commit` vs `852/.husky/pre-commit` check a check — classificar `blocking`, `warning`, `telemetry`, `cross-repo`, medir lacunas (secrets, PII, lint/typecheck, doc proliferation, governance drift, CRCDM) e registrar matriz de adoção por repo
+- [ ] **852-GOV-203:** Normalizar documentação local para refletir runtime real — atualizar `docs/SYSTEM_MAP.md`, `docs/knowledge/HARVEST.md` e referências de handoff ativas para separar explicitamente `runtime ativo`, `spec local`, `hooks CRCDM` e `histórico de migração`
+- [ ] **852-GOV-204:** Definir contrato de duas frentes sem sobreposição para executor futuro — **Frente A / Runtime Canonicalization:** hook único + instalação + verificação; **Frente B / Policy & Dissemination:** taxonomia, docs, adoção cross-repo, prompts e handoff operacional
+- [ ] **852-GOV-205:** Produzir plano de execução para Sonnet/Haiku/Qwen com ordem segura — primeiro reconciliar hook canônico e instalação, depois propagar docs/tasks/disseminação; nenhum agente deve editar runtime e documentação canônica em paralelo sem matriz de verdade fechada
 
 ## ⏭️ Backlog
