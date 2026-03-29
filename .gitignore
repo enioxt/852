@@ -69,3 +69,4 @@ venv/
 
 # Context persistence state (local only)
 docs/_context_snapshots/.state.json
+error.log
