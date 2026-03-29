@@ -9,7 +9,7 @@ import {
   BarChart3, AlertCircle, Bot, Loader2,
   Mic, Brain, ClipboardList, ChevronDown, Shield,
   Github, Code2, Eye, PenLine, Scale,
-  HelpCircle,
+  HelpCircle, Radio, LayoutDashboard, ThumbsUp, MessageSquare,
 } from 'lucide-react';
 
 interface Stats {
@@ -156,7 +156,7 @@ export default function Home() {
               o radar da base
             </p>
             <p className="mt-4 text-lg sm:text-xl text-neutral-300 max-w-lg text-center leading-relaxed">
-              Canal protegido para relatar, organizar e transformar dores reais da base em pauta coletiva.
+              Registre o problema. A IA organiza. A base vota. Vira pauta.
             </p>
           </div>
 
@@ -172,27 +172,34 @@ export default function Home() {
             Anonimato protegido: toque para entender
           </button>
 
-          <div className="mt-5 grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
-            <Link
-              href="/chat"
-              className="group flex items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-base font-semibold text-black transition hover:bg-neutral-200 active:scale-[0.98]"
-            >
-              Conversar agora
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link
-              href="/sugestao"
-              className="group flex items-center justify-center gap-3 rounded-2xl border border-neutral-800 bg-neutral-900/70 px-6 py-4 text-base font-semibold text-white transition hover:border-neutral-700 hover:bg-neutral-800/70 active:scale-[0.98]"
-            >
-              Enviar texto direto
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
+          {/* ═══════════ MINI STATS (social proof precoce) ═══════════ */}
+          {stats && (stats.totalConversations > 0 || stats.totalReportsShared > 0) && (
+            <div className="mt-6 flex items-center justify-center gap-6 sm:gap-10 py-4 px-6 rounded-2xl border border-neutral-800/50 bg-neutral-900/30 w-full max-w-xl">
+              {stats.totalConversations > 0 && (
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-white tabular-nums">{stats.totalConversations}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">conversas</p>
+                </div>
+              )}
+              {stats.totalReportsShared > 0 && (
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-white tabular-nums">{stats.totalReportsShared}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">relatos</p>
+                </div>
+              )}
+              {stats.totalIssuesOpen > 0 && (
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-white tabular-nums">{stats.totalIssuesOpen}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">topicos em debate</p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* ═══════════ DUAS FORMAS DE PARTICIPAR (lado a lado) ═══════════ */}
           <div className="mt-10 w-full">
             <h2 className="text-xl font-bold text-white text-center mb-2">
-              Escolha como participar
+              Como voce quer participar?
             </h2>
             <p className="text-sm text-neutral-500 text-center mb-6">
               Um caminho assistido por IA. Outro totalmente direto. Os dois com proteção de identidade.
@@ -246,6 +253,56 @@ export default function Home() {
               Nao precisa instalar nada. Funciona no celular e no computador.
             </p>
           </div>
+
+          {/* ═══════════ PAPO DE CORREDOR PREVIEW ═══════════ */}
+          {stats?.recentIssues && stats.recentIssues.length > 0 && (
+            <div className="mt-10 w-full">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white">O que a base está discutindo</h2>
+                <Link
+                  href="/papo-de-corredor"
+                  className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1 transition"
+                >
+                  Ver tudo <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="space-y-2">
+                {stats.recentIssues.slice(0, 3).map((issue, i) => (
+                  <Link
+                    key={issue.id}
+                    href="/papo-de-corredor"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-neutral-800/60 bg-neutral-900/40 hover:bg-neutral-800/50 hover:border-neutral-700/60 transition-all group active:scale-[0.99]"
+                  >
+                    <span className="text-xl font-bold text-neutral-700 w-6 text-center flex-shrink-0 tabular-nums">
+                      {i + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white leading-snug line-clamp-2">{issue.title}</p>
+                      {issue.category && (
+                        <span className="text-[11px] text-neutral-500 mt-0.5 block">{issue.category}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0 text-neutral-500 text-xs">
+                      <span className="flex items-center gap-1">
+                        <ThumbsUp className="w-3.5 h-3.5" /> {issue.votes}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MessageSquare className="w-3.5 h-3.5" /> {issue.comment_count}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/papo-de-corredor"
+                className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-neutral-800/50 text-sm text-neutral-400 hover:text-white hover:border-neutral-700 hover:bg-neutral-800/30 transition"
+              >
+                <Radio className="w-4 h-4 text-amber-400" />
+                Entrar no Papo de Corredor
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          )}
 
           {/* ═══════════ DESTAQUE DOS RELATORIOS DE IA ═══════════ */}
           {stats?.latestAIReport && (
@@ -437,6 +494,14 @@ export default function Home() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
+              href="/papo-de-corredor"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto text-base text-neutral-400 hover:text-white transition px-4 py-3 rounded-xl hover:bg-neutral-800/40 touch-target"
+            >
+              <Radio className="w-5 h-5" />
+              Papo de Corredor
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
               href="/reports"
               className="flex items-center justify-center gap-2 w-full sm:w-auto text-base text-neutral-400 hover:text-white transition px-4 py-3 rounded-xl hover:bg-neutral-800/40 touch-target"
             >
@@ -448,7 +513,7 @@ export default function Home() {
               href="/dashboard"
               className="flex items-center justify-center gap-2 w-full sm:w-auto text-base text-neutral-400 hover:text-white transition px-4 py-3 rounded-xl hover:bg-neutral-800/40 touch-target"
             >
-              <BarChart3 className="w-5 h-5" />
+              <LayoutDashboard className="w-5 h-5" />
               Painel de dados
               <ArrowRight className="w-4 h-4" />
             </Link>

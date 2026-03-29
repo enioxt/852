@@ -249,6 +249,16 @@
 - [x] **CRCDM hooks**: Pre/post-commit and pre/post-push hooks installed for cross-repo change detection
 - [x] **Push completed**: Security changes deployed to main branch (commit 1c57608)
 
+## ✅ P0 - Sprint v9.1 (Landing UX + Engagement, 2026-03-29)
+
+- [x] **Landing tagline**: "Registre o problema. A IA organiza. A base vota. Vira pauta." — mais direta e scaneável no mobile
+- [x] **Remove CTAs duplicados**: 2 botões simples removidos (redundância com os cards detalhados)
+- [x] **Mini stats acima do fold**: Faixa compacta conversas/relatos/topicos aparece logo após o badge de anonimato (social proof precoce)
+- [x] **Preview Papo de Corredor**: Top 3 tópicos em debate na landing com votos e comentários — mostra a plataforma viva, cria FOMO, aumenta contribuição
+- [x] **Fix ícone duplicado**: `BarChart3` em "Painel de dados" corrigido para `LayoutDashboard`
+- [x] **Papo de Corredor nos links secundários**: Link com ícone `Radio` adicionado
+- [x] **Heading CTA**: "Escolha como participar" → "Como voce quer participar?" — mais ativo
+
 ## 🚨 P0 - Governance Follow-up (Pre-commit SSOT Audit, 2026-03-29)
 
 - [x] **852-GOV-201:** Hook único canônico: `~/.egos/hooks/pre-commit` (symlink). `.husky/pre-commit` substituído por stub de redirecionamento. Decisão: CRCDM universal = hook único.
