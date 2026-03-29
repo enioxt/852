@@ -37,7 +37,7 @@
 | **LLM Fallback** | Gemini 2.0 Flash via OpenRouter |
 | **Banco** | Supabase PostgreSQL (lhscgsqhiooyatkebose) |
 | **Analytics** | Microsoft Clarity (vtsny72z0w) |
-| **Deploy** | Contabo VPS (porta 3001, Caddy reverse proxy) |
+| **Deploy** | VPS Hetzner (204.168.217.125) (porta 3001, Caddy reverse proxy) |
 
 ## Comandos Principais
 
@@ -45,7 +45,7 @@
 npm run dev              # Servidor local (porta 3000)
 npm run build            # Build de produção
 npm run lint             # ESLint
-# No VPS (217.216.95.126):
+# No VPS Hetzner (204.168.217.125):
 docker compose up -d     # Subir stack
 docker compose logs -f   # Ver logs em tempo real
 ```
@@ -62,8 +62,8 @@ docker compose logs -f   # Ver logs em tempo real
 ## Deploy
 
 ```bash
-# Produção no VPS Contabo (217.216.95.126):
-ssh root@217.216.95.126
+# Produção no VPS Hetzner (204.168.217.125):
+ssh root@hetzner
 cd /opt/852
 git pull && docker compose up -d --build
 ```

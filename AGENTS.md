@@ -10,7 +10,7 @@
 ## LLM Reference Signature
 
 - **Role:** workspace map + deploy surface + governance entrypoint
-- **Summary:** Public anonymous institutional intelligence chatbot for Civil Police officers in Minas Gerais. Features AI-powered chat, PII detection, conversation review, report sharing, smart correlation engine, trending community topics (Papo de Corredor), and ATRiAN ethical validation. Deployed on Contabo VPS, governed by the EGOS mesh.
+- **Summary:** Public anonymous institutional intelligence chatbot for Civil Police officers in Minas Gerais. Features AI-powered chat, PII detection, conversation review, report sharing, smart correlation engine, trending community topics (Papo de Corredor), and ATRiAN ethical validation. Deployed on Hetzner VPS, governed by the EGOS mesh.
 - **Read next:**
   - `.windsurfrules` — active repo governance and local mandates
   - `TASKS.md` — current priorities and blockers
@@ -279,8 +279,8 @@ npm run lint
 rsync -avz --exclude='node_modules' --exclude='.next' --exclude='.env' --exclude='.git' \
   --exclude='.egos' --exclude='.agent' --exclude='.windsurf' \
   --exclude='.guarani/orchestration' --exclude='.guarani/philosophy' \
-  --exclude='.guarani/prompts' --exclude='.guarani/refinery' ./ contabo:/opt/852/
-ssh contabo "cd /opt/852 && docker compose build --no-cache && docker compose up -d --force-recreate"
+  --exclude='.guarani/prompts' --exclude='.guarani/refinery' ./ hetzner:/opt/852/
+ssh hetzner "cd /opt/852 && docker compose build --no-cache && docker compose up -d --force-recreate"
 
 # Smoke tests
 curl -I https://852.egos.ia.br

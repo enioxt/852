@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
+# Migration: Contabo → Hetzner (2026-03-28)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-REMOTE_HOST="${REMOTE_HOST:-contabo}"
+REMOTE_HOST="${REMOTE_HOST:-hetzner}"
 REMOTE_PATH="${REMOTE_PATH:-/opt/852}"
 PUBLIC_URL="${PUBLIC_URL:-https://852.egos.ia.br}"
 

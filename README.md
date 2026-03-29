@@ -77,7 +77,7 @@ Landing (/)
 | **UI** | TailwindCSS 4 + Lucide Icons + Recharts |
 | **Export** | jsPDF + docx + file-saver |
 | **Analytics** | Microsoft Clarity |
-| **Deploy** | Contabo VPS + Docker Compose + Caddy |
+| **Deploy** | Hetzner VPS + Docker Compose + Caddy |
 
 ## System Map
 
@@ -164,10 +164,10 @@ TELEGRAM_CHAT_ID=xxx                         # Chat destino opcional
 # Build
 npm run build
 
-# VPS deploy (Contabo)
+# VPS deploy (Hetzner)
 rsync -avz --exclude='node_modules' --exclude='.next' --exclude='.env' \
-  --exclude='.git' --exclude='.egos' ./ contabo:/opt/852/
-ssh contabo "cd /opt/852 && docker compose build --no-cache && docker compose up -d"
+  --exclude='.git' --exclude='.egos' ./ hetzner:/opt/852/
+ssh hetzner "cd /opt/852 && docker compose build --no-cache && docker compose up -d"
 
 # Smoke test
 curl -I https://852.egos.ia.br
