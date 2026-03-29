@@ -3,12 +3,14 @@ import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { recordEvent } from '@/lib/telemetry';
 import { buildReviewPrompt } from '@/lib/prompt';
+import { ensureConfigLoaded } from '@/lib/config-store';
 
 export const maxDuration = 30;
 
 const REVIEW_LIMIT = { limit: 6, windowMs: 10 * 60 * 1000 };
 
 export async function POST(req: Request) {
+  await ensureConfigLoaded();
   try {
     if (!hasAvailableProvider()) {
       return new Response(JSON.stringify({ error: 'Nenhum provedor de IA configurado.' }), {

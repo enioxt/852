@@ -2,8 +2,10 @@ import { generateText } from 'ai';
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { searchIssuesAndReports } from '@/lib/correlate';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { ensureConfigLoaded } from '@/lib/config-store';
 
 export async function POST(req: Request) {
+  await ensureConfigLoaded();
   const ip = req.headers.get('x-forwarded-for') || 'unknown';
   const limited = checkRateLimit(`correlate:${ip}`, 20, 60_000);
   if (limited) {

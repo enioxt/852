@@ -7,6 +7,7 @@ import { validateAndLog } from '@/lib/atrian';
 import { getCurrentUser } from '@/lib/user-auth';
 import { getConversationMemory } from '@/lib/conversation-memory';
 import { getIdentityKey } from '@/lib/session';
+import { ensureConfigLoaded } from '@/lib/config-store';
 
 export const maxDuration = 60;
 
@@ -67,6 +68,7 @@ function sanitizeMessages(messages: unknown) {
 }
 
 export async function POST(req: Request) {
+  await ensureConfigLoaded();
   try {
     const ip = getClientIp(req.headers);
     const rate = checkRateLimit(`chat:${ip}`, CHAT_LIMIT.limit, CHAT_LIMIT.windowMs);

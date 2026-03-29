@@ -2,6 +2,7 @@ import { generateText } from 'ai';
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { buildHtmlReportPrompt } from '@/lib/prompt';
+import { ensureConfigLoaded } from '@/lib/config-store';
 
 export const maxDuration = 60;
 
@@ -11,6 +12,7 @@ const REPORT_LIMIT = {
 };
 
 export async function POST(req: Request) {
+  await ensureConfigLoaded();
   try {
     if (!hasAvailableProvider()) {
       return new Response(JSON.stringify({ error: 'Nenhum provedor de IA está configurado no servidor.' }), {

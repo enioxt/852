@@ -3,6 +3,7 @@ import { getModelConfig } from '@/lib/ai-provider';
 import { recordEvent } from '@/lib/telemetry';
 import { buildIntelligenceReportPrompt } from '@/lib/prompt';
 import { applyInsightWeighting } from '@/lib/insight-weighting';
+import { ensureConfigLoaded } from '@/lib/config-store';
 import {
   getSupabase,
   saveAIReport,
@@ -13,6 +14,7 @@ import {
 const AI_REPORT_TRIGGER_COUNT = 5;
 
 export async function POST(req: Request) {
+  await ensureConfigLoaded();
   try {
     const body = await req.json().catch(() => ({}));
     const forceGenerate = body.force === true;
