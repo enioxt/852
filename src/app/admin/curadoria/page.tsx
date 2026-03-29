@@ -124,6 +124,12 @@ export default function AdminCuradoriaPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link
+            href="/admin/reports"
+            className="h-10 px-4 inline-flex items-center rounded-xl border border-neutral-800 text-sm text-neutral-300 hover:bg-neutral-900 transition"
+          >
+            Ver Relatórios
+          </Link>
+          <Link
             href="/admin/validations"
             className="h-10 px-4 inline-flex items-center rounded-xl border border-neutral-800 text-sm text-neutral-300 hover:bg-neutral-900 transition"
           >
