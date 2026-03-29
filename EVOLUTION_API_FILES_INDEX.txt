@@ -1,0 +1,326 @@
+INVESTIGATION DELIVERABLES
+===========================
+
+Generated Documentation
+------------------------
+
+/home/enio/852/
+├── EVOLUTION_API_INDEX.md                    [7.6 KB | 290 linhas]
+│   └─ Guia de navegação principal
+│   └─ Quick links por necessidade
+│   └─ Checklist pré-implementação
+│
+├── EVOLUTION_API_QUICK_REFERENCE.md          [5.2 KB | 227 linhas]
+│   └─ Resumo executivo
+│   └─ Endpoints em tabela
+│   └─ Exemplos curl prontos
+│   └─ Troubleshooting
+│   └─ MELHOR PARA: Desenvolvimento rápido
+│
+├── EVOLUTION_API_CARTEIRA_LIVRE_INVESTIGATION.md [19 KB | 757 linhas]
+│   └─ Documentação completa (16 seções)
+│   └─ Código-fonte (snippets)
+│   └─ Exemplos payload completos
+│   └─ Railway configuration
+│   └─ MELHOR PARA: Entendimento profundo
+│
+├── FORJA_IMPLEMENTATION_STRUCTURE.md         [?? KB | ?? linhas]
+│   └─ Estrutura de diretórios proposta
+│   └─ 7 arquivos com código-fonte
+│   └─ Checklist 4 fases
+│   └─ Integração em endpoints
+│   └─ MELHOR PARA: Implementação
+│
+├── EVOLUTION_API_SUMMARY.txt                 [8.5 KB | 276 linhas]
+│   └─ Sumário visual em texto puro
+│   └─ Todas informações-chave
+│   └─ Timeline e custos
+│   └─ MELHOR PARA: Visão geral rápida
+│
+└── EVOLUTION_API_FILES_INDEX.txt             [ESTE ARQUIVO]
+    └─ Índice visual dos deliverables
+    └─ Estrutura de arquivos
+    └─ Como navegar
+
+
+TOTAL: ~1,550 linhas de documentação
+
+
+Source Files Investigated
+--------------------------
+
+/home/enio/carteira-livre/
+├── services/whatsapp/
+│   └── evolution-api.ts (200 linhas) ✓
+│       • sendText()
+│       • sendButtons()
+│       • sendList()
+│       • getConnectionState()
+│       • getQRCode()
+│
+├── services/notifications/
+│   ├── zapi.ts (600 linhas) ✓ *** COPIAR ISTO ***
+│   │   • sendTextMessage() [MAIN]
+│   │   • sendViaEvolution()
+│   │   • sendViaZAPI()
+│   │   • sendViaWasender()
+│   │   • sendViaWaha()
+│   │   • checkConnection()
+│   │   • getQRCode()
+│   │
+│   └── whatsapp-dispatcher.ts (400 linhas) ✓
+│       • notifyAdmins()
+│       • notifyAdminNewRegistration()
+│       • notifyAdminPaymentFailed()
+│       • notifyInstructorWelcome()
+│       • notifyInstructorNewRequest()
+│       • notifyStudentWelcome()
+│       • notifyStudentPaymentPending()
+│       • [20+ notification functions]
+│
+├── scripts/
+│   └── setup-evolution-api.ts (250 linhas) ✓
+│       • checkExistingInstances()
+│       • createInstance()
+│       • getQRCode()
+│       • checkConnection()
+│
+└── docs/guides/
+    └── WHATSAPP_SETUP_GUIDE.md (500 linhas) ✓
+        • Meta Business verification
+        • Railway deployment
+        • Instance creation
+        • Webhook configuration
+        • Complete workflow
+
+
+KEY INFORMATION EXTRACTED
+--------------------------
+
+Authentication:
+  • Header: apikey
+  • Value: EVOLUTION_API_KEY (from env)
+  • Content-Type: application/json
+  • Format: Standard HTTP headers
+
+Environment Variables:
+  EVOLUTION_API_URL          [Required]
+  EVOLUTION_API_KEY          [Required]
+  EVOLUTION_INSTANCE_NAME    [Required]
+  WHATSAPP_PROVIDER          [Optional = 'evolution']
+  WHATSAPP_VERIFY_TOKEN      [For webhook]
+  ADMIN_PHONES               [For notifications]
+
+API Endpoints (7):
+  1. POST   /message/sendText/{instance}
+  2. POST   /message/sendButtons/{instance}
+  3. POST   /message/sendList/{instance}
+  4. GET    /instance/connectionState/{instance}
+  5. GET    /instance/connect/{instance}
+  6. POST   /instance/create
+  7. GET    /instance/fetchInstances
+
+TypeScript Interfaces (5+):
+  • SendTextParams
+  • SendButtonsParams
+  • SendListParams
+  • EvolutionResponse
+  • MessageResult
+
+Infrastructure:
+  • Platform: Railway
+  • Database: PostgreSQL
+  • Cache: Redis (optional)
+  • Version: v2.3.7 (evolution-api)
+
+
+FORJA IMPLEMENTATION STRUCTURE
+------------------------------
+
+forja/
+├── src/lib/whatsapp/
+│   ├── providers.ts              [COPY from zapi.ts]
+│   ├── types.ts                  [CREATE]
+│   ├── format.ts                 [CREATE]
+│   └── notifications.ts          [CREATE]
+│
+├── src/app/api/notifications/whatsapp/
+│   └── route.ts                  [CREATE]
+│
+├── scripts/
+│   └── test-whatsapp.ts          [CREATE]
+│
+├── .env                          [UPDATE]
+└── package.json                  [UPDATE scripts]
+
+Total: 5 new files + 1 copy + 2 updates
+
+
+KEY METRICS
+-----------
+
+Documentation:
+  • Total lines: ~1,550
+  • Total size: ~40 KB
+  • Documents: 5
+  • Sections: 50+
+  • Code snippets: 20+
+  • Examples: 15+
+
+Source code:
+  • Files analyzed: 5
+  • Lines analyzed: ~1,950
+  • Functions documented: 30+
+  • Endpoints documented: 7
+
+Timeline:
+  • Setup: 1-2 hours
+  • Webhook: 1-2 hours
+  • Notifications: 2-3 hours
+  • Testing: 1-2 hours
+  • Total: 6-9 hours
+
+Costs:
+  • Railway: R$ 0 (already running)
+  • Meta API: R$ 0.05 per utility message
+  • Monthly estimate: R$ 50-150 (for 1k-5k notifications)
+
+
+USAGE GUIDE
+-----------
+
+1. START HERE
+   └─ Read EVOLUTION_API_INDEX.md (5 minutes)
+
+2. FOR QUICK REFERENCE
+   └─ Read EVOLUTION_API_QUICK_REFERENCE.md (10 minutes)
+
+3. FOR IMPLEMENTATION
+   └─ Read FORJA_IMPLEMENTATION_STRUCTURE.md (30 minutes)
+
+4. FOR DEEP DIVE
+   └─ Read EVOLUTION_API_CARTEIRA_LIVRE_INVESTIGATION.md (1-2 hours)
+
+5. FOR OVERVIEW
+   └─ Read EVOLUTION_API_SUMMARY.txt (10 minutes)
+
+
+NEXT STEPS
+----------
+
+Phase 1: Preparation (1 hour)
+  ☐ Read EVOLUTION_API_QUICK_REFERENCE.md
+  ☐ Read FORJA_IMPLEMENTATION_STRUCTURE.md
+  ☐ Understand zapi.ts structure
+
+Phase 2: Setup (1-2 hours)
+  ☐ Copy zapi.ts to forja/src/lib/whatsapp/providers.ts
+  ☐ Create types.ts
+  ☐ Create format.ts
+  ☐ Add env variables
+
+Phase 3: Webhook (1-2 hours)
+  ☐ Create webhook route
+  ☐ Implement GET validation
+  ☐ Implement POST handler
+  ☐ Test with curl
+
+Phase 4: Integration (2-3 hours)
+  ☐ Create notifications.ts
+  ☐ Implement helper functions
+  ☐ Integrate in endpoints
+  ☐ Add unit tests
+
+Phase 5: Testing (1-2 hours)
+  ☐ Write integration tests
+  ☐ Test E2E flow
+  ☐ Production validation
+
+
+CHECKLIST
+---------
+
+Documentation:
+  [✓] Investigate source code
+  [✓] Extract authentication details
+  [✓] Document endpoints
+  [✓] Document types
+  [✓] Create quick reference
+  [✓] Create implementation guide
+  [✓] Create summary
+
+Investigation Status:
+  [✓] Files located
+  [✓] Code analyzed
+  [✓] Endpoints mapped
+  [✓] Architecture understood
+  [✓] Reusability assessed
+  [✓] Timeline estimated
+  [✓] Costs calculated
+  [✓] Ready for implementation
+
+
+IMPORTANT NOTES
+---------------
+
+1. 100% Reusable
+   • zapi.ts already supports Evolution API
+   • No need to reinvent the wheel
+   • Just copy and adapt
+
+2. Zero Infrastructure Cost
+   • Railway already running for carteira-livre
+   • Can support multiple instances
+   • Multi-tenant capable
+
+3. Security First
+   • API keys in .env only
+   • Webhook tokens validated
+   • Phone numbers masked in logs
+   • Fire-and-forget notifications
+
+4. Production Ready
+   • Evolution API v2.3.7 stable
+   • Meta WhatsApp Business API official
+   • Railway auto-scaling
+   • Proper error handling
+
+5. Support Available
+   • Official Evolution API docs
+   • carteira-livre as reference
+   • Complete code examples
+   • Troubleshooting guide
+
+
+CONTACTS & REFERENCES
+---------------------
+
+Evolution API:
+  https://doc.evolution.br
+  https://github.com/EvolutionAPI/evolution-api
+
+Meta WhatsApp:
+  https://developers.facebook.com/docs/whatsapp
+
+Railway:
+  https://railway.app/docs
+
+Local References:
+  /home/enio/carteira-livre/docs/guides/WHATSAPP_SETUP_GUIDE.md
+  /home/enio/852/EVOLUTION_API_*.md
+
+
+CONCLUSION
+----------
+
+✓ Investigation COMPLETE
+✓ All information DOCUMENTED
+✓ Ready for IMPLEMENTATION
+✓ 6-9 hours estimated
+
+Next: Start Phase 1 (reading documentation)
+
+
+---
+Last updated: 2026-03-29
+Location: /home/enio/852/

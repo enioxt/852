@@ -1,0 +1,331 @@
+================================================================================
+                        EVOLUTION API INVESTIGATION REPORT
+                           Carteira-Livre → Forja
+================================================================================
+
+DATA: 2026-03-29
+OBJETIVO: Documentar implementação da Evolution API para reutilização em Forja
+REPOSITÓRIO FONTE: /home/enio/carteira-livre
+STATUS: COMPLETO
+
+================================================================================
+                           DOCUMENTAÇÃO GERADA
+================================================================================
+
+1. EVOLUTION_API_INDEX.md
+   └─ Guia de navegação dos 3 documentos principais
+   └─ Quick navigation por necessidade
+   └─ Checklist antes de implementar
+   └─ Próximos passos
+
+2. EVOLUTION_API_QUICK_REFERENCE.md (5.2 KB - 227 linhas)
+   └─ Resumo executivo
+   └─ Endpoints principais (tabela)
+   └─ Exemplos de payload (curl)
+   └─ Quick start (5 minutos)
+   └─ Troubleshooting
+
+3. EVOLUTION_API_CARTEIRA_LIVRE_INVESTIGATION.md (19 KB - 757 linhas)
+   └─ Documentação completa e detalhada
+   └─ 16 seções cobrindo toda implementação
+   └─ Código-fonte (snippets)
+   └─ Exemplos de payload completos
+   └─ Recomendações para Forja
+
+4. FORJA_IMPLEMENTATION_STRUCTURE.md (não listado acima)
+   └─ Estrutura recomendada para Forja
+   └─ 7 arquivos a criar (com código)
+   └─ Checklist de implementação (4 fases)
+   └─ Timeline e custos
+
+================================================================================
+                           ARQUIVOS INVESTIGADOS
+================================================================================
+
+carteira-livre/services/whatsapp/evolution-api.ts (200 linhas)
+  - sendText()
+  - sendButtons()
+  - sendList()
+  - getConnectionState()
+  - getQRCode()
+
+carteira-livre/services/notifications/zapi.ts (600 linhas) *** COPIAR ISTO
+  - Multi-provider abstraction
+  - sendTextMessage() ← função principal
+  - sendViaEvolution() ← implementação específica
+  - checkConnection()
+  - getQRCode()
+
+carteira-livre/services/notifications/whatsapp-dispatcher.ts (400 linhas)
+  - notifyAdmins()
+  - notifyAdminNewRegistration()
+  - notifyAdminPaymentFailed()
+  - notifyInstructorWelcome()
+  - notifyStudentWelcome()
+  - [20+ funções de notificação]
+
+carteira-livre/scripts/setup-evolution-api.ts (250 linhas)
+  - Script CLI para setup
+  - Criar instância
+  - QR Code scanning
+  - Webhook configuration
+
+carteira-livre/docs/guides/WHATSAPP_SETUP_GUIDE.md (500 linhas)
+  - Setup Meta Business
+  - Deploy Evolution API no Railway
+  - Criação de webhook
+  - Fluxo completo
+
+================================================================================
+                           INFORMAÇÕES-CHAVE
+================================================================================
+
+AUTENTICAÇÃO:
+  - Header: apikey
+  - Value: EVOLUTION_API_KEY
+  - Content-Type: application/json
+  - Multi-instance support: SIM
+
+ENV VARS NECESSÁRIAS:
+  EVOLUTION_API_URL=https://seu-evolution.railway.app
+  EVOLUTION_API_KEY=sua-chave-secreta
+  EVOLUTION_INSTANCE_NAME=forja
+  WHATSAPP_PROVIDER=evolution
+  WHATSAPP_VERIFY_TOKEN=seu-token-aleatorio
+  ADMIN_PHONES=5534999999999,5534888888888
+
+ENDPOINTS PRINCIPAIS:
+  POST /message/sendText/{instance}          → Enviar texto
+  POST /message/sendButtons/{instance}       → Enviar com botões
+  POST /message/sendList/{instance}          → Enviar com lista
+  GET  /instance/connectionState/{instance}  → Verificar conexão
+  GET  /instance/connect/{instance}          → QR Code
+  POST /instance/create                      → Criar instância
+  GET  /instance/fetchInstances              → Listar instâncias
+
+REUTILIZAÇÃO:
+  - 100% reutilizável
+  - Código já existe em zapi.ts
+  - Railway já está rodando
+  - Custo incremental: R$0 (infra) + R$0.05/msg (Meta)
+
+================================================================================
+                           ESTRUTURA FORJA
+================================================================================
+
+forja/
+├── src/lib/whatsapp/
+│   ├── providers.ts              ← COPIAR de zapi.ts (carteira-livre)
+│   ├── types.ts                  ← CRIAR (interfaces)
+│   ├── format.ts                 ← CRIAR (formatPhone, validations)
+│   └── notifications.ts          ← CRIAR (helpers de alto nível)
+├── src/app/api/notifications/whatsapp/
+│   └── route.ts                  ← CRIAR (webhook GET/POST)
+└── scripts/
+    └── test-whatsapp.ts          ← CRIAR (testes locais)
+
+TOTAL: 6 novos arquivos, 1 cópia
+
+================================================================================
+                           TIMELINE
+================================================================================
+
+Fase 1: Setup Inicial              1-2 horas
+  - Copiar zapi.ts
+  - Criar types.ts, format.ts
+  - Adicionar env vars
+
+Fase 2: Webhook                    1-2 horas
+  - Criar rota /api/notifications/whatsapp
+  - GET validation
+  - POST message receive
+  - Testes com curl
+
+Fase 3: Notificações               2-3 horas
+  - Implementar sendTextMessage()
+  - Implementar notifyAdmin()
+  - Implementar notifyUser*()
+  - Integrar em endpoints
+
+Fase 4: Testes E2E                 1-2 horas
+  - Unit tests
+  - Integration tests
+  - Production testing
+
+TOTAL: 6-9 horas (implementação completa)
+
+================================================================================
+                           CUSTOS
+================================================================================
+
+Railway (Evolution API): R$0
+  └─ Já está rodando para carteira-livre
+  └─ Pode suportar múltiplas instâncias
+
+Meta API (WhatsApp):
+  └─ R$0.05 por mensagem "utility"
+  └─ R$0 por mensagem "service" (cliente inicia)
+
+Estimativa Mensal (100 notifs/dia):
+  └─ R$150/mês (5k mensagens)
+
+================================================================================
+                           CÓDIGO PRINCIPAL
+================================================================================
+
+Função central para reutilizar:
+
+  import { sendTextMessage } from '@/lib/whatsapp/providers';
+
+  const result = await sendTextMessage(
+    '5534999999999',
+    'Olá! Esta é uma notificação.'
+  );
+
+  if (result.success) {
+    console.log('Mensagem enviada:', result.messageId);
+  } else {
+    console.error('Erro:', result.error);
+  }
+
+Detecta provider automaticamente:
+  - Lê WHATSAPP_PROVIDER do .env
+  - Se 'evolution', usa Evolution API
+  - Se 'zapi', usa Z-API
+  - Etc.
+
+================================================================================
+                           WEBHOOK
+================================================================================
+
+GET /api/notifications/whatsapp?hub.mode=subscribe&hub.challenge=...
+  └─ Validar WHATSAPP_VERIFY_TOKEN
+  └─ Retornar challenge
+
+POST /api/notifications/whatsapp
+  └─ Receber eventos de Evolution API
+  └─ Processar mensagens (event = 'messages.upsert')
+  └─ Retornar { status: 'ok' }
+
+Configurar webhook no Evolution API:
+  URL: https://seu-forja.com/api/notifications/whatsapp
+  Events: MESSAGES_UPSERT, CONNECTION_UPDATE, etc
+
+================================================================================
+                           PRÓXIMOS PASSOS
+================================================================================
+
+1. Ler EVOLUTION_API_QUICK_REFERENCE.md (10 minutos)
+
+2. Ler FORJA_IMPLEMENTATION_STRUCTURE.md (20 minutos)
+
+3. Copiar carteira-livre/services/notifications/zapi.ts
+   → forja/src/lib/whatsapp/providers.ts
+
+4. Criar 5 novos arquivos:
+   ├─ forja/src/lib/whatsapp/types.ts
+   ├─ forja/src/lib/whatsapp/format.ts
+   ├─ forja/src/lib/whatsapp/notifications.ts
+   ├─ forja/src/app/api/notifications/whatsapp/route.ts
+   └─ forja/scripts/test-whatsapp.ts
+
+5. Adicionar env vars ao .env
+
+6. Testar webhook com curl
+
+7. Integrar em endpoints existentes
+
+8. Escrever testes unitários
+
+================================================================================
+                           TROUBLESHOOTING
+================================================================================
+
+Erro: 401 Unauthorized
+  → Verificar EVOLUTION_API_KEY
+
+Erro: 404 Instance not found
+  → Verificar EVOLUTION_INSTANCE_NAME
+
+Erro: Message not delivered
+  → Verificar se número é válido (55 + DDD + 9 dígitos)
+
+Erro: Webhook não recebe mensagens
+  → Verificar WHATSAPP_VERIFY_TOKEN
+  → Verificar URL no Evolution API
+
+Erro: Processo local não conecta
+  → Verificar se Evolution API está online
+  → Verificar se EVOLUTION_API_URL está correto
+
+================================================================================
+                           SEGURANÇA
+================================================================================
+
+DO:
+  ✓ API Key em .env (nunca em código)
+  ✓ Webhook token validado em GET
+  ✓ Telefone mascarado em logs (últimos 4 dígitos)
+  ✓ Fire-and-forget notifications (não bloqueia fluxo)
+  ✓ Logging centralizado
+
+DON'T:
+  ✗ Commitar .env com secrets
+  ✗ Logar número de telefone completo
+  ✗ Deixar API key em comentários de código
+  ✗ Enviar SMS direto para prod sem testar
+  ✗ Usar webhook token fraco
+
+================================================================================
+                           DOCUMENTAÇÃO OFICIAL
+================================================================================
+
+Evolution API:
+  https://doc.evolution.br
+  https://github.com/EvolutionAPI/evolution-api
+
+Meta WhatsApp Business API:
+  https://developers.facebook.com/docs/whatsapp
+
+Railway:
+  https://railway.app/docs
+
+carteira-livre (referência):
+  /home/enio/carteira-livre/docs/guides/WHATSAPP_SETUP_GUIDE.md
+
+================================================================================
+                           STATUS
+================================================================================
+
+Investigação:
+  [✓] Localizar arquivos
+  [✓] Ler código-fonte
+  [✓] Documentar endpoints
+  [✓] Documentar tipos
+  [✓] Criar guia de implementação
+  [✓] Criar referência rápida
+  [✓] Criar estrutura para Forja
+  [✓] Listar arquivos a copiar
+
+Pronto para implementação em Forja.
+
+================================================================================
+                           CONCLUSÃO
+================================================================================
+
+A implementação da Evolution API em carteira-livre é REUTILIZÁVEL 100%.
+
+Para Forja:
+  1. Copiar 1 arquivo (zapi.ts)
+  2. Criar 5 novos arquivos
+  3. Adicionar 6 env vars
+  4. 6-9 horas de trabalho
+
+Custo incremental: R$0 (infra) + ~R$150/mês (mensagens)
+
+Benefício: Notificações via WhatsApp para todos os usuários do Forja.
+
+================================================================================
+
+Última atualização: 2026-03-29
+Localização: /home/enio/852/EVOLUTION_API_*.md
