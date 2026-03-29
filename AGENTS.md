@@ -178,6 +178,7 @@
 | 53 | Email Notification System (vote + comment alerts, SMTP, user prefs) | `notifications-email.ts`, `mailer.ts`, `email-templates/` | Active |
 | 54 | User Notification Preferences (opt-in/out, digest frequency) | `api/auth/notification-preferences/route.ts`, `NotificationPreferencesForm.tsx` | Active |
 | 55 | Landing UX: mini stats + Papo de Corredor preview above fold | `app/page.tsx` | Active |
+| 56 | Integration Hub: UI admin p/ gerenciar todas as API keys via Supabase (AES-256) | `admin/integrations/`, `lib/config-store.ts`, `lib/crypto-config.ts` | Active |
 
 ## Agent 852 — Roadmap
 

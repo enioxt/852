@@ -267,9 +267,20 @@
 - [x] **`IssueCommentNotificationPayload`**: tipo exportado; `notifications.ts` atualizado com branch `issue_commented`
 - [x] **Doc drift fix**: `.windsurfrules` corrigido — Contabo → Hetzner `204.168.217.125` + release script documentado
 - [x] **AGENTS.md v3.1.0**: capabilities 53-55 adicionados (email notifications, notification prefs, landing UX)
-- [ ] **AÇÃO HUMANA: `npx supabase db push`** — aplicar migrations `20260328000000` (user_notification_preferences_852) e `20260328000001` (get_issue_participants) no Supabase
-- [ ] **AÇÃO HUMANA: VPS .env** — confirmar `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` no `.env` do Hetzner
+- [ ] **AÇÃO HUMANA: `npx supabase db push`** — aplicar 3 migrations: `20260328000000` + `20260328000001` + `20260329000000` (Integration Hub)
+- [ ] **AÇÃO HUMANA: VPS .env bootstrap** — setar `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CONFIG_ENCRYPTION_KEY` (gerar: `openssl rand -hex 32`), `ADMIN_SETUP_KEY`
 - [ ] **AÇÃO HUMANA: `npm run release:prod`** — deploy na máquina com SSH configurado para `hetzner`
+- [ ] **APÓS DEPLOY**: acessar `/admin/integrations` → inserir SMTP, Telegram, DashScope, OpenRouter via UI — zero mais SSH pra chaves
+
+## ✅ Integration Hub (2026-03-29)
+
+- [x] **`app_config_852` migration**: tabela criptografada com catálogo de 16 integrações pré-seed
+- [x] **`crypto-config.ts`**: AES-256-GCM encrypt/decrypt — chave de bootstrap no `.env`
+- [x] **`config-store.ts`**: TTL cache 5min, overlay em `process.env`, `invalidateConfigCache()`
+- [x] **`/api/admin/integrations`**: GET (masked) / PUT (salva criptografado + injeta process.env) / POST test (DashScope, OpenRouter, OpenAI, Telegram, SMTP, Webhook)
+- [x] **`/admin/integrations/page.tsx`**: UI com cards por grupo, badge de status, teste com ⚡, edição inline, indicador AES-256
+- [x] **`/conta`**: link "Integration Hub — Chaves & APIs" adicionado ao portal admin
+- [x] **`.env.example`**: reestruturado — bootstrap (3 vars) separado de opcionais
 
 ## 🚨 P0 - Governance Follow-up (Pre-commit SSOT Audit, 2026-03-29)
 

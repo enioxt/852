@@ -997,6 +997,9 @@ function AccountPageContent() {
                    <Link href="/admin/validations" className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-blue-800/60 bg-blue-900/30 px-4 text-xs font-medium text-white transition hover:bg-blue-900/50">
                      Validação de Cadastros (MASP)
                    </Link>
+                   <Link href="/admin/integrations" className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-amber-800/60 bg-amber-900/20 px-4 text-xs font-medium text-amber-300 transition hover:bg-amber-900/30">
+                     Integration Hub — Chaves & APIs
+                   </Link>
                  </div>
                </div>
             )}
