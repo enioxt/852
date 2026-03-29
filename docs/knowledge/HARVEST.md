@@ -116,3 +116,38 @@ scrollbar-color: #404040 #171717; /* thumb track */
 MDN Web Docs, Chrome Developers, LogRocket, Eleken UX, NN/G, MagicUI, Balsamiq
 
 ---
+
+## Record: 2026-03-29 | Pre-commit Governance Audit — Runtime vs. Local Spec
+
+### 1. Verdade Verificada
+- **Runtime ativo no 852:** `.git/hooks/pre-commit -> /home/enio/.egos/hooks/pre-commit`
+- **Spec local presente mas não ativado por wiring:** `852/.husky/pre-commit`
+- **Evidência de não ativação do Husky local:** sem `prepare` no `package.json` e sem `core.hooksPath` configurado
+- **Hooks adicionais reais no repo:** `.git/hooks/post-commit`, `.git/hooks/pre-push`, `.git/hooks/post-push` com CRCDM
+
+### 2. Taxonomia Útil
+- **Runtime Hook:** o que realmente bloqueia ou permite commits/pushes no ambiente atual
+- **Shadow Spec:** implementação local versionada no repo, mas sem prova de instalação ativa
+- **Historical SSOT References:** `TASKS.md`, `SYSTEM_MAP.md` e handoffs que descrevem o estado anterior ou parcial
+- **Cross-Repo Extension Hooks:** hooks CRCDM que adicionam logging DAG, impacto e alertas cross-repo além do bloqueio local
+
+### 3. Diferença Material Entre as Superfícies
+- `~/.egos/hooks/pre-commit` está orientado a **CRCDM/mesh telemetry**: impacto, DAG, contexto cross-repo, logging e warnings operacionais
+- `852/.husky/pre-commit` está orientado a **policy enforcement local**: secrets scan, doc proliferation, limites SSOT, handoff freshness e governance drift hint
+- Conclusão: as duas superfícies não são equivalentes; uma reconciliação explícita é necessária antes de chamar qualquer uma de SSOT canônico
+
+### 4. Padrão de Execução sem Duplicidade
+- **Frente A — Runtime Canonicalization:** decidir o hook canônico, instalar de forma verificável, comparar checks e eliminar drift entre runtime e spec
+- **Frente B — Policy & Dissemination:** atualizar docs/tasks/mapas, classificar checks por tipo (`blocking`, `warning`, `telemetry`, `cross-repo`) e propagar a matriz de adoção para outros repos
+- Regra: a Frente B não deve declarar SSOT final antes da Frente A fechar a matriz de verdade
+
+### 5. Ordem Segura para Próximo Agente
+1. Comparar `~/.egos/hooks/pre-commit` vs `.husky/pre-commit`
+2. Decidir canônico + estratégia de instalação
+3. Validar runtime real no repo
+4. Só então atualizar `SYSTEM_MAP`, `TASKS`, handoff e disseminação
+
+### 6. Sinal de Maturidade
+Não basta existir `.husky/pre-commit` no repo. A maturidade correta exige: **arquivo versionado + instalação verificável + docs coerentes + adoção cross-repo rastreável**.
+
+---

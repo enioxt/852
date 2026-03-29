@@ -24,7 +24,9 @@
 - `.windsurf/workflows/*` — Windsurf slash workflows
 - `.agent/workflows/*` — Antigravity/Cline slash workflows
 - `.windsurf/skills/*` and `.agent/skills/*` — shared skills
-- `.git/hooks/pre-commit -> /home/enio/.egos/hooks/pre-commit`
+- `.git/hooks/pre-commit -> /home/enio/.egos/hooks/pre-commit` — runtime hook ativo verificado
+- `.husky/pre-commit` — spec local versionada no repo, atualmente sem prova de instalação via `core.hooksPath` ou `prepare`
+- `.git/hooks/post-commit`, `.git/hooks/pre-push`, `.git/hooks/post-push` — CRCDM hooks ativos para logging e impacto cross-repo
 
 ## 4. Module Roots
 
