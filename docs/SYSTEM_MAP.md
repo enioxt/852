@@ -24,9 +24,9 @@
 - `.windsurf/workflows/*` — Windsurf slash workflows
 - `.agent/workflows/*` — Antigravity/Cline slash workflows
 - `.windsurf/skills/*` and `.agent/skills/*` — shared skills
-- `.git/hooks/pre-commit -> /home/enio/.egos/hooks/pre-commit` — runtime hook ativo verificado
-- `.husky/pre-commit` — spec local versionada no repo, atualmente sem prova de instalação via `core.hooksPath` ou `prepare`
-- `.git/hooks/post-commit`, `.git/hooks/pre-push`, `.git/hooks/post-push` — CRCDM hooks ativos para logging e impacto cross-repo
+- `.git/hooks/pre-commit → ~/.egos/hooks/pre-commit` — **hook canônico único** (symlink); checks: gitleaks, regex secrets, doc-proliferation, SSOT limits, handoff freshness, CRCDM DAG
+- `.git/hooks/post-commit`, `.git/hooks/pre-push` — CRCDM hooks (observability + cross-repo impact)
+- `.husky/pre-commit` — stub de redirecionamento (não ativo); decisão GOV-201 2026-03-29: hook único = CRCDM universal
 
 ## 4. Module Roots
 
@@ -47,7 +47,7 @@
 - Production release: `npm run release:prod`
 - Runtime contract: `docker-compose.yml`
 - Public URL: `https://852.egos.ia.br`
-- VPS target: Contabo `217.216.95.126`
+- VPS target: Hetzner `204.168.217.125`
 
 ## 6. Core Product Flows
 

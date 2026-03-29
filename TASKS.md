@@ -251,10 +251,10 @@
 
 ## 🚨 P0 - Governance Follow-up (Pre-commit SSOT Audit, 2026-03-29)
 
-- [ ] **852-GOV-201:** Reconciliar verdade do hook de runtime vs. shadow spec local — hoje o runtime verificado é `.git/hooks/pre-commit -> /home/enio/.egos/hooks/pre-commit`, enquanto `852/.husky/pre-commit` existe como spec local sem `prepare` no `package.json` e sem `core.hooksPath`; decidir um único canônico e remover ambiguidade
-- [ ] **852-GOV-202:** Comparar `~/.egos/hooks/pre-commit` vs `852/.husky/pre-commit` check a check — classificar `blocking`, `warning`, `telemetry`, `cross-repo`, medir lacunas (secrets, PII, lint/typecheck, doc proliferation, governance drift, CRCDM) e registrar matriz de adoção por repo
-- [ ] **852-GOV-203:** Normalizar documentação local para refletir runtime real — atualizar `docs/SYSTEM_MAP.md`, `docs/knowledge/HARVEST.md` e referências de handoff ativas para separar explicitamente `runtime ativo`, `spec local`, `hooks CRCDM` e `histórico de migração`
-- [ ] **852-GOV-204:** Definir contrato de duas frentes sem sobreposição para executor futuro — **Frente A / Runtime Canonicalization:** hook único + instalação + verificação; **Frente B / Policy & Dissemination:** taxonomia, docs, adoção cross-repo, prompts e handoff operacional
-- [ ] **852-GOV-205:** Produzir plano de execução para Sonnet/Haiku/Qwen com ordem segura — primeiro reconciliar hook canônico e instalação, depois propagar docs/tasks/disseminação; nenhum agente deve editar runtime e documentação canônica em paralelo sem matriz de verdade fechada
+- [x] **852-GOV-201:** Hook único canônico: `~/.egos/hooks/pre-commit` (symlink). `.husky/pre-commit` substituído por stub de redirecionamento. Decisão: CRCDM universal = hook único.
+- [x] **852-GOV-202:** Gaps identificados e fechados: doc-proliferation + SSOT limits + handoff freshness adicionados ao CRCDM hook universal. Checks ativos: gitleaks, regex-secret, doc-prolif, SSOT size, handoff, CRCDM DAG.
+- [x] **852-GOV-203:** `docs/SYSTEM_MAP.md` atualizado: hook canônico documentado, VPS Hetzner corrigido, spec local marcada como stub.
+- [x] **852-GOV-204:** Contrato resolvido: frente única (CRCDM universal). Sem dual-hook. Sem sobreposição.
+- [x] **852-GOV-205:** Plano executado: hook reconciliado → docs atualizados → propagado via governance-sync em 2026-03-29.
 
 ## ⏭️ Backlog
