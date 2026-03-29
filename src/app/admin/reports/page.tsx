@@ -20,6 +20,7 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
+  TrendingUp,
 } from 'lucide-react';
 
 interface ReportMessage {
@@ -77,6 +78,21 @@ interface ApiResponse {
   summary?: Summary;
 }
 
+interface ThemeCount {
+  theme: string;
+  count: number;
+  pct: number;
+}
+
+interface InsightSummary {
+  totalReports: number;
+  reportsWithReview: number;
+  topThemes: ThemeCount[];
+  topTags: ThemeCount[];
+  topBlindSpots: ThemeCount[];
+  windowDays: number;
+}
+
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Todos (exceto deletados)' },
   { value: 'pending_human', label: 'Pendentes' },
@@ -100,6 +116,14 @@ export default function AdminReportsPage() {
   const [daysFilter, setDaysFilter] = useState('30');
   const [page, setPage] = useState(1);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [insights, setInsights] = useState<InsightSummary | null>(null);
+
+  const loadInsights = useCallback(async (days: string) => {
+    try {
+      const res = await fetch(`/api/admin/insights?days=${days}`);
+      if (res.ok) setInsights(await res.json());
+    } catch { /* non-critical */ }
+  }, []);
 
   const load = useCallback(async (p = page) => {
     setLoading(true);
@@ -132,12 +156,18 @@ export default function AdminReportsPage() {
   const applyFilters = () => {
     setPage(1);
     load(1);
+    loadInsights(daysFilter);
   };
 
   useEffect(() => {
     load(page);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
+
+  useEffect(() => {
+    loadInsights(daysFilter);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const reports = data?.reports || [];
   const pagination = data?.pagination;
@@ -235,6 +265,71 @@ export default function AdminReportsPage() {
             <SummaryCard icon={Clock3} label="Pendentes" value={summary.pending} tone="amber" />
             <SummaryCard icon={CheckCircle2} label="Publicados" value={summary.published} tone="green" />
             <SummaryCard icon={ShieldX} label="Deletados" value={summary.deleted} tone="red" />
+          </div>
+        )}
+
+        {/* Cross-conversation insights */}
+        {insights && (insights.topThemes.length > 0 || insights.topTags.length > 0) && (
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-5 space-y-4">
+            <div className="flex items-center gap-2 text-sm font-semibold text-neutral-200">
+              <TrendingUp className="w-4 h-4 text-blue-400" />
+              Temas Recorrentes
+              <span className="ml-auto text-xs text-neutral-500 font-normal">
+                {insights.reportsWithReview}/{insights.totalReports} relatos com revisão IA
+              </span>
+            </div>
+
+            {insights.topThemes.length > 0 && (
+              <div>
+                <p className="text-xs text-neutral-500 mb-2">Temas da IA (top {Math.min(12, insights.topThemes.length)})</p>
+                <div className="flex flex-wrap gap-2">
+                  {insights.topThemes.slice(0, 12).map((t) => (
+                    <span
+                      key={t.theme}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-blue-800/40 bg-blue-900/20 text-xs text-blue-300"
+                    >
+                      {t.theme}
+                      <span className="opacity-60">×{t.count}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {insights.topTags.length > 0 && (
+              <div>
+                <p className="text-xs text-neutral-500 mb-2">Tags dos relatos (top {Math.min(10, insights.topTags.length)})</p>
+                <div className="flex flex-wrap gap-2">
+                  {insights.topTags.slice(0, 10).map((t) => (
+                    <span
+                      key={t.theme}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-neutral-700 bg-neutral-800 text-xs text-neutral-300"
+                    >
+                      <Tag className="w-2.5 h-2.5 opacity-60" />
+                      {t.theme}
+                      <span className="opacity-50">×{t.count}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {insights.topBlindSpots.length > 0 && (
+              <div>
+                <p className="text-xs text-amber-500/80 mb-2">Pontos cegos recorrentes</p>
+                <div className="flex flex-wrap gap-2">
+                  {insights.topBlindSpots.slice(0, 6).map((t) => (
+                    <span
+                      key={t.theme}
+                      className="px-2.5 py-1 rounded-full border border-amber-800/40 bg-amber-900/10 text-xs text-amber-400"
+                    >
+                      {t.theme.slice(0, 60)}{t.theme.length > 60 ? '…' : ''}
+                      <span className="opacity-60 ml-1">×{t.count}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
