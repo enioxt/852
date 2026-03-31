@@ -1,16 +1,23 @@
 /**
  * PII Scanner — Detects sensitive/personal data in conversation text
  *
- * Scans for: CPF, RG, MASP, phone numbers, emails, process numbers,
- * REDS numbers, proper names (heuristic), addresses, and other PII.
+ * Local implementation kept in sync with @egosbr/guard-brasil v0.2.0 patterns.
+ * Covers: CPF, CNPJ, RG, MASP, SUS, NIS/PIS, Título de Eleitor, phone, email,
+ * REDS, process numbers, plates, date of birth, CEP, and name heuristics.
  *
- * Returns a list of findings with positions so the UI can highlight them.
+ * TODO (EGOS-158): Once @egosbr/guard-brasil@0.2.0 is published to npm,
+ * replace this file with: import { scanForPII, maskPII } from '@egosbr/guard-brasil'
+ * and update chat/conversations routes accordingly.
  */
 
 export type PIICategory =
   | 'cpf'
+  | 'cnpj'
   | 'rg'
   | 'masp'
+  | 'sus'
+  | 'nis_pis'
+  | 'titulo_eleitor'
   | 'phone'
   | 'email'
   | 'reds'
@@ -18,6 +25,7 @@ export type PIICategory =
   | 'name'
   | 'address'
   | 'plate'
+  | 'cep'
   | 'date_of_birth';
 
 export interface PIIFinding {
@@ -37,6 +45,13 @@ const PII_PATTERNS: Array<{
   pattern: RegExp;
   suggestion: string;
 }> = [
+  {
+    // More specific (14 digits) before CPF (11 digits) to avoid partial match
+    category: 'cnpj',
+    label: 'CNPJ',
+    pattern: /\b\d{2}[.\s]?\d{3}[.\s]?\d{3}[/\s]?\d{4}[-.\s]?\d{2}\b/g,
+    suggestion: '[CNPJ REMOVIDO]',
+  },
   {
     category: 'cpf',
     label: 'CPF',
@@ -84,6 +99,30 @@ const PII_PATTERNS: Array<{
     label: 'Placa',
     pattern: /\b[A-Z]{3}[-\s]?\d[A-Z0-9]\d{2}\b/gi,
     suggestion: '[PLACA REMOVIDA]',
+  },
+  {
+    category: 'sus',
+    label: 'Cartão SUS',
+    pattern: /\b[1-9]\d{2}\s?\d{4}\s?\d{4}\s?\d{4}\b/g,
+    suggestion: '[SUS REMOVIDO]',
+  },
+  {
+    category: 'nis_pis',
+    label: 'NIS/PIS',
+    pattern: /\b[12]\d{2}\.?\d{5}\.?\d{2}-?\d\b/g,
+    suggestion: '[NIS REMOVIDO]',
+  },
+  {
+    category: 'titulo_eleitor',
+    label: 'Título de Eleitor',
+    pattern: /\b\d{4}\s?\d{4}\s?\d{4}\b/g,
+    suggestion: '[TÍTULO REMOVIDO]',
+  },
+  {
+    category: 'cep',
+    label: 'CEP',
+    pattern: /\b\d{5}[-.\s]?\d{3}\b/g,
+    suggestion: '[CEP REMOVIDO]',
   },
   {
     category: 'date_of_birth',
