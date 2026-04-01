@@ -1,5 +1,8 @@
 # 852 Inteligencia
 
+> **Status:** ⏸️ Ritmo reduzido — parceiro parcial. Eagle Eye + investigação criminal funcional.  
+> Este projeto tem MVP funcional disponível. Interessados em contribuir ou co-fundar: entre em contato via [Issues](https://github.com/enioxt/852/issues) ou enio@egos.ia.br
+
 > Canal de inteligencia institucional para os **852 municipios** de Minas Gerais.
 
 Plataforma anonima e segura baseada no ecossistema EGOS para coleta, estruturacao e analise de relatos de Policiais Civis.
