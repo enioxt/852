@@ -3,7 +3,7 @@ import { buildAgentPrompt } from '@/lib/prompt';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { recordChatCompletion, recordRateLimitHit, recordChatError, recordEvent } from '@/lib/telemetry';
-import { validateAndLog } from '@/lib/atrian';
+import { filterChunk, validateAndLog } from '@/lib/atrian';
 import { getCurrentUser } from '@/lib/user-auth';
 import { getConversationMemory } from '@/lib/conversation-memory';
 import { getIdentityKey } from '@/lib/session';
@@ -148,6 +148,7 @@ export async function POST(req: Request) {
       system: buildAgentPrompt(memoryBlock),
       messages,
       temperature: 0.7,
+      abortSignal: req.signal, // CHAT-007: stop billing when client disconnects
       onFinish: async ({ text, usage }) => {
         const inputTokens = usage?.inputTokens || 0;
         const outputTokens = usage?.outputTokens || 0;
@@ -157,23 +158,35 @@ export async function POST(req: Request) {
           tokensIn: inputTokens, tokensOut: outputTokens,
           costUsd: cost, clientIp: ip,
         });
-        // ATRiAN: validate completed response and log violations
+        // ATRiAN: validate completed response and log violations (post-hoc, full text)
         if (text) {
           validateAndLog(text, ip);
         }
       },
     });
 
-    return result.toTextStreamResponse({
-      headers: {
-        'X-Model-Id': modelId,
-        'X-Provider': providerLabel,
-        'X-Model-Free': pricing.free ? 'true' : 'false',
-        'X-Model-Routing': routingReason,
-        'X-RateLimit-Remaining': String(rate.remaining),
-        'X-RateLimit-Reset': String(rate.resetAt),
+    // CHAT-001: Stream-time ATRiAN filter — blocks critical entities (e.g. SINDPOL) before
+    // they reach the client mid-stream. Complements post-hoc validateAndLog above.
+    const atrianTransform = new TransformStream<string, string>({
+      transform(chunk, controller) {
+        controller.enqueue(filterChunk(chunk));
       },
     });
+
+    return new Response(
+      result.textStream.pipeThrough(atrianTransform).pipeThrough(new TextEncoderStream()),
+      {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'X-Model-Id': modelId,
+          'X-Provider': providerLabel,
+          'X-Model-Free': pricing.free ? 'true' : 'false',
+          'X-Model-Routing': routingReason,
+          'X-RateLimit-Remaining': String(rate.remaining),
+          'X-RateLimit-Reset': String(rate.resetAt),
+        },
+      }
+    );
   } catch (error: unknown) {
     const detail = error instanceof Error ? error.message : 'Unknown error';
     recordChatError(detail, getClientIp(req.headers));
