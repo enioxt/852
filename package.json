@@ -26,7 +26,8 @@
     "orchestrator:logs": "npx tsx scripts/orchestrator/log-analyzer.ts",
     "orchestrator:health": "npx tsx scripts/orchestrator/health-monitor.ts",
     "orchestrator:db": "npx tsx scripts/orchestrator/database-auditor.ts",
-    "orchestrator:fix": "npx tsx scripts/orchestrator/auto-fix-agent.ts"
+    "orchestrator:fix": "npx tsx scripts/orchestrator/auto-fix-agent.ts",
+    "eval": "bun src/eval/runner.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
