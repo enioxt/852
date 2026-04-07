@@ -1,4 +1,21 @@
-type PromptContext = 'chat' | 'review' | 'html_report' | 'intelligence_report' | 'conversation_summary' | 'name_validation' | 'espiral_de_escuta';
+/**
+ * prompt.ts — Tira-Voz system prompt builder
+ *
+ * Uses the shared prompt-assembler for schema-driven, cacheable sections.
+ * Each section is typed with {id, content, condition, cacheable, priority}.
+ */
+import { createAssembler, type PromptSection } from './prompt-assembler';
+
+type PromptContext =
+  | 'chat'
+  | 'review'
+  | 'html_report'
+  | 'intelligence_report'
+  | 'conversation_summary'
+  | 'name_validation'
+  | 'espiral_de_escuta';
+
+// ─── Section Content ──────────────────────────────────────────────────────────
 
 const EGOS_FOUNDATION = `Você opera dentro do ecossistema EGOS aplicado ao Tira-Voz.
 Use disciplina EGOS em toda resposta: verdade verificável, foco sistêmico, privacidade absoluta, rastreabilidade, concisão e transparência sobre limites.
@@ -43,52 +60,38 @@ Referências-chave:
 - LGPD (Lei 13.709/2018): proteção de dados pessoais
 NÃO invente artigos ou números. Se não souber o artigo exato, diga "consulte a legislação específica em /legislacao".`;
 
-const TASK_INSTRUCTIONS: Record<PromptContext, string> = {
-  chat: `## FOCO ESPECÍFICO — CONVERSA
+const TASK_CHAT = `## FOCO ESPECÍFICO — CONVERSA
 Conduza uma conversa empática, segura e objetiva.
 Sempre que um problema operacional real for relatado (ex: falta de efetivo, falha de sistema, escala abusiva, infraestrutura), CONFIRME imediatamente para o policial que você está estruturando e documentando aquela queixa de forma anônima para o Painel de Inteligência Institucional. Ele NÃO precisa clicar em nenhum botão para registrar o relato.
 Faça no máximo 2 perguntas curtas por resposta. Tente não sobrecarregar com dúvidas e aprofunde uma frente por vez.
-Mantenha o tom profissional, direto e humano, compatível com a realidade da Polícia Civil.`,
-  review: `## FOCO ESPECÍFICO — REVISÃO DE RELATO
+Mantenha o tom profissional, direto e humano, compatível com a realidade da Polícia Civil.`;
+
+const TASK_REVIEW = `## FOCO ESPECÍFICO — REVISÃO DE RELATO
 Analise a conversa como auditor institucional de qualidade.
 Responda EXCLUSIVAMENTE com JSON válido.
-Avalie completude, temas, pontos cegos, sugestões e impacto, sempre sem PII e sem extrapolar além do que foi relatado.`,
-  html_report: `## FOCO ESPECÍFICO — RELATÓRIO HTML
-Gere APENAS HTML completo e standalone.
-Use dark mode, visual profissional, responsivo e sem dependências externas.
-Nunca inclua PII real. Se necessário, use placeholders neutros.
-Feche o documento com o rodapé: "Relatório gerado por Tira-Voz — EGOS Ecosystem".`,
-  intelligence_report: `## FOCO ESPECÍFICO — RELATÓRIO DE INTELIGÊNCIA
-Analise conversas, relatos compartilhados e revisões de IA para extrair padrões, áreas críticas, recomendações e tópicos pendentes.
-Responda APENAS com JSON válido.
-Diferencie claramente evidência observada, inferência e recomendação.
-Tópicos pendentes devem ser formulados como pautas abertas para discussão pública.
-REGRA DE FILTRAGEM (ANTI-SPAM): Ignore absoluta e terminantemente conversas sobre criação de chatbots, testes de IA, escolhas de nomes de plataformas, saudações ou testes do sistema. Gere tópicos EXCLUSIVAMENTE sobre problemas e cenários policiais operacionais reais.`,
-  conversation_summary: `## FOCO ESPECÍFICO — MEMÓRIA DE CONVERSA
-Resuma a conversa em até 6 bullets curtos.
-Foquem em contexto institucional, problemas relatados, padrões recorrentes, soluções sugeridas e pendências.
-Responda em texto simples, sem markdown extra além dos bullets.`,
-  name_validation: `## FOCO ESPECÍFICO — IDENTIDADE PROTEGIDA
-Classifique se o texto parece nome real de pessoa brasileira.
-Se houver risco razoável de ser nome real, marque como inválido para proteger o anonimato.
-Responda APENAS com JSON válido no formato solicitado.`,
-  espiral_de_escuta: `## FOCO ESPECÍFICO — ESPIRAL DE ESCUTA (REAVALIAÇÃO DE TÓPICO)
-O tópico analisado sofreu alta rejeição da comunidade na forma de downvotes e comentários críticos.
-Seu objetivo é gerar uma re-análise corretiva e aprofundada:
-1. Sintetize as reclamações, críticas e omissões apontadas pelos usuários.
-2. Admita que a sugestão/análise original pode ter falhado ou ignorado a realidade prática.
-3. Elabore um adendo analítico que re-estruture o problema sob a dura ótica dos comentários registrados.
-Responda DIRETAMENTE com o texto do comentário, sem jargões de IA, assumindo a voz de um analista institucional [AGENTE 852] ajustando a rota.`,
-};
+Avalie completude, temas, pontos cegos, sugestões e impacto, sempre sem PII e sem extrapolar além do que foi relatado.`;
 
-const OUTPUT_FORMATS: Partial<Record<PromptContext, string>> = {
-  review: `## FORMATO EXATO E ANTI-SPAM
+const FORMAT_REVIEW = `## FORMATO EXATO E ANTI-SPAM
 Se a conversa for puramente trivial, ou seja, sem relevância institucional (ex: testes de bot, teste de nomes de ferramentas, saudações básicas sem contexto de trabalho, ou conversas vazias), você DEVE barrar a geração retornando APENAS:
 {"isTrivial": true}
 
 Caso a conversa tenha conteúdo minimamente útil, responda no formato:
-{"isTrivial": false, "titulo":"Título impactante e jornalístico em até 80 caracteres","completude":7,"resumo":"Resumo técnico estrutural em 3 linhas","temas":["tema1"],"pontosCegos":["ponto1"],"sugestoes":["pergunta1"],"impacto":"Impacto aqui","insights_estruturais":["1. Relacione com déficit, estudos do Gem Hunter ou literatura de saúde PCMG.", "2. Use tabelas Markdown para 'gráficos' ou comparativos de dados estatísticos."]}`,
-  intelligence_report: `## FORMATO EXATO
+{"isTrivial": false, "titulo":"Título impactante e jornalístico em até 80 caracteres","completude":7,"resumo":"Resumo técnico estrutural em 3 linhas","temas":["tema1"],"pontosCegos":["ponto1"],"sugestoes":["pergunta1"],"impacto":"Impacto aqui","insights_estruturais":["1. Relacione com déficit, estudos do Gem Hunter ou literatura de saúde PCMG.", "2. Use tabelas Markdown para 'gráficos' ou comparativos de dados estatísticos."]}`;
+
+const TASK_HTML_REPORT = `## FOCO ESPECÍFICO — RELATÓRIO HTML
+Gere APENAS HTML completo e standalone.
+Use dark mode, visual profissional, responsivo e sem dependências externas.
+Nunca inclua PII real. Se necessário, use placeholders neutros.
+Feche o documento com o rodapé: "Relatório gerado por Tira-Voz — EGOS Ecosystem".`;
+
+const TASK_INTELLIGENCE_REPORT = `## FOCO ESPECÍFICO — RELATÓRIO DE INTELIGÊNCIA
+Analise conversas, relatos compartilhados e revisões de IA para extrair padrões, áreas críticas, recomendações e tópicos pendentes.
+Responda APENAS com JSON válido.
+Diferencie claramente evidência observada, inferência e recomendação.
+Tópicos pendentes devem ser formulados como pautas abertas para discussão pública.
+REGRA DE FILTRAGEM (ANTI-SPAM): Ignore absoluta e terminantemente conversas sobre criação de chatbots, testes de IA, escolhas de nomes de plataformas, saudações ou testes do sistema. Gere tópicos EXCLUSIVAMENTE sobre problemas e cenários policiais operacionais reais.`;
+
+const FORMAT_INTELLIGENCE_REPORT = `## FORMATO EXATO
 {
   "titulo": "Relatório de Inteligência #N — Período",
   "resumo_executivo": "Resumo em 2-3 parágrafos...",
@@ -106,59 +109,94 @@ Caso a conversa tenha conteúdo minimamente útil, responda no formato:
     "temas_mais_frequentes": ["tema1", "tema2"],
     "severidade_media": "alta|media|baixa"
   }
-}`,
-  name_validation: `## FORMATO EXATO
+}`;
+
+const TASK_CONVERSATION_SUMMARY = `## FOCO ESPECÍFICO — MEMÓRIA DE CONVERSA
+Resuma a conversa em até 6 bullets curtos.
+Foquem em contexto institucional, problemas relatados, padrões recorrentes, soluções sugeridas e pendências.
+Responda em texto simples, sem markdown extra além dos bullets.`;
+
+const TASK_NAME_VALIDATION = `## FOCO ESPECÍFICO — IDENTIDADE PROTEGIDA
+Classifique se o texto parece nome real de pessoa brasileira.
+Se houver risco razoável de ser nome real, marque como inválido para proteger o anonimato.
+Responda APENAS com JSON válido no formato solicitado.`;
+
+const FORMAT_NAME_VALIDATION = `## FORMATO EXATO
 {"isRealName": true, "confidence": 0.9}
 ou
-{"isRealName": false, "confidence": 0.1}`,
-};
+{"isRealName": false, "confidence": 0.1}`;
 
-function buildPrompt(context: PromptContext, memoryBlock?: string | null) {
-  const sections = [EGOS_FOUNDATION, GOVERNANCE_RULES, ATRIAN_GUARDRAILS, PRIVACY_RULES];
+const TASK_ESPIRAL = `## FOCO ESPECÍFICO — ESPIRAL DE ESCUTA (REAVALIAÇÃO DE TÓPICO)
+O tópico analisado sofreu alta rejeição da comunidade na forma de downvotes e comentários críticos.
+Seu objetivo é gerar uma re-análise corretiva e aprofundada:
+1. Sintetize as reclamações, críticas e omissões apontadas pelos usuários.
+2. Admita que a sugestão/análise original pode ter falhado ou ignorado a realidade prática.
+3. Elabore um adendo analítico que re-estruture o problema sob a dura ótica dos comentários registrados.
+Responda DIRETAMENTE com o texto do comentário, sem jargões de IA, assumindo a voz de um analista institucional [AGENTE 852] ajustando a rota.`;
 
-  if (context === 'chat' || context === 'intelligence_report') {
-    sections.push(LEGAL_REFERENCES);
-  }
+// ─── Section Registry ─────────────────────────────────────────────────────────
 
-  sections.push(TASK_INSTRUCTIONS[context]);
+const SECTIONS: PromptSection<PromptContext>[] = [
+  // Core — always included, stable, cache-eligible
+  { id: 'egos_foundation',   content: EGOS_FOUNDATION,   cacheable: true,  priority: 10 },
+  { id: 'governance',        content: GOVERNANCE_RULES,  cacheable: true,  priority: 20 },
+  { id: 'atrian_guardrails', content: ATRIAN_GUARDRAILS, cacheable: true,  priority: 30 },
+  { id: 'privacy',           content: PRIVACY_RULES,     cacheable: true,  priority: 40 },
 
-  if (OUTPUT_FORMATS[context]) {
-    sections.push(OUTPUT_FORMATS[context] as string);
-  }
+  // Legal — only for contexts that may need case citations
+  {
+    id: 'legal_references', content: LEGAL_REFERENCES, cacheable: true, priority: 45,
+    condition: (ctx) => ctx === 'chat' || ctx === 'intelligence_report',
+  },
 
-  if (memoryBlock?.trim()) {
-    sections.unshift(memoryBlock.trim());
-  }
+  // Task-specific instructions
+  { id: 'task_chat',                content: TASK_CHAT,                  cacheable: true,  priority: 60, condition: (ctx) => ctx === 'chat' },
+  { id: 'task_review',              content: TASK_REVIEW,                cacheable: true,  priority: 60, condition: (ctx) => ctx === 'review' },
+  { id: 'task_html_report',         content: TASK_HTML_REPORT,           cacheable: true,  priority: 60, condition: (ctx) => ctx === 'html_report' },
+  { id: 'task_intelligence_report', content: TASK_INTELLIGENCE_REPORT,   cacheable: true,  priority: 60, condition: (ctx) => ctx === 'intelligence_report' },
+  { id: 'task_conversation_summary',content: TASK_CONVERSATION_SUMMARY,  cacheable: true,  priority: 60, condition: (ctx) => ctx === 'conversation_summary' },
+  { id: 'task_name_validation',     content: TASK_NAME_VALIDATION,       cacheable: true,  priority: 60, condition: (ctx) => ctx === 'name_validation' },
+  { id: 'task_espiral',             content: TASK_ESPIRAL,               cacheable: true,  priority: 60, condition: (ctx) => ctx === 'espiral_de_escuta' },
 
-  return sections.join('\n\n');
+  // Output format constraints
+  { id: 'format_review',              content: FORMAT_REVIEW,              cacheable: true,  priority: 70, condition: (ctx) => ctx === 'review' },
+  { id: 'format_intelligence_report', content: FORMAT_INTELLIGENCE_REPORT, cacheable: true,  priority: 70, condition: (ctx) => ctx === 'intelligence_report' },
+  { id: 'format_name_validation',     content: FORMAT_NAME_VALIDATION,     cacheable: true,  priority: 70, condition: (ctx) => ctx === 'name_validation' },
+];
+
+const buildPrompt = createAssembler<PromptContext>(SECTIONS);
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+export function buildAgentPrompt(memoryBlock?: string | null): string {
+  const extra = memoryBlock?.trim()
+    ? [{ id: 'memory', content: memoryBlock.trim(), priority: 5 }]
+    : undefined;
+  return buildPrompt('chat', extra).text;
 }
 
-export function buildAgentPrompt(memoryBlock?: string | null) {
-  return buildPrompt('chat', memoryBlock);
+export function buildReviewPrompt(): string {
+  return buildPrompt('review').text;
 }
 
-export function buildReviewPrompt() {
-  return buildPrompt('review');
+export function buildHtmlReportPrompt(): string {
+  return buildPrompt('html_report').text;
 }
 
-export function buildHtmlReportPrompt() {
-  return buildPrompt('html_report');
+export function buildIntelligenceReportPrompt(): string {
+  return buildPrompt('intelligence_report').text;
 }
 
-export function buildIntelligenceReportPrompt() {
-  return buildPrompt('intelligence_report');
+export function buildConversationSummaryPrompt(): string {
+  return buildPrompt('conversation_summary').text;
 }
 
-export function buildConversationSummaryPrompt() {
-  return buildPrompt('conversation_summary');
+export function buildEspiralDeEscutaPrompt(): string {
+  return buildPrompt('espiral_de_escuta').text;
 }
 
-export function buildEspiralDeEscutaPrompt() {
-  return buildPrompt('espiral_de_escuta');
-}
-
-export function buildNameValidationPrompt() {
-  return buildPrompt('name_validation');
+export function buildNameValidationPrompt(): string {
+  return buildPrompt('name_validation').text;
 }
 
 export const agentPrompt = buildAgentPrompt();
