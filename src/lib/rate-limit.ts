@@ -3,6 +3,46 @@ type Bucket = {
   resetAt: number;
 };
 
+// ─── Per-identity budget tiers ────────────────────────────────────────────────
+
+/** Budget limits per identity tier (CHAT-008) */
+export const IDENTITY_BUDGET = {
+  /** Authenticated users get a more generous window */
+  authenticated: { limit: 50, windowMs: 10 * 60 * 1000 },
+  /** Anonymous session hash — moderate */
+  anonymous:     { limit: 20, windowMs: 10 * 60 * 1000 },
+  /** Fallback when no identity is available — same as per-IP */
+  unknown:       { limit: 12, windowMs:  5 * 60 * 1000 },
+} as const;
+
+export type IdentityTier = keyof typeof IDENTITY_BUDGET;
+
+/** Derive tier from identityKey prefix (user: vs anon:) */
+export function getIdentityTier(identityKey: string | null): IdentityTier {
+  if (!identityKey) return 'unknown';
+  if (identityKey.startsWith('user:')) return 'authenticated';
+  if (identityKey.startsWith('anon:')) return 'anonymous';
+  return 'unknown';
+}
+
+/**
+ * Check the per-identity budget on top of the per-IP rate limit.
+ * Call this AFTER checkRateLimit(ip) passes.
+ * Returns false if identity budget is exhausted.
+ */
+export function checkIdentityBudget(identityKey: string | null): {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+  tier: IdentityTier;
+} {
+  const tier = getIdentityTier(identityKey);
+  const { limit, windowMs } = IDENTITY_BUDGET[tier];
+  const key = `budget:${identityKey ?? 'unknown'}`;
+  const result = checkRateLimit(key, limit, windowMs);
+  return { ...result, tier };
+}
+
 const buckets = new Map<string, Bucket>();
 
 export function getClientIp(headers: Headers): string {

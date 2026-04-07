@@ -1,6 +1,6 @@
 import { streamText } from 'ai';
 import { buildAgentPrompt } from '@/lib/prompt';
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIp, checkIdentityBudget } from '@/lib/rate-limit';
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { recordChatCompletion, recordRateLimitHit, recordChatError, recordEvent } from '@/lib/telemetry';
 import { filterChunk, validateAndLog } from '@/lib/atrian';
@@ -91,6 +91,25 @@ export async function POST(req: Request) {
     const sessionHash = req.headers.get('x-session-hash');
     const user = await getCurrentUser();
     const identityKey = getIdentityKey(sessionHash, user?.id);
+
+    // CHAT-008: per-identity budget (on top of per-IP limit)
+    const budget = checkIdentityBudget(identityKey);
+    if (!budget.allowed) {
+      recordRateLimitHit(identityKey ?? ip, '/api/chat');
+      return new Response(JSON.stringify({
+        error: 'Limite de mensagens por sessão atingido. Tente novamente em alguns minutos.',
+        resetAt: budget.resetAt,
+      }), {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': String(budget.resetAt),
+          'X-Budget-Tier': budget.tier,
+        },
+      });
+    }
+
     const memoryBlock = await getConversationMemory(identityKey);
 
     if (messages.length === 0) {
