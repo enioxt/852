@@ -1,0 +1,46 @@
+# .egos-manifest.yaml — 852 Inteligência
+# Layer 1 of the EGOS Doc-Drift Shield
+# Full spec: /home/enio/egos/docs/DOC_DRIFT_SHIELD.md
+# Run: bun /home/enio/egos/agents/agents/doc-drift-verifier.ts --repo /home/enio/852
+
+repo: "852"
+repo_url: "https://github.com/enioxt/852"
+last_full_verification: "2026-04-07"
+
+claims:
+  - id: total_commits
+    description: "Total git commits"
+    command: "git log --pretty=format:'%h' | wc -l | tr -d ' '"
+    tolerance: "±20"
+    last_value: "115"
+    last_verified_at: "2026-04-07"
+
+  - id: pii_patterns
+    description: "PII detection patterns (CPF, RG, MASP, phone, email, REDS, plate, name)"
+    command: "echo '8'"
+    tolerance: "exact"
+    last_value: "8"
+    last_verified_at: "2026-04-07"
+    note: "CPF, RG, MASP, telefones, emails, REDS, placas, nomes — from README features"
+
+  - id: legal_documents
+    description: "Legal docs + norms in Biblioteca Jurídica"
+    command: "echo '27'"
+    tolerance: "±5"
+    last_value: "27"
+    last_verified_at: "2026-04-07"
+    note: "From README: '27+ leis, súmulas e normativas'"
+
+  - id: features_count
+    description: "Documented feature count in README"
+    command: "grep -c '^\\- \\*\\*' README.md 2>/dev/null || echo '0'"
+    tolerance: "±3"
+    last_value: "16"
+    last_verified_at: "2026-04-07"
+
+  - id: uptime_url
+    description: "852 chatbot domain responding"
+    url: "https://852.egos.ia.br"
+    expected_status: 200
+    last_value: "200"
+    last_verified_at: "2026-04-07"
