@@ -1,6 +1,6 @@
 # AGENTS.md — 852 Inteligência
 
-> **VERSION:** 3.0.0 | **UPDATED:** 2026-03-13
+> **VERSION:** 3.1.0 | **UPDATED:** 2026-04-08
 > **TYPE:** Next.js production chatbot + report sharing + EGOS-governed public repo
 
 ---
@@ -175,6 +175,12 @@
 | 50 | ETHIK Agent: x402 Payment Gateway & Tokenomics Engine | `src/lib/ethik-agent.ts` | Active |
 | 51 | GCP Dynamic API Keys (Quota-restricted Ephmeral Keys) | `src/lib/gcp-keys.ts` | Active |
 | 52 | ATRiAN CLI Scanner & Standalone Engine | `packages/atrian/` | Active |
+| 53 | ATRiAN Stream Filter + Abort Signal (CHAT-001+007) | `api/chat/route.ts` | Active |
+| 54 | Per-identity rate-limit budget by tier (CHAT-008) | `rate-limit.ts` | Active |
+| 55 | Schema-driven Prompt Assembler — modular system prompt (CHAT-003) | `prompt-assembler.ts` | Active |
+| 56 | Tira-Voz eval: 20 golden test cases + automated eval runner (CHAT-009) | `eval/` | Active |
+| 57 | PII parity with Guard Brasil v0.2.0 (CNPJ, SUS, NIS/PIS, TRE, CEP) | `pii-scanner.ts` | Active |
+| 58 | .egos-manifest.yaml doc-drift claims (DRIFT-010) | `.egos-manifest.yaml` | Active |
 
 ## Agent 852 — Roadmap
 
