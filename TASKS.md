@@ -227,7 +227,7 @@
 - [x] Proactive collaboration suggestions (agent sugere temas durante a conversa)
 - [x] User-linked conversation persistence (load from Supabase when logged in)
 - [x] BYOK: usuários plugam próprias API keys (API backend pronta)
-- [ ] Fórum: notificações, follow-up mode, integração cross-page
+- [x] Fórum: notificações, follow-up mode, integração cross-page
 - [x] AI Reports v2: auto-análise a cada 5 relatos, HTML output, padrões cross-report
 - [x] Lotação auto-detect via chatbot: mencionar lotação, confirmar e vincular ao perfil
 - [x] Suggest external LLMs: sugerir que usuário passe prompt por Claude/Gemini/GPT
