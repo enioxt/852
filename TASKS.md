@@ -212,13 +212,13 @@
 - [x] Roteamento inteligente de modelos por tarefa (chat/review/html/intelligence/summary)
 - [x] Harden `/start` compartilhado: System Map, module roots, workflows e deploy surface como ativação mandatória
 - [x] Eliminar warnings SSR do Recharts no build do /dashboard
-- [ ] Cross-conversation insight aggregation (temas, padrões, regiões)
+- [x] Cross-conversation insight aggregation (temas, padrões, regiões)
 - [x] Refinar OG image para proporção real 1200x630
 - [x] Decompose `chat/page.tsx` (~450 lines), extract WelcomeScreen, MessageList, InputArea, ExportMenu
 - [x] CI/CD pipeline (lint + build + smoke on push/PR)
 - [x] Consolidar package manager (remover vestígios de bun, manter npm)
 - [x] Pipeline real de notificações do 852 (Telegram/Discord/webhook/admin alerts) acoplado a eventos críticos
-- [~] ATRiAN v2: RollingBuffer + StreamingValidator architecture (estrutura pronta, requer integração streaming)
+- [x] ATRiAN v2: RollingBuffer + StreamingValidator with feature flag (ATRIAN_V2_ENABLED)
 - [x] ATRiAN dashboard: visualizar violations no /admin/telemetry
 - [x] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
 - [x] Admin view para relatórios compartilhados (autenticado)
