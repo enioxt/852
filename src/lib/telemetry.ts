@@ -41,7 +41,9 @@ export type TelemetryEventType =
   | 'issue_vote_emails_sent'
   | 'admin_reports_viewed'
   | 'user_lotacao_confirmed'
-  | 'user_lotacao_auto_saved';
+  | 'user_lotacao_auto_saved'
+  | 'user_byok_added'
+  | 'user_byok_deleted';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
