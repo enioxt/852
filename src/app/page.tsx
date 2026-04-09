@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { MasterReportModal } from '@/components/corredor/MasterReportModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight, Lock, FileDown, Users,
@@ -117,6 +118,7 @@ function ExpandableCard({
 export default function Home() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [isMasterReportOpen, setIsMasterReportOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/stats')
@@ -249,7 +251,10 @@ export default function Home() {
 
           {/* ═══════════ DESTAQUE DOS RELATORIOS DE IA ═══════════ */}
           {stats?.latestAIReport && (
-            <Link href="/reports" className="mt-6 w-full block group">
+            <button
+              onClick={() => setIsMasterReportOpen(true)}
+              className="mt-6 w-full block group text-left"
+            >
               <div className="rounded-3xl border border-violet-700/40 bg-gradient-to-br from-violet-950/30 via-neutral-950 to-neutral-900/80 p-6 sm:p-7 shadow-[0_0_0_1px_rgba(139,92,246,0.08),0_20px_60px_rgba(0,0,0,0.35)] hover:border-violet-500/60 hover:bg-violet-950/35 transition-all active:scale-[0.99]">
                 <div className="flex items-start gap-4">
                   <div className="w-14 h-14 rounded-2xl bg-violet-500/10 flex items-center justify-center flex-shrink-0 border border-violet-500/20">
@@ -300,7 +305,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </Link>
+            </button>
           )}
 
           {/* ═══════════ COMO A INFORMACAO FLUI ═══════════ */}
@@ -529,6 +534,12 @@ export default function Home() {
             Abrir chat protegido
             <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </Link>
+
+          {/* Master Report Modal */}
+          <MasterReportModal
+            isOpen={isMasterReportOpen}
+            onClose={() => setIsMasterReportOpen(false)}
+          />
         </div>
       </main>
 
