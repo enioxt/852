@@ -221,16 +221,16 @@
 - [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
 - [x] ATRiAN dashboard: visualizar violations no /admin/telemetry
 - [x] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
-- [ ] Admin view para relatórios compartilhados (autenticado)
+- [x] Admin view para relatórios compartilhados (autenticado)
 - [ ] Tool use: web search para dados institucionais (AI SDK tools)
 - [x] Voice input (speech-to-text via Browser API) no chat e na sugestão
-- [ ] Proactive collaboration suggestions (agent sugere temas durante a conversa)
+- [x] Proactive collaboration suggestions (agent sugere temas durante a conversa)
 - [x] User-linked conversation persistence (load from Supabase when logged in)
 - [ ] BYOK: usuários plugam próprias API keys, grupos com chave compartilhada
 - [ ] Fórum: notificações, follow-up mode, integração cross-page
-- [ ] AI Reports v2: auto-análise a cada 5 relatos, HTML output, padrões cross-report
+- [x] AI Reports v2: auto-análise a cada 5 relatos, HTML output, padrões cross-report
 - [ ] Lotação auto-detect via chatbot: mencionar lotação, confirmar e vincular ao perfil
-- [ ] Suggest external LLMs: sugerir que usuário passe prompt por Claude/Gemini/GPT
+- [x] Suggest external LLMs: sugerir que usuário passe prompt por Claude/Gemini/GPT
 
 ## ✅ P2 - Sprint v8.5 (Completed 2026-03-20)
 

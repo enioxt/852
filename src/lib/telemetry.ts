@@ -39,7 +39,9 @@ export type TelemetryEventType =
   | 'issue_commented'
   | 'news_summarization'
   | 'issue_vote_emails_sent'
-  | 'admin_reports_viewed';
+  | 'admin_reports_viewed'
+  | 'user_lotacao_confirmed'
+  | 'user_lotacao_auto_saved';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
