@@ -45,7 +45,10 @@ export type TelemetryEventType =
   | 'user_byok_added'
   | 'user_byok_deleted'
   | 'tool_use_institutional_search'
-  | 'tool_use_legal_search';
+  | 'tool_use_legal_search'
+  | 'forum_notification_created'
+  | 'forum_follow_up_enabled'
+  | 'forum_follow_up_disabled';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
