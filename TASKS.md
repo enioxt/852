@@ -218,7 +218,7 @@
 - [x] CI/CD pipeline (lint + build + smoke on push/PR)
 - [x] Consolidar package manager (remover vestígios de bun, manter npm)
 - [x] Pipeline real de notificações do 852 (Telegram/Discord/webhook/admin alerts) acoplado a eventos críticos
-- [ ] ATRiAN v2: NeMo Guardrails ou Guardrails AI para validação em tempo real (pós-streaming)
+- [~] ATRiAN v2: RollingBuffer + StreamingValidator architecture (estrutura pronta, requer integração streaming)
 - [x] ATRiAN dashboard: visualizar violations no /admin/telemetry
 - [x] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
 - [x] Admin view para relatórios compartilhados (autenticado)
