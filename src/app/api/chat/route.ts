@@ -7,6 +7,14 @@ import { filterChunk, validateAndLog } from '@/lib/atrian';
 import { getCurrentUser } from '@/lib/user-auth';
 import { getConversationMemory } from '@/lib/conversation-memory';
 import { getIdentityKey } from '@/lib/session';
+import {
+  detectHesitation,
+  getProactiveSuggestions,
+  formatSuggestionsForChat,
+  generateHesitationHelp,
+  shouldSuggestExternalLLM,
+  getExternalLLMSuggestion,
+} from '@/lib/proactive-suggestions';
 
 export const maxDuration = 60;
 
@@ -47,7 +55,7 @@ function sanitizeMessages(messages: unknown) {
       const rawText = getMessageText(message).slice(0, 32000);
       const isUser = message.role === 'user';
       let content = rawText;
-      
+
       // Early Deep Atrian Layer: Mask PII from user inputs before LLM ingests it
       if (isUser && rawText.length > 0) {
         // Only require pii-scanner when needed to avoid circular logic or initialization issues
@@ -112,6 +120,32 @@ export async function POST(req: Request) {
 
     const memoryBlock = await getConversationMemory(identityKey);
 
+    // Proactive suggestions: detect hesitation or complex queries
+    const lastUserMessage = messages.filter(m => m.role === 'user').pop();
+    let proactiveContext = '';
+
+    if (lastUserMessage) {
+      // Check for hesitation and provide help
+      if (detectHesitation(lastUserMessage.content)) {
+        proactiveContext = generateHesitationHelp();
+      }
+      // Check for complex queries and suggest external LLM
+      else if (shouldSuggestExternalLLM(lastUserMessage.content)) {
+        proactiveContext = getExternalLLMSuggestion();
+      }
+      // Check for topic suggestions based on keywords
+      else {
+        const suggestions = getProactiveSuggestions(lastUserMessage.content);
+        if (suggestions.length > 0) {
+          proactiveContext = formatSuggestionsForChat(suggestions);
+        }
+      }
+    }
+
+    // Build enhanced system prompt with proactive context
+    const systemPrompt = buildAgentPrompt(memoryBlock) +
+      (proactiveContext ? `\n\n## CONTEXTO ADICIONAL\n${proactiveContext}` : '');
+
     if (messages.length === 0) {
       return new Response(JSON.stringify({ error: 'Nenhuma mensagem válida foi enviada.' }), {
         status: 400,
@@ -135,7 +169,7 @@ export async function POST(req: Request) {
 
     // Dynamic Context Orchestration (Document Pipeline)
     const totalChars = messages.reduce((acc, msg) => acc + msg.content.length, 0);
-    
+
     if (totalChars > 12000) {
       // Deep Tier: Huge payload (e.g. pasted long document)
       const configObj = getModelConfig('intelligence_report');
@@ -164,7 +198,7 @@ export async function POST(req: Request) {
 
     const result = streamText({
       model: provider.chat(modelId),
-      system: buildAgentPrompt(memoryBlock),
+      system: systemPrompt,
       messages,
       temperature: 0.7,
       abortSignal: req.signal, // CHAT-007: stop billing when client disconnects
