@@ -222,7 +222,7 @@
 - [x] ATRiAN dashboard: visualizar violations no /admin/telemetry
 - [x] Expandir KNOWN_ACRONYMS no atrian.ts com siglas específicas de cada delegacia/setor
 - [x] Admin view para relatórios compartilhados (autenticado)
-- [ ] Tool use: web search para dados institucionais (AI SDK tools)
+- [x] Tool use: web search para dados institucionais (Serper + Brave APIs, testes, docs)
 - [x] Voice input (speech-to-text via Browser API) no chat e na sugestão
 - [x] Proactive collaboration suggestions (agent sugere temas durante a conversa)
 - [x] User-linked conversation persistence (load from Supabase when logged in)
@@ -231,7 +231,6 @@
 - [x] AI Reports v2: auto-análise a cada 5 relatos, HTML output, padrões cross-report
 - [x] Lotação auto-detect via chatbot: mencionar lotação, confirmar e vincular ao perfil
 - [x] Suggest external LLMs: sugerir que usuário passe prompt por Claude/Gemini/GPT
-- [~] Tool use: web search estrutura pronta (requer alinhamento SDK)
 
 ## ✅ P2 - Sprint v8.5 (Completed 2026-03-20)
 
