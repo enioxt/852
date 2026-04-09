@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { ReportPreviewTooltip } from './ReportPreviewTooltip';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 interface HotTopic {
   id: string;
   title: string;

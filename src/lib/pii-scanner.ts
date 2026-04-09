@@ -36,8 +36,8 @@ export function getPIISummary(findings: PIIFinding[]): string {
   return guardGetPIISummary(findings);
 }
 
-export function maskPII(text: string, category?: string): string {
-  return guardMaskPII(text, category);
+export function maskPII(text: string, categories?: string[]): string {
+  return guardMaskPII(text, categories as any);
 }
 
 // Legacy compatibility: auto-scan + sanitize
