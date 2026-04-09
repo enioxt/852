@@ -43,7 +43,9 @@ export type TelemetryEventType =
   | 'user_lotacao_confirmed'
   | 'user_lotacao_auto_saved'
   | 'user_byok_added'
-  | 'user_byok_deleted';
+  | 'user_byok_deleted'
+  | 'tool_use_institutional_search'
+  | 'tool_use_legal_search';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
