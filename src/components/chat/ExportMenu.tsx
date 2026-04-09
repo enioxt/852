@@ -6,7 +6,7 @@ import { Download, FileText, ChevronDown, Share2, Copy, Check, Loader2 } from 'l
 // Module caches for lazy-loaded libraries
 let jsPDFModule: typeof import('jspdf').default | null = null;
 let docxModule: typeof import('docx') | null = null;
-let fileSaverModule: typeof import('file-saver') | null = null;
+let fileSaverModule: { saveAs: (data: Blob | string, filename?: string) => void } | null = null;
 
 // Async loaders
 async function loadJsPDF() {
@@ -26,7 +26,7 @@ async function loadDocx() {
 
 async function loadFileSaver() {
   if (!fileSaverModule) {
-    fileSaverModule = await import('file-saver');
+    const mod = await import('file-saver'); fileSaverModule = { saveAs: mod.saveAs || (mod as unknown as { default: { saveAs: (data: Blob | string, filename?: string) => void } }).default.saveAs };
   }
   return fileSaverModule;
 }

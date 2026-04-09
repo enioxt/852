@@ -13,7 +13,7 @@ import { Download, FileText, ChevronDown, Loader2 } from 'lucide-react';
 // Types for lazy-loaded modules
 type JsPDFType = typeof import('jspdf').default;
 type DocxType = typeof import('docx');
-type FileSaverType = typeof import('file-saver');
+type FileSaverType = { saveAs: (data: Blob | string, filename?: string) => void };
 
 // Module caches
 let jsPDFModule: JsPDFType | null = null;
@@ -38,7 +38,7 @@ async function loadDocx(): Promise<DocxType> {
 
 async function loadFileSaver(): Promise<FileSaverType> {
   if (!fileSaverModule) {
-    fileSaverModule = await import('file-saver');
+    const mod = await import('file-saver'); fileSaverModule = { saveAs: mod.saveAs || (mod as unknown as { default: { saveAs: (data: Blob | string, filename?: string) => void } }).default.saveAs };
   }
   return fileSaverModule;
 }
