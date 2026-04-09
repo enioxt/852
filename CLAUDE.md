@@ -1,3 +1,15 @@
+# EGOS-KERNEL-PROPAGATED: 2026-04-08
+<!-- AUTO-INJECTED by governance-propagate.sh — DO NOT EDIT THIS BLOCK MANUALLY -->
+<!-- Kernel rules: ~/.claude/CLAUDE.md (always authoritative) -->
+<!-- Domain rules: ~/.claude/egos-rules/*.md -->
+<!-- Re-run: bash ~/egos/scripts/governance-propagate.sh --exec to update -->
+
+> **EGOS Kernel rules apply to this repo.** See `~/.claude/CLAUDE.md` for full rules.
+> Critical non-negotiables: no force-push main, no secret logging, no git add -A in agents.
+> SSOT map: `~/.claude/egos-rules/ssot-map.md` | LLM routing: `~/.claude/egos-rules/llm-routing.md`
+
+---
+
 # CLAUDE.md — 852 Inteligência (Tira-Voz)
 
 > Lido automaticamente pelo Claude Code CLI ao executar `claude` neste diretório.
