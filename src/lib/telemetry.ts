@@ -48,7 +48,9 @@ export type TelemetryEventType =
   | 'tool_use_legal_search'
   | 'forum_notification_created'
   | 'forum_follow_up_enabled'
-  | 'forum_follow_up_disabled';
+  | 'forum_follow_up_disabled'
+  | 'insights_aggregation_viewed'
+  | 'conversation_insight_viewed';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
