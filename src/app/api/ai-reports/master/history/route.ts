@@ -3,6 +3,9 @@
  *
  * Returns version history of the master intelligence report.
  * Limited to last 10 versions for performance.
+ *
+ * Graceful degradation: if migration 20260409160000 hasn't been applied yet
+ * (missing version/is_master_report columns), returns empty history with migration hint.
  */
 
 import { getSupabase } from '@/lib/supabase';
@@ -25,6 +28,18 @@ export async function GET() {
       .limit(10);
 
     if (error) {
+      // Graceful degradation for missing columns (migration not yet applied)
+      const isMigrationError = error.message?.includes('does not exist') ||
+        error.code === '42703'; // PostgreSQL undefined_column
+      if (isMigrationError) {
+        console.warn('[master-history] Migration 20260409160000 not applied yet — returning empty history');
+        return Response.json({
+          history: [],
+          currentVersion: 0,
+          count: 0,
+          migrationPending: true,
+        });
+      }
       console.error('[master-history] Error fetching history:', error);
       return Response.json({ error: 'Failed to fetch history' }, { status: 500 });
     }
