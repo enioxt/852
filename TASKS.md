@@ -257,4 +257,31 @@
 - [x] **852-GOV-204:** Contrato resolvido: frente única (CRCDM universal). Sem dual-hook. Sem sobreposição.
 - [x] **852-GOV-205:** Plano executado: hook reconciliado → docs atualizados → propagado via governance-sync em 2026-03-29.
 
+## 🚀 P3 - Sprint v10 (Analytics & Performance — 2026-04-09)
+
+### Analytics Avançado
+- [x] **Dashboard de engajamento**: métricas de retenção, churn, tempo médio de sessão (lib/analytics.ts + API + UI)
+- [x] **Funnel de conversão**: track de landing → chat → report → share completo
+- [ ] **Heatmap de cliques**: integração com Clarity para análise de UX
+- [ ] **Análise de sentimento**: tendências de mood nos relatórios (time-series)
+- [ ] **Relatórios exportáveis**: CSV/Excel de métricas para administração
+
+### Performance & Otimização
+- [x] **Edge caching**: Cache de hot topics e stats no edge (headers CDN-Cache-Control)
+- [ ] **Lazy loading**: Code-splitting de componentes pesados (Recharts, PDF export)
+- [ ] **Database indexing**: Análise de queries lentas + índices otimizados
+- [ ] **Bundle optimization**: Redução de ~20% no bundle size
+
+### Integrações Futuras
+- [ ] **REDS Integration**: API bridge para consulta de ocorrências (autenticado)
+- [ ] **SEI Protocolo**: Geração de protocolos SEI para relatos oficiais
+- [ ] **InteliLink Bridge**: Conector para sistema de inteligência policial
+- [ ] **Google Drive Export**: Salvar relatórios direto no Drive (OAuth)
+
+### UX & Acessibilidade
+- [ ] **Tema claro**: Alternative light mode (toggle dark/light)
+- [ ] **Fonte ajustável**: Controles de acessibilidade para idosos
+- [ ] **Leitor de tela**: ARIA labels completos em todas as páginas
+- [ ] **Keyboard navigation**: Navegação 100% por teclado
+
 ## ⏭️ Backlog

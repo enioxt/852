@@ -164,6 +164,12 @@ export default function TelemetryDashboard() {
             Relatórios
           </Link>
           <Link
+            href="/admin/analytics"
+            className="h-10 px-4 inline-flex items-center rounded-xl border border-neutral-800 text-sm text-neutral-300 hover:bg-neutral-900 transition"
+          >
+            Analytics
+          </Link>
+          <Link
             href="/admin/validations"
             className="h-10 px-4 inline-flex items-center rounded-xl border border-neutral-800 text-sm text-neutral-300 hover:bg-neutral-900 transition"
           >

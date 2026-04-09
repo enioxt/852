@@ -58,7 +58,8 @@ export type TelemetryEventType =
   | 'email_digest_sent'
   | 'email_immediate_sent'
   | 'email_bounced'
-  | 'notification_queued';
+  | 'notification_queued'
+  | 'admin_analytics_viewed';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
