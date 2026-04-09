@@ -268,9 +268,9 @@
 
 ### Performance & Otimização
 - [x] **Edge caching**: Cache de hot topics e stats no edge (headers CDN-Cache-Control)
-- [ ] **Lazy loading**: Code-splitting de componentes pesados (Recharts, PDF export)
-- [ ] **Database indexing**: Análise de queries lentas + índices otimizados
-- [ ] **Bundle optimization**: Redução de ~20% no bundle size
+- [x] **Lazy loading**: Code-splitting Recharts (ChartsModule.tsx) + PDF export lazy
+- [x] **Database indexing**: 15 índices criados (hot topics, analytics, sentiment)
+- [x] **Bundle optimization**: ~25% reduction via lazy loading Recharts/jsPDF/docx
 
 ### Integrações Futuras
 - [ ] **REDS Integration**: API bridge para consulta de ocorrências (autenticado)
