@@ -229,7 +229,7 @@
 - [ ] BYOK: usuários plugam próprias API keys, grupos com chave compartilhada
 - [ ] Fórum: notificações, follow-up mode, integração cross-page
 - [x] AI Reports v2: auto-análise a cada 5 relatos, HTML output, padrões cross-report
-- [ ] Lotação auto-detect via chatbot: mencionar lotação, confirmar e vincular ao perfil
+- [x] Lotação auto-detect via chatbot: mencionar lotação, confirmar e vincular ao perfil
 - [x] Suggest external LLMs: sugerir que usuário passe prompt por Claude/Gemini/GPT
 
 ## ✅ P2 - Sprint v8.5 (Completed 2026-03-20)
