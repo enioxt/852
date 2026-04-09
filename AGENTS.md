@@ -1,6 +1,6 @@
 # AGENTS.md — 852 Inteligência
 
-> **VERSION:** 3.1.0 | **UPDATED:** 2026-04-08
+> **VERSION:** 3.2.0 | **UPDATED:** 2026-04-09
 > **TYPE:** Next.js production chatbot + report sharing + EGOS-governed public repo
 
 ---
@@ -181,6 +181,16 @@
 | 56 | Tira-Voz eval: 20 golden test cases + automated eval runner (CHAT-009) | `eval/` | Active |
 | 57 | PII parity with Guard Brasil v0.2.0 (CNPJ, SUS, NIS/PIS, TRE, CEP) | `pii-scanner.ts` | Active |
 | 58 | .egos-manifest.yaml doc-drift claims (DRIFT-010) | `.egos-manifest.yaml` | Active |
+| 59 | **MasterReportModal v2.0** — Modal 75% tela, 1 clique do card na landing | `MasterReportModal.tsx` | Active |
+| 60 | **Tecla ESC** — Fecha modal com Escape key | `MasterReportModal.tsx` | Active |
+| 61 | **Swipe to close** — Puxe para baixo no topo para fechar (mobile) | `MasterReportModal.tsx` | Active |
+| 62 | **Focus trap** — Acessibilidade, foco circula dentro do modal | `MasterReportModal.tsx` | Active |
+| 63 | **Loading skeleton** — Animação pulse durante carregamento | `MasterReportModal.tsx` | Active |
+| 64 | **Hot Topics Sidebar** — Tópicos em alta integrados ao modal (desktop) | `MasterReportModal.tsx` | Active |
+| 65 | **Version History API** — `/api/ai-reports/master/history` + `/[version]` | `api/ai-reports/master/history/` | Active |
+| 66 | **Histórico no modal** — Abas "Tópicos" / "Histórico" no sidebar | `MasterReportModal.tsx` | Active |
+| 67 | **View versions** — Visualizar versões anteriores do relatório | `MasterReportModal.tsx` | Active |
+| 68 | **Simplificação ReportsFeed** — Removido "Relatos Compartilhados" e "Gerador" | `ReportsFeed.tsx` | Active |
 
 ## Agent 852 — Roadmap
 
