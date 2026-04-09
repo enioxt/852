@@ -4,8 +4,12 @@ import { checkRateLimit, getClientIp, checkIdentityBudget } from '@/lib/rate-lim
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { recordChatCompletion, recordRateLimitHit, recordChatError, recordEvent } from '@/lib/telemetry';
 import { filterChunk, validateAndLog } from '@/lib/atrian';
-// NOTE: ATRiAN v2 imports available for future integration:
-// import { RollingBuffer, StreamingValidator, OutputGate, ATRIAN_V2_RULES } from '@/lib/atrian-v2';
+import {
+  RollingBuffer,
+  StreamingValidator,
+  OutputGate,
+  ATRIAN_V2_RULES,
+} from '@/lib/atrian-v2';
 import { getCurrentUser } from '@/lib/user-auth';
 import { getConversationMemory } from '@/lib/conversation-memory';
 import { getIdentityKey } from '@/lib/session';
@@ -253,14 +257,58 @@ export async function POST(req: Request) {
       },
     });
 
-    // CHAT-001: Stream-time ATRiAN v2 filter — blocks critical entities (e.g. SINDPOL) before
-    // they reach the client mid-stream. Complements post-hoc validateAndLog above.
-    // FUTURE: ATRiAN v2 with RollingBuffer + StreamingValidator for real-time validation
-    const atrianTransform = new TransformStream<string, string>({
-      transform(chunk, controller) {
-        controller.enqueue(filterChunk(chunk));
-      },
-    });
+    // CHAT-001 + CHAT-011: Stream-time ATRiAN validation
+    // v1: Simple filterChunk | v2: RollingBuffer + StreamingValidator (when enabled)
+    const ATRIAN_V2_ENABLED = process.env.ATRIAN_V2_ENABLED === 'true';
+
+    let atrianTransform: TransformStream<string, string>;
+
+    if (ATRIAN_V2_ENABLED) {
+      // ATRiAN v2: Full streaming validation with RollingBuffer
+      const validator = new StreamingValidator({
+        rules: ATRIAN_V2_RULES,
+        onViolation: (result) => {
+          recordEvent({
+            event_type: 'atrian_v2_violation',
+            metadata: {
+              ruleId: result.ruleId,
+              severity: result.severity,
+              action: result.action,
+            },
+          });
+        },
+      });
+
+      const gate = new OutputGate({ validator, bufferSize: 200 });
+
+      atrianTransform = new TransformStream<string, string>({
+        transform: async (chunk, controller) => {
+          const decision = await gate.processChunk(chunk);
+
+          if (decision.status === 'closed') {
+            // Abort streaming on critical violation
+            controller.error(new Error('ATRiAN v2: Critical violation detected'));
+            return;
+          }
+
+          if (decision.output) {
+            controller.enqueue(decision.output);
+          }
+          // If null, chunk is blocked (don't enqueue)
+        },
+        flush: () => {
+          // Reset gate for next conversation
+          gate.reset();
+        },
+      });
+    } else {
+      // ATRiAN v1: Simple pattern matching (legacy)
+      atrianTransform = new TransformStream<string, string>({
+        transform(chunk, controller) {
+          controller.enqueue(filterChunk(chunk));
+        },
+      });
+    }
 
     return new Response(
       result.textStream.pipeThrough(atrianTransform).pipeThrough(new TextEncoderStream()),
