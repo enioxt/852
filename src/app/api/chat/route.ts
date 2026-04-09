@@ -4,6 +4,8 @@ import { checkRateLimit, getClientIp, checkIdentityBudget } from '@/lib/rate-lim
 import { getModelConfig, hasAvailableProvider } from '@/lib/ai-provider';
 import { recordChatCompletion, recordRateLimitHit, recordChatError, recordEvent } from '@/lib/telemetry';
 import { filterChunk, validateAndLog } from '@/lib/atrian';
+// NOTE: ATRiAN v2 imports available for future integration:
+// import { RollingBuffer, StreamingValidator, OutputGate, ATRIAN_V2_RULES } from '@/lib/atrian-v2';
 import { getCurrentUser } from '@/lib/user-auth';
 import { getConversationMemory } from '@/lib/conversation-memory';
 import { getIdentityKey } from '@/lib/session';
@@ -251,8 +253,9 @@ export async function POST(req: Request) {
       },
     });
 
-    // CHAT-001: Stream-time ATRiAN filter — blocks critical entities (e.g. SINDPOL) before
+    // CHAT-001: Stream-time ATRiAN v2 filter — blocks critical entities (e.g. SINDPOL) before
     // they reach the client mid-stream. Complements post-hoc validateAndLog above.
+    // FUTURE: ATRiAN v2 with RollingBuffer + StreamingValidator for real-time validation
     const atrianTransform = new TransformStream<string, string>({
       transform(chunk, controller) {
         controller.enqueue(filterChunk(chunk));
