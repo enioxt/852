@@ -286,4 +286,39 @@
 - [ ] **Leitor de tela**: ARIA labels completos em todas as páginas
 - [ ] **Keyboard navigation**: Navegação 100% por teclado
 
+## 🚀 P2 - Sprint v11 (MasterReportModal v2.0 — 2026-04-09)
+
+### UX Revolution — Relatório Master
+- [x] **Modal 75% tela**: MasterReportModal ocupa 75% da tela desktop, tela cheia mobile
+- [x] **1 clique para relatório**: Card na landing abre modal direto (sem navegação de página)
+- [x] **Remoção de abas**: "Relatos Compartilhados" e "Gerador de Relatórios" removidos
+- [x] **Simplificação ReportsFeed**: Apenas Master Report, sem tabs redundantes
+
+### MasterReportModal v2.0 — Features
+- [x] **Tecla ESC**: Fecha modal com Escape key
+- [x] **Swipe to close**: Puxe para baixo no topo para fechar (mobile)
+- [x] **Focus trap**: Acessibilidade — foco circula dentro do modal
+- [x] **Loading skeleton**: Animação pulse durante carregamento
+- [x] **Mobile-first**: Menu hamburguer para ações no mobile
+- [x] **Pull hint**: Dica visual "Puxe para baixo no topo para fechar"
+
+### Integrações
+- [x] **Hot Topics Sidebar**: Tópicos em alta integrados ao modal (desktop)
+- [x] **Version History API**: `/api/ai-reports/master/history` + `/[version]`
+- [x] **Histórico no modal**: Abas "Tópicos" / "Histórico" no sidebar
+- [x] **View versions**: Visualizar versões anteriores do relatório
+- [x] **Version badge**: Badge "Atual" na versão mais recente
+- [x] **Back to current**: Botão para voltar à versão atual quando vendo antiga
+
+### APIs Novas
+- [x] **GET /api/ai-reports/master/history**: Lista últimas 10 versões
+- [x] **GET /api/ai-reports/master/history/[version]**: Retorna versão específica
+
+### Arquivos
+- [x] `src/components/corredor/MasterReportModal.tsx` — Componente principal
+- [x] `src/app/api/ai-reports/master/history/route.ts` — API histórico
+- [x] `src/app/api/ai-reports/master/history/[version]/route.ts` — API versão
+- [x] `src/components/corredor/ReportsFeed.tsx` — Simplificado (22 linhas)
+- [x] `src/app/page.tsx` — Integração modal na landing
+
 ## ⏭️ Backlog
