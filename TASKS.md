@@ -262,9 +262,9 @@
 ### Analytics Avançado
 - [x] **Dashboard de engajamento**: métricas de retenção, churn, tempo médio de sessão (lib/analytics.ts + API + UI)
 - [x] **Funnel de conversão**: track de landing → chat → report → share completo
-- [ ] **Heatmap de cliques**: integração com Clarity para análise de UX
-- [ ] **Análise de sentimento**: tendências de mood nos relatórios (time-series)
-- [ ] **Relatórios exportáveis**: CSV/Excel de métricas para administração
+- [x] **Heatmap de cliques**: lib/clarity.ts + /admin/clarity + tracking events
+- [x] **Análise de sentimento**: lib/sentiment.ts + migration + API + lexicon PT-BR
+- [x] **Relatórios exportáveis**: /api/admin/export CSV com BOM para Excel
 
 ### Performance & Otimização
 - [x] **Edge caching**: Cache de hot topics e stats no edge (headers CDN-Cache-Control)

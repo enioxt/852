@@ -170,6 +170,12 @@ export default function TelemetryDashboard() {
             Analytics
           </Link>
           <Link
+            href="/admin/clarity"
+            className="h-10 px-4 inline-flex items-center rounded-xl border border-neutral-800 text-sm text-neutral-300 hover:bg-neutral-900 transition"
+          >
+            Clarity
+          </Link>
+          <Link
             href="/admin/validations"
             className="h-10 px-4 inline-flex items-center rounded-xl border border-neutral-800 text-sm text-neutral-300 hover:bg-neutral-900 transition"
           >
