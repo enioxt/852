@@ -51,7 +51,14 @@ export type TelemetryEventType =
   | 'forum_follow_up_disabled'
   | 'insights_aggregation_viewed'
   | 'conversation_insight_viewed'
-  | 'atrian_v2_violation';
+  | 'atrian_v2_violation'
+  | 'notification_preferences_updated'
+  | 'issue_notification_subscribed'
+  | 'issue_notification_unsubscribed'
+  | 'email_digest_sent'
+  | 'email_immediate_sent'
+  | 'email_bounced'
+  | 'notification_queued';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;

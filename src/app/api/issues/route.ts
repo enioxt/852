@@ -2,6 +2,7 @@ import { createIssue, getIssues, voteIssue, addIssueComment, getIssueComments, g
 import { recordEvent } from '@/lib/telemetry';
 import { getCurrentUser } from '@/lib/user-auth';
 import { queueIssueNotification } from '@/lib/notifications';
+import { autoSubscribeOnVote, sendCommentNotifications } from '@/lib/notifications-email';
 
 function isAuthenticatedParticipant(user: Awaited<ReturnType<typeof getCurrentUser>>) {
   return Boolean(user?.id);
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
         return Response.json({ error: 'issueId e identidade do votante obrigatórios' }, { status: 400 });
       }
       const result = await voteIssue(issueId, sessionHash || '', user?.id, voteType);
-      
+
       if (result.voted && result.issue) {
         recordEvent({ event_type: 'issue_voted', metadata: { issueId, userId: user?.id || null, voteType } });
         queueIssueNotification('issue_voted', {
@@ -62,6 +63,11 @@ export async function POST(req: Request) {
           voteType,
           votedByUserId: user?.id,
         });
+
+        // Auto-subscribe voter to email notifications for this issue
+        if (user?.id) {
+          void autoSubscribeOnVote(user.id, issueId);
+        }
 
         // Espiral de Escuta (AI Feedback Loop Trigger)
         const totalVotes = result.issue.votes + (result.issue.downvotes || 0);
@@ -94,6 +100,26 @@ export async function POST(req: Request) {
       }
       if (!issueId || !commentBody) return Response.json({ error: 'issueId e body obrigatórios' }, { status: 400 });
       const id = await addIssueComment(issueId, commentBody, false, user?.id, parentCommentId);
+
+      // Trigger comment notifications for participants
+      if (id && user?.id) {
+        // Get issue title for notification
+        const { data: issue } = await (await import('@/lib/supabase')).getSupabase()
+          ?.from('issues_852')
+          .select('title')
+          .eq('id', issueId)
+          .single() || { data: null };
+
+        void sendCommentNotifications({
+          issueId,
+          issueTitle: issue?.title,
+          commentId: id,
+          commentPreview: commentBody,
+          authorNickname: user.display_name || user.displayName || 'Anônimo',
+          mentionedUserIds: extractMentions(commentBody),
+        });
+      }
+
       return Response.json({ commentId: id });
     }
 
@@ -104,12 +130,12 @@ export async function POST(req: Request) {
       // Build threaded structure
       const commentMap = new Map();
       const rootComments = [];
-      
+
       // First pass: create map
       for (const c of comments) {
         commentMap.set(c.id, { ...c, replies: [] });
       }
-      
+
       // Second pass: build tree
       for (const c of comments) {
         const comment = commentMap.get(c.id);
@@ -120,7 +146,7 @@ export async function POST(req: Request) {
           rootComments.push(comment);
         }
       }
-      
+
       return Response.json({ comments: rootComments, flat: comments });
     }
 
@@ -161,4 +187,31 @@ export async function POST(req: Request) {
     const msg = error instanceof Error ? error.message : 'Erro interno';
     return Response.json({ error: msg }, { status: 500 });
   }
+}
+
+/**
+ * Extract user mentions from comment text
+ * Format: @username or @[nickname]
+ */
+function extractMentions(text: string): string[] {
+  const mentions: string[] = [];
+
+  // Match @[nickname] format
+  const bracketRegex = /@\[([^\]]+)\]/g;
+  let match;
+  while ((match = bracketRegex.exec(text)) !== null) {
+    if (match[1]) mentions.push(match[1]);
+  }
+
+  // Match @username format
+  const atRegex = /@(\w+)/g;
+  while ((match = atRegex.exec(text)) !== null) {
+    // Skip if already captured as bracket mention
+    const prevChar = text[match.index - 1];
+    if (prevChar !== '[' && match[1]) {
+      mentions.push(match[1]);
+    }
+  }
+
+  return mentions;
 }

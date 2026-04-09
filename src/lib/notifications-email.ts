@@ -11,6 +11,11 @@ import {
   type IssueVoteEmailContext,
 } from '@/lib/email-templates/issue-vote-notification';
 import { recordEvent } from '@/lib/telemetry';
+import {
+  queueImmediateNotification,
+  getOrCreatePreferences,
+  subscribeToIssue,
+} from '@/lib/email-notifications';
 
 interface IssueVoteNotificationPayload {
   issueId: string;
@@ -20,6 +25,15 @@ interface IssueVoteNotificationPayload {
   downvotes?: number;
   voteType: 'up' | 'down';
   votedByUserId?: string;
+}
+
+interface CommentNotificationPayload {
+  issueId: string;
+  issueTitle?: string | null;
+  commentId: string;
+  commentPreview: string;
+  authorNickname: string;
+  mentionedUserIds?: string[];
 }
 
 /**
@@ -75,10 +89,10 @@ export async function sendIssueVoteEmails(payload: IssueVoteNotificationPayload)
       return;
     }
 
-    // 3. Fetch notification preferences for each user
+    // 3. Fetch notification preferences for each user (new system)
     const { data: preferences, error: prefsError } = await supabase
-      .from('user_notification_preferences_852')
-      .select('user_id, notify_on_issue_votes, digest_frequency')
+      .from('notification_preferences_852')
+      .select('user_id, notify_votes, daily_digest_enabled')
       .in('user_id', userPreferences.map((u) => u.id));
 
     if (prefsError) {
@@ -91,8 +105,8 @@ export async function sendIssueVoteEmails(payload: IssueVoteNotificationPayload)
       (preferences || []).map((p) => [
         p.user_id,
         {
-          notifyOnVotes: p.notify_on_issue_votes,
-          frequency: p.digest_frequency,
+          notifyOnVotes: p.notify_votes,
+          dailyDigestEnabled: p.daily_digest_enabled,
         },
       ])
     );
@@ -104,11 +118,15 @@ export async function sendIssueVoteEmails(payload: IssueVoteNotificationPayload)
     for (const user of userPreferences) {
       const prefs = prefsMap.get(user.id);
 
-      // Skip if user hasn't set preferences (defaults to notify=true)
+      // Skip if user disabled vote notifications or enabled digest mode
       const shouldNotify = prefs?.notifyOnVotes !== false;
-      const isImmediate = !prefs || prefs.frequency === 'immediate';
+      const isImmediate = !prefs?.dailyDigestEnabled;
 
       if (!shouldNotify || !isImmediate) {
+        // Queue for digest if digest is enabled
+        if (prefs?.dailyDigestEnabled && shouldNotify) {
+          // Don't send immediate, will be included in digest
+        }
         continue;
       }
 
@@ -169,6 +187,99 @@ export async function sendIssueVoteEmails(payload: IssueVoteNotificationPayload)
 }
 
 /**
+ * Send email notifications for new comments on an issue
+ * Notifies all participants and mentioned users
+ */
+export async function sendCommentNotifications(
+  payload: CommentNotificationPayload
+): Promise<void> {
+  const sb = getSupabase();
+  if (!sb) return;
+
+  try {
+    // 1. Get all participants of the issue
+    const { data: participantIds, error: fetchError } = await sb.rpc(
+      'get_issue_participants',
+      { p_issue_id: payload.issueId }
+    );
+
+    if (fetchError) {
+      console.error('[Email Notifications] Failed to fetch participants:', fetchError);
+      return;
+    }
+
+    // 2. Combine with mentioned users
+    const allUserIds = new Set([
+      ...(participantIds || []).map((p: { user_id: string }) => p.user_id),
+      ...(payload.mentionedUserIds || []),
+    ]);
+
+    if (allUserIds.size === 0) return;
+
+    // 3. Get user preferences
+    const { data: preferences } = await sb
+      .from('notification_preferences_852')
+      .select('user_id, immediate_on_reply, daily_digest_enabled')
+      .in('user_id', Array.from(allUserIds));
+
+    const prefsMap = new Map(
+      (preferences || []).map((p) => [
+        p.user_id,
+        { immediateOnReply: p.immediate_on_reply, digestEnabled: p.daily_digest_enabled },
+      ])
+    );
+
+    // 4. Queue notifications for each user
+    let queuedCount = 0;
+
+    for (const userId of allUserIds) {
+      const prefs = prefsMap.get(userId);
+
+      // Skip if user disabled reply notifications
+      if (prefs?.immediateOnReply === false) continue;
+
+      // Queue immediate notification (respects quiet hours)
+      const isMentioned = payload.mentionedUserIds?.includes(userId);
+      const notificationType = isMentioned ? 'immediate_mention' : 'immediate_comment';
+
+      const notificationId = await queueImmediateNotification(
+        userId,
+        payload.issueId,
+        notificationType,
+        payload.issueTitle || 'Novo comentário',
+        payload.commentPreview.slice(0, 200),
+        payload.authorNickname
+      );
+
+      if (notificationId) {
+        queuedCount++;
+      }
+    }
+
+    console.log(
+      `[Email Notifications] Comment on ${payload.issueId}: queued ${queuedCount} notifications`
+    );
+  } catch (error) {
+    console.error('[Email Notifications] Comment notification error:', error);
+  }
+}
+
+/**
+ * Subscribe a voter to issue notifications (auto-subscribe on vote)
+ */
+export async function autoSubscribeOnVote(
+  userId: string,
+  issueId: string
+): Promise<void> {
+  const prefs = await getOrCreatePreferences(userId);
+  if (!prefs) return;
+
+  // Default to subscribed with email if user has notifications enabled
+  const emailEnabled = prefs.dailyDigestEnabled || prefs.immediateOnReply;
+  await subscribeToIssue(userId, issueId, 'vote', emailEnabled);
+}
+
+/**
  * Create a database function to get issue participants if not already exists
  * This should be created via migration or called once during setup
  */
@@ -199,4 +310,4 @@ export async function ensureGetIssueParticipantsFunction(): Promise<void> {
   }
 }
 
-export type { IssueVoteNotificationPayload };
+export type { IssueVoteNotificationPayload, CommentNotificationPayload };
