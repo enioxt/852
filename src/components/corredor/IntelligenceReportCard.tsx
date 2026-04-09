@@ -303,12 +303,22 @@ ${stripHtml(report.content_html)}
                 {report.model_id} via {report.provider}
               </span>
             </div>
-            <div className="border border-neutral-700 rounded-xl overflow-hidden bg-white max-h-[500px] overflow-y-auto">
+            <div
+              className="border border-neutral-700 rounded-xl overflow-hidden bg-slate-950 max-h-[500px] overflow-y-auto report-iframe-container"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#1e3a5f #0f172a',
+              }}
+            >
               <iframe
                 srcDoc={report.content_html}
                 className="w-full min-h-[400px] border-0"
                 title={`AI Report ${report.id}`}
                 sandbox="allow-same-origin"
+                style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#1e3a5f #0f172a',
+                }}
               />
             </div>
           </div>

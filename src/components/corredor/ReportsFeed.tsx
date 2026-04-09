@@ -10,6 +10,7 @@ import { listSharedReports, deleteReport, type Report, loadAllPublicReports, del
 import { getOrCreateSessionHash } from '@/lib/session';
 import MarkdownMessage from '@/components/chat/MarkdownMessage';
 import { IntelligenceReportCard } from './IntelligenceReportCard';
+import MasterIntelligenceReportSection from './MasterIntelligenceReportSection';
 
 type Tab = 'shared' | 'intelligence' | 'generator';
 
@@ -362,40 +363,7 @@ export function ReportsFeed({ category = 'all' }: ReportsFeedProps) {
         )}
 
         {tab === 'intelligence' && (
-          <>
-            {intelReports.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center">
-                  <Bot className="w-8 h-8 text-neutral-700" />
-                </div>
-                <div className="text-center space-y-2">
-                  <h3 className="text-lg font-semibold text-neutral-400">Nenhum relatório de inteligência ainda</h3>
-                  <p className="text-sm text-neutral-600 max-w-xl">
-                    Esses relatórios agregam conversas, relatos compartilhados e tópicos pendentes para gerar insights automaticamente.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
-                  <p className="text-xs sm:text-sm text-neutral-500">
-                    {intelReports.length} relatório(s) de inteligência • Cards com preview de 5 linhas
-                  </p>
-                </div>
-
-                <div className="grid gap-4">
-                  {intelReports.map((report) => (
-                    <IntelligenceReportCard
-                      key={report.id}
-                      report={report}
-                      isExpanded={expandedIntelReport === report.id}
-                      onToggle={() => setExpandedIntelReport(expandedIntelReport === report.id ? null : report.id)}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
+          <MasterIntelligenceReportSection />
         )}
 
         {/* ═══ Generator Tab ═══ */}

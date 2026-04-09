@@ -26,25 +26,81 @@ body {
   min-width: 56px;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Dark Blue Theme */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #0f172a;
+  /* slate-950 */
+  border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 3px;
+  background: #1e3a5f;
+  /* brand-blue */
+  border-radius: 4px;
+  border: 2px solid #0f172a;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #3b82f6;
+  /* brand-blue-light */
+}
+
+::-webkit-scrollbar-corner {
+  background: #0f172a;
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e3a5f #0f172a;
+}
+
+/* Report iframe scrollbar override */
+.report-iframe-container,
+.master-report-content,
+.report-content-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #1e3a5f #0f172a;
+}
+
+.report-iframe-container::-webkit-scrollbar,
+.master-report-content::-webkit-scrollbar,
+.report-content-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.report-iframe-container::-webkit-scrollbar-track,
+.master-report-content::-webkit-scrollbar-track,
+.report-content-scroll::-webkit-scrollbar-track {
+  background: #0f172a;
+  border-radius: 4px;
+}
+
+.report-iframe-container::-webkit-scrollbar-thumb,
+.master-report-content::-webkit-scrollbar-thumb,
+.report-content-scroll::-webkit-scrollbar-thumb {
+  background: #1e3a5f;
+  border-radius: 4px;
+  border: 2px solid #0f172a;
+}
+
+.report-iframe-container::-webkit-scrollbar-thumb:hover,
+.master-report-content::-webkit-scrollbar-thumb:hover,
+.report-content-scroll::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
 }
 
 /* Hide scrollbar for horizontal scroll areas */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -59,6 +115,7 @@ body {
 .pb-mobile-nav {
   padding-bottom: 3.5rem;
 }
+
 @media (min-width: 768px) {
   .pb-mobile-nav {
     padding-bottom: 0;
@@ -69,6 +126,7 @@ body {
   0% {
     transform: translate3d(0, 0, 0);
   }
+
   100% {
     transform: translate3d(-50%, 0, 0);
   }

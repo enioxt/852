@@ -265,6 +265,8 @@
 - [x] **Heatmap de cliques**: lib/clarity.ts + /admin/clarity + tracking events
 - [x] **Análise de sentimento**: lib/sentiment.ts + migration + API + lexicon PT-BR
 - [x] **Relatórios exportáveis**: /api/admin/export CSV com BOM para Excel
+- [x] **Relatório Master Único**: /api/ai-reports/master + MasterIntelligenceReportSection (consolida todos em 1)
+- [x] **Correção scrollbars**: tema dark azul (#1e3a5f) em toda a aplicação
 
 ### Performance & Otimização
 - [x] **Edge caching**: Cache de hot topics e stats no edge (headers CDN-Cache-Control)

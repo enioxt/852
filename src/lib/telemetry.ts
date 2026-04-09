@@ -62,7 +62,8 @@ export type TelemetryEventType =
   | 'admin_analytics_viewed'
   | 'admin_sentiment_viewed'
   | 'sentiment_analyzed'
-  | 'admin_data_exported';
+  | 'admin_data_exported'
+  | 'master_intelligence_report_updated';
 
 export interface TelemetryEvent {
   event_type: TelemetryEventType;
