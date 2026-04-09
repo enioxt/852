@@ -84,21 +84,35 @@ Use dark mode, visual profissional, responsivo e sem dependências externas.
 Nunca inclua PII real. Se necessário, use placeholders neutros.
 Feche o documento com o rodapé: "Relatório gerado por Tira-Voz — EGOS Ecosystem".`;
 
-const TASK_INTELLIGENCE_REPORT = `## FOCO ESPECÍFICO — RELATÓRIO DE INTELIGÊNCIA
+const TASK_INTELLIGENCE_REPORT = `## FOCO ESPECÍFICO — RELATÓRIO DE INTELIGÊNCIA v2
 Analise conversas, relatos compartilhados e revisões de IA para extrair padrões, áreas críticas, recomendações e tópicos pendentes.
+
+## ANÁLISE DE PADRÕES CRUZADOS (NOVO v2)
+Quando o mesmo tema aparecer em MÚLTIPLAS conversas (ex: 3+ relatos sobre falta de viatura):
+1. Destaque como PADRÃO CRUZADO com contagem exata
+2. Identifique tendência: crescente, estável ou novo
+3. Agrupe por similaridade semântica
+4. Distinga problemas RECORRENTES de novos problemas
+
 Responda APENAS com JSON válido.
 Diferencie claramente evidência observada, inferência e recomendação.
 Tópicos pendentes devem ser formulados como pautas abertas para discussão pública.
 REGRA DE FILTRAGEM (ANTI-SPAM): Ignore absoluta e terminantemente conversas sobre criação de chatbots, testes de IA, escolhas de nomes de plataformas, saudações ou testes do sistema. Gere tópicos EXCLUSIVAMENTE sobre problemas e cenários policiais operacionais reais.`;
 
-const FORMAT_INTELLIGENCE_REPORT = `## FORMATO EXATO
+const FORMAT_INTELLIGENCE_REPORT = `## FORMATO EXATO v2
 {
   "titulo": "Relatório de Inteligência #N — Período",
-  "resumo_executivo": "Resumo em 2-3 parágrafos...",
+  "resumo_executivo": "Resumo em 2-3 parágrafos com destaque para padrões cruzados...",
   "insights": [
-    {"titulo": "...", "descricao": "...", "categoria": "infraestrutura|efetivo|assedio|plantao|carreira|tecnologia|outro", "severidade": "critica|alta|media|baixa", "evidencias": "Citações anonimizadas..."}
+    {"titulo": "...", "descricao": "...", "categoria": "infraestrutura|efetivo|assedio|plantao|carreira|tecnologia|outro", "severidade": "critica|alta|media|baixa", "evidencias": "Citações anonimizadas...", "recorrencia": "nova|recorrente"}
   ],
   "padroes_detectados": ["padrão 1", "padrão 2"],
+  "padroes_cruzados_v2": [
+    {"tema": "...", "ocorrencias": 3, "tendencia": "crescente|estavel|novo", "conversas_afetadas": ["id1", "id2"]}
+  ],
+  "agrupamentos_semanticos": [
+    {"grupo_id": "grupo_1", "resumo_tema": "...", "quantidade_relatorios": 3, "keywords": ["kw1", "kw2"]}
+  ],
   "topicos_pendentes": [
     {"titulo": "...", "descricao": "...", "categoria": "...", "origem": "ai_suggestion"}
   ],
@@ -107,7 +121,9 @@ const FORMAT_INTELLIGENCE_REPORT = `## FORMATO EXATO
     "total_conversas_analisadas": 0,
     "total_relatorios_analisados": 0,
     "temas_mais_frequentes": ["tema1", "tema2"],
-    "severidade_media": "alta|media|baixa"
+    "severidade_media": "alta|media|baixa",
+    "problemas_recorrentes": 0,
+    "novos_problemas": 0
   }
 }`;
 
@@ -138,10 +154,10 @@ Responda DIRETAMENTE com o texto do comentário, sem jargões de IA, assumindo a
 
 const SECTIONS: PromptSection<PromptContext>[] = [
   // Core — always included, stable, cache-eligible
-  { id: 'egos_foundation',   content: EGOS_FOUNDATION,   cacheable: true,  priority: 10 },
-  { id: 'governance',        content: GOVERNANCE_RULES,  cacheable: true,  priority: 20 },
-  { id: 'atrian_guardrails', content: ATRIAN_GUARDRAILS, cacheable: true,  priority: 30 },
-  { id: 'privacy',           content: PRIVACY_RULES,     cacheable: true,  priority: 40 },
+  { id: 'egos_foundation', content: EGOS_FOUNDATION, cacheable: true, priority: 10 },
+  { id: 'governance', content: GOVERNANCE_RULES, cacheable: true, priority: 20 },
+  { id: 'atrian_guardrails', content: ATRIAN_GUARDRAILS, cacheable: true, priority: 30 },
+  { id: 'privacy', content: PRIVACY_RULES, cacheable: true, priority: 40 },
 
   // Legal — only for contexts that may need case citations
   {
@@ -150,18 +166,18 @@ const SECTIONS: PromptSection<PromptContext>[] = [
   },
 
   // Task-specific instructions
-  { id: 'task_chat',                content: TASK_CHAT,                  cacheable: true,  priority: 60, condition: (ctx) => ctx === 'chat' },
-  { id: 'task_review',              content: TASK_REVIEW,                cacheable: true,  priority: 60, condition: (ctx) => ctx === 'review' },
-  { id: 'task_html_report',         content: TASK_HTML_REPORT,           cacheable: true,  priority: 60, condition: (ctx) => ctx === 'html_report' },
-  { id: 'task_intelligence_report', content: TASK_INTELLIGENCE_REPORT,   cacheable: true,  priority: 60, condition: (ctx) => ctx === 'intelligence_report' },
-  { id: 'task_conversation_summary',content: TASK_CONVERSATION_SUMMARY,  cacheable: true,  priority: 60, condition: (ctx) => ctx === 'conversation_summary' },
-  { id: 'task_name_validation',     content: TASK_NAME_VALIDATION,       cacheable: true,  priority: 60, condition: (ctx) => ctx === 'name_validation' },
-  { id: 'task_espiral',             content: TASK_ESPIRAL,               cacheable: true,  priority: 60, condition: (ctx) => ctx === 'espiral_de_escuta' },
+  { id: 'task_chat', content: TASK_CHAT, cacheable: true, priority: 60, condition: (ctx) => ctx === 'chat' },
+  { id: 'task_review', content: TASK_REVIEW, cacheable: true, priority: 60, condition: (ctx) => ctx === 'review' },
+  { id: 'task_html_report', content: TASK_HTML_REPORT, cacheable: true, priority: 60, condition: (ctx) => ctx === 'html_report' },
+  { id: 'task_intelligence_report', content: TASK_INTELLIGENCE_REPORT, cacheable: true, priority: 60, condition: (ctx) => ctx === 'intelligence_report' },
+  { id: 'task_conversation_summary', content: TASK_CONVERSATION_SUMMARY, cacheable: true, priority: 60, condition: (ctx) => ctx === 'conversation_summary' },
+  { id: 'task_name_validation', content: TASK_NAME_VALIDATION, cacheable: true, priority: 60, condition: (ctx) => ctx === 'name_validation' },
+  { id: 'task_espiral', content: TASK_ESPIRAL, cacheable: true, priority: 60, condition: (ctx) => ctx === 'espiral_de_escuta' },
 
   // Output format constraints
-  { id: 'format_review',              content: FORMAT_REVIEW,              cacheable: true,  priority: 70, condition: (ctx) => ctx === 'review' },
-  { id: 'format_intelligence_report', content: FORMAT_INTELLIGENCE_REPORT, cacheable: true,  priority: 70, condition: (ctx) => ctx === 'intelligence_report' },
-  { id: 'format_name_validation',     content: FORMAT_NAME_VALIDATION,     cacheable: true,  priority: 70, condition: (ctx) => ctx === 'name_validation' },
+  { id: 'format_review', content: FORMAT_REVIEW, cacheable: true, priority: 70, condition: (ctx) => ctx === 'review' },
+  { id: 'format_intelligence_report', content: FORMAT_INTELLIGENCE_REPORT, cacheable: true, priority: 70, condition: (ctx) => ctx === 'intelligence_report' },
+  { id: 'format_name_validation', content: FORMAT_NAME_VALIDATION, cacheable: true, priority: 70, condition: (ctx) => ctx === 'name_validation' },
 ];
 
 const buildPrompt = createAssembler<PromptContext>(SECTIONS);

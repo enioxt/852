@@ -4,6 +4,11 @@ import { recordEvent } from '@/lib/telemetry';
 import { buildIntelligenceReportPrompt } from '@/lib/prompt';
 import { applyInsightWeighting } from '@/lib/insight-weighting';
 import {
+  detectCrossReportPatterns,
+  describePatterns,
+  type CrossReportPattern,
+} from '@/lib/ai-reports-v2';
+import {
   getSupabase,
   saveAIReport,
   createIssue,
@@ -51,7 +56,7 @@ export async function POST(req: Request) {
     // Fetch conversations within date window (instead of LIMIT 20)
     const { data: conversations } = await sb
       .from('conversations_852')
-      .select('messages, title, created_at, message_count')
+      .select('id, messages, title, created_at, message_count')
       .gte('created_at', startDateISO)
       .lte('created_at', endDateISO)
       .order('created_at', { ascending: false });
@@ -59,7 +64,7 @@ export async function POST(req: Request) {
     // Fetch reports within date window
     const { data: reports } = await sb
       .from('reports_852')
-      .select('messages, review_data, created_at')
+      .select('id, messages, review_data, created_at')
       .neq('status', 'deleted')
       .gte('created_at', startDateISO)
       .lte('created_at', endDateISO)
@@ -94,7 +99,31 @@ export async function POST(req: Request) {
         return `--- REVISÃO IA ${i + 1} ---\nResumo: ${rd.resumo || 'N/A'}\nTemas: ${Array.isArray(rd.temas) ? rd.temas.join(', ') : 'N/A'}\nSugestões: ${Array.isArray(rd.sugestoes) ? rd.sugestoes.map((s: { texto?: string }) => s.texto).join('; ') : 'N/A'}\nPontos Cegos: ${Array.isArray(rd.pontosCegos) ? rd.pontosCegos.join('; ') : 'N/A'}`;
       }).join('\n\n');
 
-    const userMessage = `Analise as seguintes ${convoList.length} conversas e ${reportList.length} relatórios (período: últimos ${windowDays} dias, ${startDate.toLocaleDateString('pt-BR')} a ${now.toLocaleDateString('pt-BR')}):\n\n## CONVERSAS BRUTAS\n${convoText}\n\n## REVISÕES DA IA (sugestões que podem não ter sido seguidas)\n${reviewText || 'Nenhuma revisão disponível'}\n\nGere o relatório completo em JSON.`;
+    // v2: Detect cross-report patterns
+    const reportReviewsMap = new Map(reportList.map(r => [r.id, r.review_data as Record<string, unknown>]));
+    const crossPatterns = detectCrossReportPatterns(
+      convoList.map(c => ({
+        id: String(c.id || 'unknown'),
+        messages: Array.isArray(c.messages) ? c.messages : (typeof c.messages === 'string' ? JSON.parse(c.messages) : []),
+        created_at: String(c.created_at || ''),
+      })),
+      reportReviewsMap
+    );
+    const patternDescription = describePatterns(crossPatterns);
+
+    const userMessage = `Analise as seguintes ${convoList.length} conversas e ${reportList.length} relatórios (período: últimos ${windowDays} dias, ${startDate.toLocaleDateString('pt-BR')} a ${now.toLocaleDateString('pt-BR')}):
+
+## PADRÕES CRUZADOS DETECTADOS (v2)
+${patternDescription}
+${crossPatterns.length > 0 ? `\nDetalhes: ${JSON.stringify(crossPatterns.slice(0, 3), null, 2)}` : ''}
+
+## CONVERSAS BRUTAS
+${convoText}
+
+## REVISÕES DA IA (sugestões que podem não ter sido seguidas)
+${reviewText || 'Nenhuma revisão disponível'}
+
+Gere o relatório completo em JSON com foco em padrões cruzados.`;
 
     const { provider, modelId, providerLabel, pricing } = getModelConfig('intelligence_report');
     const startTime = Date.now();
