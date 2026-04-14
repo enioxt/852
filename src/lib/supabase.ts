@@ -14,8 +14,13 @@ export function getSupabase(): SupabaseClient | null {
   if (_sb) return _sb;
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
+  console.log('[getSupabase] URL exists:', !!url, 'Key exists:', !!key, 'Key length:', key?.length || 0);
+  if (!url || !key) {
+    console.error('[getSupabase] Missing config - URL:', !!url, 'Key:', !!key);
+    return null;
+  }
   _sb = createClient(url, key);
+  console.log('[getSupabase] Client created successfully');
   return _sb;
 }
 
@@ -529,13 +534,13 @@ export async function addIssueComment(
   const sb = getSupabase();
   if (!sb) return null;
 
-  const insertData: Record<string, unknown> = { 
-    issue_id: issueId, 
-    body, 
-    is_ai: isAi, 
-    user_id: userId || null 
+  const insertData: Record<string, unknown> = {
+    issue_id: issueId,
+    body,
+    is_ai: isAi,
+    user_id: userId || null
   };
-  
+
   if (parentCommentId) {
     insertData.parent_comment_id = parentCommentId;
   }
