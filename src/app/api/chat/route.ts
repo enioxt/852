@@ -214,33 +214,32 @@ export async function POST(req: Request) {
       messages,
       temperature: 0.7,
       abortSignal: req.signal, // CHAT-007: stop billing when client disconnects
-      // NOTE: Tool use implementation pending SDK version alignment
-      // tools: {
-      //   institutional_search: {
-      //     description: INSTITUTIONAL_SEARCH_TOOL.description,
-      //     parameters: INSTITUTIONAL_SEARCH_TOOL.parameters,
-      //     execute: async ({ query, category, limit }: { query: string; category: string; limit: number }) => {
-      //       const results = await institutionalSearch(query, category, limit);
-      //       recordEvent({
-      //         event_type: 'tool_use_institutional_search',
-      //         metadata: { query, category, resultCount: results.length },
-      //       });
-      //       return formatToolResults('institutional_search', results);
-      //     },
-      //   },
-      //   legal_search: {
-      //     description: LEGAL_SEARCH_TOOL.description,
-      //     parameters: LEGAL_SEARCH_TOOL.parameters,
-      //     execute: async ({ query, source }: { query: string; source: string }) => {
-      //       const results = await institutionalSearch(query, source, 3);
-      //       recordEvent({
-      //         event_type: 'tool_use_legal_search',
-      //         metadata: { query, source },
-      //       });
-      //       return formatToolResults('legal_search', results);
-      //     },
-      //   },
-      // },
+      tools: {
+        institutional_search: {
+          description: INSTITUTIONAL_SEARCH_TOOL.description,
+          inputSchema: INSTITUTIONAL_SEARCH_TOOL.parameters,
+          execute: async ({ query, category, limit }: { query: string; category: string; limit: number }) => {
+            const results = await institutionalSearch(query, category, limit);
+            recordEvent({
+              event_type: 'tool_use_institutional_search',
+              metadata: { query, category, resultCount: results.length },
+            });
+            return formatToolResults('institutional_search', results);
+          },
+        },
+        legal_search: {
+          description: LEGAL_SEARCH_TOOL.description,
+          inputSchema: LEGAL_SEARCH_TOOL.parameters,
+          execute: async ({ query, source }: { query: string; source: string }) => {
+            const results = await institutionalSearch(query, source, 3);
+            recordEvent({
+              event_type: 'tool_use_legal_search',
+              metadata: { query, source },
+            });
+            return formatToolResults('legal_search', results);
+          },
+        },
+      },
       onFinish: async ({ text, usage }) => {
         const inputTokens = usage?.inputTokens || 0;
         const outputTokens = usage?.outputTokens || 0;
