@@ -70,10 +70,10 @@ export async function GET() {
             exists: true,
             report: masterReport,
             stats: {
-              totalConversations: masterReport.total_conversations_all_time || 0,
-              totalReports: masterReport.total_reports_all_time || 0,
-              version: masterReport.version || 1,
-              lastUpdated: masterReport.updated_at,
+              totalConversations: (masterReport.total_conversations_all_time as number) || 0,
+              totalReports: (masterReport.total_reports_all_time as number) || 0,
+              version: (masterReport.version as number) || 1,
+              lastUpdated: masterReport.updated_at as string,
             },
           });
         }
@@ -98,8 +98,8 @@ export async function GET() {
       exists: true,
       report: basicReport,
       stats: {
-        totalConversations: basicReport.total_conversations_all_time || 0,
-        totalReports: basicReport.total_reports_all_time || 0,
+        totalConversations: (basicReport as Record<string, unknown>).total_conversations_all_time as number || 0,
+        totalReports: (basicReport as Record<string, unknown>).total_reports_all_time as number || 0,
         version: basicReport.version || 1,
         lastUpdated: basicReport.updated_at,
       },
