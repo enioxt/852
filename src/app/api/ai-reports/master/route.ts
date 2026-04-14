@@ -39,9 +39,12 @@ export async function GET() {
       .single();
 
     if (error || !masterReport) {
+      console.error('[852-master-report] GET query error:', JSON.stringify(error));
+      console.error('[852-master-report] GET query data:', masterReport ? 'has data' : 'null');
       return Response.json({
         exists: false,
         message: 'Master report not yet created. It will be generated when sufficient data is available.',
+        debug: error ? { code: error.code, message: error.message, details: error.details } : 'no data',
       });
     }
 
