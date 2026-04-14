@@ -32,46 +32,59 @@ export async function GET() {
 
     console.log('[852-master-report] Starting GET request...');
 
-    // Query all columns - select '*' is most compatible
-    const { data: reports, error: queryError } = await sb
-      .from('ai_reports_852')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    console.log('[852-master-report] Query result:', { hasData: !!reports, count: reports?.length, error: queryError?.message });
-
-    if (queryError) {
-      console.error('[852-master-report] Query error:', JSON.stringify(queryError));
-      return Response.json({
-        exists: false,
-        message: 'Database query failed.',
-        debug: { code: queryError.code, message: queryError.message },
-      });
+    // Strategy 1: Try SQL direct query via RPC if available
+    try {
+      const { data: sqlResult, error: sqlError } = await sb.rpc('get_master_report');
+      if (!sqlError && sqlResult) {
+        console.log('[852-master-report] Found via RPC');
+        return Response.json({
+          exists: true,
+          report: sqlResult,
+          stats: {
+            totalConversations: sqlResult.total_conversations_all_time || 0,
+            totalReports: sqlResult.total_reports_all_time || 0,
+            version: sqlResult.version || 1,
+            lastUpdated: sqlResult.updated_at,
+          },
+        });
+      }
+    } catch (rpcErr) {
+      console.log('[852-master-report] RPC not available, trying REST...');
     }
 
-    if (!reports || reports.length === 0) {
-      console.log('[852-master-report] No reports found in database');
-      return Response.json({
-        exists: false,
-        message: 'Master report not yet created. It will be generated when sufficient data is available.',
-      });
+    // Strategy 2: Try REST API with minimal columns (pre-migration compatible)
+    try {
+      const { data: reports, error: queryError } = await sb
+        .from('ai_reports_852')
+        .select('id, content_html, content_summary, created_at, updated_at')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (!queryError && reports && reports.length > 0) {
+        const report = reports[0];
+        console.log('[852-master-report] Found via REST:', report.id);
+        return Response.json({
+          exists: true,
+          report: report,
+          stats: {
+            totalConversations: 0,
+            totalReports: 1,
+            version: 1,
+            lastUpdated: report.updated_at,
+          },
+        });
+      }
+    } catch (restErr) {
+      console.log('[852-master-report] REST query failed:', restErr);
     }
 
-    // Use the most recent report as master
-    const masterReport = reports[0];
-    console.log('[852-master-report] Found report:', { id: masterReport.id, hasContent: !!masterReport.content_html });
-
+    // Fallback: no report available
+    console.log('[852-master-report] No master report available');
     return Response.json({
-      exists: true,
-      report: masterReport,
-      stats: {
-        totalConversations: 0,
-        totalReports: reports.length,
-        version: 1,
-        lastUpdated: masterReport.updated_at,
-      },
+      exists: false,
+      message: 'Master report not yet created. It will be generated when sufficient data is available.',
     });
+
   } catch (error) {
     console.error('[852-master-report] GET error:', error);
     return Response.json({ error: 'Erro interno' }, { status: 500 });
