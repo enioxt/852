@@ -29,12 +29,12 @@ export async function GET() {
       return Response.json({ error: 'Supabase não configurado' }, { status: 503 });
     }
 
-    // Query all reports and filter manually (schema cache safe)
-    const { data: allReports, error: queryError } = await sb
+    // Query only basic columns that exist pre-migration (schema cache safe)
+    const { data: reports, error: queryError } = await sb
       .from('ai_reports_852')
-      .select('*')
+      .select('id, content_html, content_summary, created_at, updated_at, model_id, provider, metadata')
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(5);
 
     if (queryError) {
       console.error('[852-master-report] Query error:', JSON.stringify(queryError));
@@ -45,25 +45,24 @@ export async function GET() {
       });
     }
 
-    // Find master report manually
-    const masterReport = allReports?.find((r: Record<string, unknown>) => r.is_master_report === true);
-
-    if (!masterReport) {
-      console.log('[852-master-report] No master report found in', allReports?.length || 0, 'records');
+    if (!reports || reports.length === 0) {
       return Response.json({
         exists: false,
         message: 'Master report not yet created. It will be generated when sufficient data is available.',
       });
     }
 
+    // Use the most recent report as master (temporary until schema cache refreshes)
+    const masterReport = reports[0];
+
     return Response.json({
       exists: true,
       report: masterReport,
       stats: {
-        totalConversations: (masterReport.total_conversations_all_time as number) || 0,
-        totalReports: (masterReport.total_reports_all_time as number) || 0,
-        version: (masterReport.version as number) || 1,
-        lastUpdated: masterReport.updated_at as string,
+        totalConversations: 0,
+        totalReports: reports.length,
+        version: 1,
+        lastUpdated: masterReport.updated_at,
       },
     });
   } catch (error) {
