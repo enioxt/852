@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface CollapsibleMessageProps {
@@ -13,15 +13,18 @@ interface CollapsibleMessageProps {
 export default function CollapsibleMessage({ children, maxHeight = 320, isEnabled = true, fadeClass = 'from-neutral-950' }: CollapsibleMessageProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsClamping, setNeedsClamping] = useState(false);
+  const [contentHeight, setContentHeight] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  // We can use a ref callback to measure the content
-  const measureRef = (node: HTMLDivElement | null) => {
-    if (node && isEnabled && !needsClamping) {
-      if (node.scrollHeight > maxHeight) {
+  useEffect(() => {
+    if (contentRef.current && isEnabled) {
+      const height = contentRef.current.scrollHeight;
+      setContentHeight(height);
+      if (height > maxHeight) {
         setNeedsClamping(true);
       }
     }
-  };
+  }, [children, maxHeight, isEnabled]);
 
   if (!isEnabled) {
     return <>{children}</>;
@@ -30,10 +33,9 @@ export default function CollapsibleMessage({ children, maxHeight = 320, isEnable
   return (
     <div className="relative w-full">
       <div
-        ref={measureRef}
-        className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${
-          needsClamping && !isExpanded ? '' : 'max-h-none'
-        }`}
+        ref={contentRef}
+        className={`w-full overflow-hidden transition-all duration-300 ease-in-out ${needsClamping && !isExpanded ? '' : 'max-h-none'
+          }`}
         style={{
           maxHeight: needsClamping && !isExpanded ? `${maxHeight}px` : undefined,
         }}
@@ -48,17 +50,18 @@ export default function CollapsibleMessage({ children, maxHeight = 320, isEnable
       {needsClamping && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-2 text-[11px] font-medium uppercase tracking-wider text-blue-300 hover:text-blue-100 transition-colors flex items-center gap-1"
+          className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-200 text-sm font-medium transition-all duration-200 group"
         >
           {isExpanded ? (
             <>
-              <ChevronUp className="w-3 h-3" />
-              Mostrar menos
+              <ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+              <span>Mostrar menos</span>
             </>
           ) : (
             <>
-              <ChevronDown className="w-3 h-3" />
-              Mostrar mais
+              <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+              <span>Mostrar mais</span>
+              <span className="text-xs text-blue-400/70 ml-1">(~{Math.ceil(contentHeight / 20)} linhas)</span>
             </>
           )}
         </button>
