@@ -29,33 +29,79 @@ export async function GET() {
       return Response.json({ error: 'Supabase não configurado' }, { status: 503 });
     }
 
-    // Get master report
-    const { data: masterReport, error } = await sb
+    // Try with specific columns first (schema cache friendly)
+    const { data: basicReport, error: basicError } = await sb
       .from('ai_reports_852')
-      .select('*')
+      .select('id, is_master_report, version, content_html, content_summary, created_at, updated_at')
       .eq('is_master_report', true)
-      .order('updated_at', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (error || !masterReport) {
-      console.error('[852-master-report] GET query error:', JSON.stringify(error));
-      console.error('[852-master-report] GET query data:', masterReport ? 'has data' : 'null');
+    if (basicError) {
+      // Check if it's a schema/cache error
+      const isSchemaError = basicError.message?.includes('Could not find') ||
+        basicError.message?.includes('column') ||
+        basicError.code === 'PGRST204' ||
+        basicError.code === '42703';
+
+      if (isSchemaError) {
+        console.warn('[852-master-report] Schema cache issue - trying fallback query');
+        // Fallback: query all and filter manually
+        const { data: allReports, error: allError } = await sb
+          .from('ai_reports_852')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (allError) {
+          console.error('[852-master-report] Fallback query failed:', allError);
+          return Response.json({
+            exists: false,
+            message: 'Migration pending - schema cache needs refresh',
+            migrationPending: true,
+          });
+        }
+
+        // Filter manually for master report
+        const masterReport = allReports?.find((r: Record<string, unknown>) => r.is_master_report === true);
+        if (masterReport) {
+          return Response.json({
+            exists: true,
+            report: masterReport,
+            stats: {
+              totalConversations: masterReport.total_conversations_all_time || 0,
+              totalReports: masterReport.total_reports_all_time || 0,
+              version: masterReport.version || 1,
+              lastUpdated: masterReport.updated_at,
+            },
+          });
+        }
+      }
+
+      console.error('[852-master-report] GET query error:', JSON.stringify(basicError));
       return Response.json({
         exists: false,
         message: 'Master report not yet created. It will be generated when sufficient data is available.',
-        debug: error ? { code: error.code, message: error.message, details: error.details } : 'no data',
+        debug: { code: basicError.code, message: basicError.message },
+      });
+    }
+
+    if (!basicReport) {
+      return Response.json({
+        exists: false,
+        message: 'Master report not yet created. It will be generated when sufficient data is available.',
       });
     }
 
     return Response.json({
       exists: true,
-      report: masterReport,
+      report: basicReport,
       stats: {
-        totalConversations: masterReport.total_conversations_all_time,
-        totalReports: masterReport.total_reports_all_time,
-        version: masterReport.version,
-        lastUpdated: masterReport.updated_at,
+        totalConversations: basicReport.total_conversations_all_time || 0,
+        totalReports: basicReport.total_reports_all_time || 0,
+        version: basicReport.version || 1,
+        lastUpdated: basicReport.updated_at,
       },
     });
   } catch (error) {
