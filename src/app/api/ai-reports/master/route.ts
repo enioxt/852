@@ -26,15 +26,20 @@ export async function GET() {
   try {
     const sb = getSupabase();
     if (!sb) {
+      console.error('[852-master-report] Supabase not configured');
       return Response.json({ error: 'Supabase não configurado' }, { status: 503 });
     }
 
-    // Query only basic columns that exist pre-migration (schema cache safe)
+    console.log('[852-master-report] Starting GET request...');
+
+    // Query all columns - select '*' is most compatible
     const { data: reports, error: queryError } = await sb
       .from('ai_reports_852')
-      .select('id, content_html, content_summary, created_at, updated_at, model_id, provider, metadata')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(5);
+
+    console.log('[852-master-report] Query result:', { hasData: !!reports, count: reports?.length, error: queryError?.message });
 
     if (queryError) {
       console.error('[852-master-report] Query error:', JSON.stringify(queryError));
@@ -46,14 +51,16 @@ export async function GET() {
     }
 
     if (!reports || reports.length === 0) {
+      console.log('[852-master-report] No reports found in database');
       return Response.json({
         exists: false,
         message: 'Master report not yet created. It will be generated when sufficient data is available.',
       });
     }
 
-    // Use the most recent report as master (temporary until schema cache refreshes)
+    // Use the most recent report as master
     const masterReport = reports[0];
+    console.log('[852-master-report] Found report:', { id: masterReport.id, hasContent: !!masterReport.content_html });
 
     return Response.json({
       exists: true,
