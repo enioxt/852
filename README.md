@@ -2,6 +2,8 @@
 
 > **Status:** ⏸️ Ritmo reduzido — parceiro parcial. Eagle Eye + investigação criminal funcional.  
 > Este projeto tem MVP funcional disponível. Interessados em contribuir ou co-fundar: entre em contato via [Issues](https://github.com/enioxt/852/issues) ou enio@egos.ia.br
+>
+> 🏆 **Implementação Canônica de Referência** — Este chatbot é o padrão SSOT para todos os chatbots do ecossistema EGOS. Veja [`egos/docs/modules/CHATBOT_SSOT.md`](https://github.com/enioxt/egos/blob/main/docs/modules/CHATBOT_SSOT.md).
 
 > Canal de inteligencia institucional para os **852 municipios** de Minas Gerais.
 

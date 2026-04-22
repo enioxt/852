@@ -1,5 +1,5 @@
 /**
- * GET /api/_internal/chatbot-manifest
+ * GET /api/internal/chatbot-manifest
  *
  * Machine-readable manifest consumed by EGOS chatbot-manifest-aggregator
  * to auto-populate CHATBOT_SSOT.md AUTO-GEN blocks without handwritten scores.
