@@ -1,33 +1,37 @@
 # 852 Inteligencia
 
-> **Status:** ⏸️ Ritmo reduzido — parceiro parcial. Eagle Eye + investigação criminal funcional.  
-> Este projeto tem MVP funcional disponível. Interessados em contribuir ou co-fundar: entre em contato via [Issues](https://github.com/enioxt/852/issues) ou enio@egos.ia.br
->
-> 🏆 **Implementação Canônica de Referência** — Este chatbot é o padrão SSOT para todos os chatbots do ecossistema EGOS. Veja [`egos/docs/modules/CHATBOT_SSOT.md`](https://github.com/enioxt/egos/blob/main/docs/modules/CHATBOT_SSOT.md).
+> **Versão:** 1.3.0 | **Atualizado:** 2026-05-01 | **Status:** BETA
+> **Parte do ecossistema [EGOS](https://github.com/enioxt/egos)**
+> 🏆 **Implementação Canônica de Referência** — SSOT para arquitetura de chatbot do ecossistema. Veja [`egos/docs/modules/CHATBOT_SSOT.md`](https://github.com/enioxt/egos/blob/main/docs/modules/CHATBOT_SSOT.md).
 
-> Canal de inteligencia institucional para os **852 municipios** de Minas Gerais.
+Canal de inteligência institucional para os **852 municípios** de Minas Gerais.
+Plataforma anônima e segura baseada no ecossistema EGOS para coleta, estruturação e análise de relatos de Policiais Civis.
 
-Plataforma anonima e segura baseada no ecossistema EGOS para coleta, estruturacao e analise de relatos de Policiais Civis.
+**Live:** [852.egos.ia.br](https://852.egos.ia.br) · **Status:** ⏸️ Ritmo reduzido — parceiro parcial.
+
+---
 
 ## Features
 
-- **Chatbot Anonimo** -- Streaming token-by-token com IA (Qwen-plus / Gemini 2.0 fallback)
-- **ATRiAN Truth Layer** -- Validacao etica de output: sem fabricacao de dados, siglas inventadas ou promessas falsas
-- **PII Scanner** -- Deteccao automatica de CPF, RG, MASP, telefones, emails, REDS, placas e nomes
-- **Revisao por IA** -- Analise de completude da conversa, pontos cegos e sugestoes de aprofundamento
-- **Report Sharing** -- Compartilhamento de relatos sanitizados (link + WhatsApp) com controle total do usuario
-- **Smart Correlation** -- Motor de correlacao inteligente: AI tags + busca em issues/reports existentes
-- **Papo de Corredor** -- Feed de topicos quentes com ranking por engajamento (votos + comentarios + recencia)
-- **Sugestao Direta** -- Texto livre com upload de arquivos, autosave visual, PII/ATRiAN e publicacao no forum
-- **Biblioteca Juridica** -- 27+ leis, sumulas e normativas + glossario operacional policial
-- **Gamificacao** -- Pontos, ranks policiais (Recruta a Comissario), leaderboard anonimo
-- **Identidade Anonima** -- Codinomes policiais auto-gerados + validacao AI de nomes reais
-- **Historico Local** -- Conversas persistidas no navegador com sidebar colapsavel
-- **Exportacao** -- PDF, DOCX, Markdown
-- **Telemetria** -- Microsoft Clarity + Supabase + structured JSON logs + admin dashboard
-- **Notificacoes Operacionais** -- Webhook/Telegram fire-and-forget para novas pautas e votos
-- **Mobile First & Dark Mode** -- Design Palantir/Linear para inteligencia policial
-- **API Hardening** -- Rate limit, validacao de payload, fallback explicito de provider
+- **Chatbot Anônimo** — Streaming token-by-token com IA (Qwen-plus / Gemini 2.0 fallback)
+- **ATRiAN Truth Layer** — Validação ética de output: sem fabricação de dados, siglas inventadas ou promessas falsas
+- **PII Scanner** — Detecção automática de CPF, RG, MASP, telefones, emails, REDS, placas e nomes
+- **Revisão por IA** — Análise de completude da conversa, pontos cegos e sugestões de aprofundamento
+- **Report Sharing** — Compartilhamento de relatos sanitizados (link + WhatsApp) com controle total do usuário
+- **Smart Correlation** — Motor de correlação inteligente: AI tags + busca em issues/reports existentes
+- **Papo de Corredor** — Feed de tópicos quentes com ranking por engajamento (votos + comentários + recência)
+- **Sugestão Direta** — Texto livre com upload de arquivos, autosave visual, PII/ATRiAN e publicação no fórum
+- **Biblioteca Jurídica** — 27+ leis, súmulas e normativas + glossário operacional policial
+- **Gamificação** — Pontos, ranks policiais (Recruta a Comissário), leaderboard anônimo
+- **Identidade Anônima** — Codinomes policiais auto-gerados + validação AI de nomes reais
+- **Histórico Local** — Conversas persistidas no navegador com sidebar colapsável
+- **Exportação** — PDF, DOCX, Markdown
+- **Telemetria** — Microsoft Clarity + Supabase + structured JSON logs + admin dashboard
+- **Notificações Operacionais** — Webhook/Telegram fire-and-forget para novas pautas e votos
+- **Mobile First & Dark Mode** — Design Palantir/Linear para inteligência policial
+- **API Hardening** — Rate limit, validação de payload, fallback explícito de provider
+
+---
 
 ## User Flow
 
@@ -37,35 +41,19 @@ Landing (/)
   |     |-- Quick Actions -> starts conversation
   |     |-- Free text -> AI streaming response
   |     |-- Export (PDF/DOCX/MD)
-  |     |-- "Enviar Relatorio" -> 3-step review
+  |     |-- "Enviar Relatório" -> 3-step review
   |     |     |-- Step 1: PII scan + user accepts removals
-  |     |     |-- Step 2: AI review (completude, sugestoes)
+  |     |     |-- Step 2: AI review (completude, sugestões)
   |     |     '-- Step 3: Share (link, WhatsApp, delete)
   |     '-- Sidebar (history, Home, Reports, Corredor, FAQ)
   |
   |-- "Escrever direto" -> /sugestao
-  |     |-- Texto livre + categoria + tags
-  |     |-- Upload de PDF/DOC/DOCX/TXT/MD
-  |     |-- PII scanner + ATRiAN preview
-  |     |-- Smart Correlation (AI tags + related issues/reports)
-  |     |-- Autosave local com indicador visual
-  |     '-- Publicacao final em /issues
-  |
   |-- "Papo de Corredor" -> /papo-de-corredor
-  |     |-- Top 3 featured topics (medal ranking)
-  |     |-- Full ranked list by engagement score
-  |     '-- 2-minute auto-refresh
-  |
-  |-- "Biblioteca Juridica" -> /legislacao
-  |     |-- Leis e normativas por categoria
-  |     '-- Glossario operacional
-  |
-  |-- "Ver relatorios" -> /reports
-  |     |-- Relatos Compartilhados (view/delete)
-  |     '-- Relatorios de Inteligencia (AI auto-gerados)
-  |
-  '-- Internal: /issues, /dashboard, /admin/telemetry
+  |-- "Biblioteca Jurídica" -> /legislacao
+  '-- "Ver relatórios" -> /reports
 ```
+
+---
 
 ## Stack
 
@@ -75,7 +63,7 @@ Landing (/)
 | **Runtime** | Node 20 / npm |
 | **AI** | Vercel AI SDK v6 (`@ai-sdk/openai` + `@ai-sdk/react`) |
 | **LLM Primary** | Alibaba Qwen-plus via DashScope |
-| **LLM Fallback** | Google Gemini 2.0 Flash via OpenRouter (paid) |
+| **LLM Fallback** | Google Gemini 2.0 Flash via OpenRouter |
 | **Database** | Supabase PostgreSQL |
 | **Ethics** | ATRiAN validation (prompt + output filter) |
 | **Privacy** | PII Scanner (regex + heuristics) |
@@ -84,45 +72,7 @@ Landing (/)
 | **Analytics** | Microsoft Clarity |
 | **Deploy** | Hetzner VPS + Docker Compose + Caddy |
 
-## System Map
-
-```text
-src/
-|-- app/
-|   |-- api/chat/route.ts         # POST /api/chat -- AI streaming + ATRiAN
-|   |-- api/correlate/route.ts    # POST /api/correlate -- AI tag extraction + search
-|   |-- api/hot-topics/route.ts   # GET  /api/hot-topics -- trending topics
-|   |-- api/review/route.ts       # POST /api/review -- AI conversation review
-|   |-- api/report/route.ts       # POST /api/report -- AI HTML report gen
-|   |-- api/issues/route.ts       # GET/POST /api/issues -- forum topics
-|   |-- api/telemetry/route.ts    # GET  /api/telemetry -- stats
-|   |-- api/conversations/route.ts# GET  /api/conversations -- chat history
-|   |-- api/extract/route.ts      # POST /api/extract -- AI content extraction
-|   |-- chat/page.tsx             # Chat UI
-|   |-- sugestao/page.tsx         # Free-text suggestion + correlation
-|   |-- papo-de-corredor/page.tsx # Trending community topics
-|   |-- legislacao/page.tsx       # Legal library + glossary
-|   |-- issues/page.tsx           # Discussion board
-|   |-- reports/page.tsx          # Shared reports + AI reports
-|   |-- dashboard/page.tsx        # Insights dashboard
-|   |-- conta/page.tsx            # User account / admin masquerade
-|   |-- ethik/page.tsx            # ATRiAN compliance overview
-|   '-- page.tsx                  # Landing page
-|-- components/
-|   |-- chat/Sidebar.tsx          # History + nav
-|   |-- chat/ReportReview.tsx     # 3-step PII -> AI -> Share
-|   |-- CorrelationPanel.tsx      # AI tags + related content
-|   |-- HotTopicsTicker.tsx       # Sidebar trending widget
-|   '-- MobileNav.tsx             # Mobile bottom nav (6 tabs)
-'-- lib/
-    |-- ai-provider.ts            # Shared provider config (7 task types)
-    |-- atrian.ts                 # ATRiAN ethical output validation
-    |-- correlate.ts              # Supabase issue/report search
-    |-- pii-scanner.ts            # PII detection (CPF, RG, MASP, etc.)
-    |-- gamification.ts           # Points, ranks, leaderboard
-    |-- notifications.ts          # Webhook/Telegram alerts
-    '-- telemetry.ts              # Dual telemetry (Supabase + JSON logs)
-```
+---
 
 ## Quick Start
 
@@ -133,91 +83,44 @@ cp .env.example .env   # Configure API keys
 npm run dev            # http://localhost:3000
 ```
 
-## Environment Variables
-
-```env
-DASHSCOPE_API_KEY=sk-xxx              # Alibaba DashScope (primary LLM)
-OPENROUTER_API_KEY=sk-or-xxx          # OpenRouter Gemini 2.0 (fallback)
-NEXT_PUBLIC_CLARITY_ID=xxx            # Microsoft Clarity project ID
-# Optional:
-SUPABASE_URL=https://xxx.supabase.co          # Server-side persistence
-SUPABASE_SERVICE_ROLE_KEY=xxx                 # Supabase service key
-ADMIN_SETUP_KEY=xxx                           # Bootstrap do primeiro admin
-GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com        # Google Web Client ID
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com # Mesmo client ID exposto ao frontend
-PUBLIC_BASE_URL=https://852.egos.ia.br       # Base publica usada em links/alertas
-ISSUE_ALERT_WEBHOOK_URL=https://hook.example # Webhook para novas pautas/votos
-ISSUE_ALERT_WEBHOOK_SECRET=xxx               # Segredo opcional do webhook
-TELEGRAM_BOT_TOKEN=xxx                       # Bot Telegram opcional
-TELEGRAM_CHAT_ID=xxx                         # Chat destino opcional
-```
-
-## Google Sign-In Checklist
-
-- Criar ou reutilizar um **OAuth 2.0 Web Client** no Google Cloud Console.
-- Garantir que o mesmo `client_id` esteja configurado em `GOOGLE_CLIENT_ID` e `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
-- Adicionar em **Authorized JavaScript origins**:
-  - `http://localhost:3000`
-  - `https://852.egos.ia.br`
-- Confirmar que a tela de consentimento OAuth esteja publicada para o tipo de usuário correto.
-- O fluxo atual do 852 usa **Google Identity Services + ID token verificado no backend**, então **não exige `GOOGLE_CLIENT_SECRET`** para a UI principal.
-- O endpoint legado `/api/auth/google` continua no código para compatibilidade, mas o caminho preferencial da interface é o botão novo de Google.
+---
 
 ## Deploy
 
 ```bash
-# Build
 npm run build
-
-# VPS deploy (Hetzner)
 rsync -avz --exclude='node_modules' --exclude='.next' --exclude='.env' \
-  --exclude='.git' --exclude='.egos' ./ hetzner:/opt/852/
+  --exclude='.git' ./ hetzner:/opt/852/
 ssh hetzner "cd /opt/852 && docker compose build --no-cache && docker compose up -d"
-
-# Smoke test
 curl -I https://852.egos.ia.br
 ```
 
-## Comprehensive Intelligence Reports
+---
 
-Generate deep analysis reports using multi-AI pipeline:
+## Ecossistema EGOS — Dependências
 
-```bash
-# Generate comprehensive report
-npm run report:comprehensive
+| Repo | Relação | Status |
+|------|---------|--------|
+| [egos](https://github.com/enioxt/egos) | Kernel upstream — Guard Brasil, ATRiAN, governança | PROD |
+| intelink *(privado)* | Repo irmão — inteligência policial (contexto similar) | PROD |
+| policia *(privado)* | Repo irmão — pipeline DHPP (transcrição, documentos) | BETA |
 
-# Or directly
-./scripts/run-comprehensive-report.sh
-```
+**Upstream (o que este repo usa):** Guard Brasil PII Scanner, padrão ATRiAN, CHATBOT_SSOT como referência canônica.
 
-**Pipeline stages:**
-1. **AI Analysis** (OpenRouter Gemini 2.0 Flash): Extract patterns, insights, critical areas
-2. **External Context** (Exa MCP): Validate against benchmarks (placeholder)
-3. **Technical Review** (Codex): Validate accuracy (placeholder)
-4. **Final Synthesis**: Generate HTML report + save to database
+**Downstream (quem usa este repo):** serve como SSOT de referência para arquitetura de chatbot de todos os outros repos do ecossistema.
 
-**Output:**
-- HTML report with dark mode design
-- Saved to `ai_reports_852` table
-- Accessible at `/papo-de-corredor?view=relatorios`
-
-**Standards:** See `.guarani/COMPREHENSIVE_REPORT_STANDARDS.md`
+---
 
 ## Roadmap
 
-| Priority | Feature |
-|----------|---------|
+| Prioridade | Feature |
+|------------|---------|
 | **P1** | Espiral de Escuta (reports <85% approval reopen discussion) |
 | **P1** | Correlation in /chat (trigger after AI response) |
 | **P1** | AI summaries in Papo de Corredor (weekly digest) |
 | **P1** | LGPD consent banner + self-service data access |
 | **P2** | ATRiAN v2: NeMo Guardrails integration |
 | **P2** | Voice input (speech-to-text) |
-| **P2** | Cross-conversation insight aggregation |
-| **P2** | Exa MCP integration for comprehensive reports |
-| **P2** | Codex integration for comprehensive reports |
-| **P3** | Tool use: web search for institutional data |
-| **P3** | BYOK: users plug own API keys |
 
 ## License
 
