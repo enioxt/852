@@ -25,3 +25,4 @@
 #   No dual-hook ambiguity. CRCDM + governance checks merged.
 echo "⚠️  .husky/pre-commit called directly — active hook is .git/hooks/pre-commit"
 exit 0
+bun run ~/.eos/scripts/core/evidence-gate.ts
