@@ -1,28 +1,21 @@
 #!/bin/sh
-# 852 Pre-Commit — delegates to universal CRCDM hook
+# EGOS Pre-Commit (profile: leaf)
+# Source: /home/enio/egos/.husky/_profiles/leaf.sh
 #
-# CANONICAL HOOK: ~/.egos/hooks/pre-commit (symlinked via .git/hooks/pre-commit)
-# This file exists for documentation; it is NOT the active hook.
-#
-# Active hook chain:
-#   git → .git/hooks/pre-commit → ~/.egos/hooks/pre-commit
-#
-# The active hook provides:
-#   - gitleaks secret scan (blocking)
-#   - Supabase PAT / GitHub PAT regex fallback (blocking)
-#   - Doc proliferation check (blocking)
-#   - SSOT file size limits (warning)
-#   - Handoff archive freshness (warning)
-#   - CRCDM DAG node + observability logging
-#
-# To activate this file as a HUSKY hook instead:
-#   npm install husky --save-dev
-#   npx husky init
-#   (husky will set core.hooksPath = .husky/_)
-#
-# Decision (852-GOV-201, 2026-03-29):
-#   Single canonical hook = ~/.egos/hooks/pre-commit
-#   No dual-hook ambiguity. CRCDM + governance checks merged.
-echo "⚠️  .husky/pre-commit called directly — active hook is .git/hooks/pre-commit"
-exit 0
-bun run ~/.eos/scripts/core/evidence-gate.ts
+# Para customizar checks adicionais SEM modificar o profile global,
+# adicione abaixo do "source" (ex: validações específicas deste repo).
+
+EGOS_HUSKY="/home/enio/egos/.husky"
+export EGOS_HUSKY
+
+if [ ! -f "$EGOS_HUSKY/_profiles/leaf.sh" ]; then
+  echo "⚠️  EGOS pre-commit profile não encontrado em $EGOS_HUSKY"
+  echo "   Pulando pre-commit. Clone egos em /home/enio/egos ou ajuste EGOS_HUSKY."
+  exit 0
+fi
+
+bash "$EGOS_HUSKY/_profiles/leaf.sh"
+
+# ── Customizações locais deste repo (adicionar abaixo) ──
+# Exemplo:
+# bash .husky/_local/build-check.sh
