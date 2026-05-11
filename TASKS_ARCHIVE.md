@@ -293,3 +293,21 @@
 - [x] `src/app/api/ai-reports/master/history/[version]/route.ts` — API versão
 - [x] `src/components/corredor/ReportsFeed.tsx` — Simplificado (22 linhas)
 - [x] `src/app/page.tsx` — Integração modal na landing
+
+## Archived 2026-05-11
+
+### Analytics Avançado
+- [x] **Dashboard de engajamento**: métricas de retenção, churn, tempo médio de sessão (lib/analytics.ts + API + UI)
+- [x] **Funnel de conversão**: track de landing → chat → report → share completo
+- [x] **Heatmap de cliques**: lib/clarity.ts + /admin/clarity + tracking events
+- [x] **Análise de sentimento**: lib/sentiment.ts + migration + API + lexicon PT-BR
+- [x] **Relatórios exportáveis**: /api/admin/export CSV com BOM para Excel
+- [x] **Relatório Master Único**: /api/ai-reports/master + MasterIntelligenceReportSection (consolida todos em 1)
+- [x] **Correção scrollbars**: tema dark azul (#1e3a5f) em toda a aplicação
+
+### Performance & Otimização
+- [x] **Edge caching**: Cache de hot topics e stats no edge (headers CDN-Cache-Control)
+- [x] **Lazy loading**: Code-splitting Recharts (ChartsModule.tsx) + PDF export lazy
+- [x] **Database indexing**: 15 índices criados (hot topics, analytics, sentiment)
+- [x] **Bundle optimization**: ~25% reduction via lazy loading Recharts/jsPDF/docx
+
