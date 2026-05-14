@@ -1,10 +1,9 @@
 # EGOS-KERNEL-PROPAGATED: 2026-05-14
 <!-- AUTO-INJECTED by disseminate-propagator.ts — DO NOT EDIT THIS BLOCK MANUALLY -->
-<!-- Kernel commit: ebc177f3 | 2 rule section(s) changed -->
+<!-- Kernel commit: aa4ee664 | 1 rule section(s) changed -->
 <!-- Source of rules: egos/AGENTS.md (canonical). Kernel-only authoritative copy: ~/.claude/CLAUDE.md -->
 <!-- Re-run: bun ~/egos/scripts/disseminate-propagator.ts --all to update -->
-<!-- - CLAUDE.md (1 lines) -->
-<!-- ~ CLAUDE.md → ## DUAL PURSUIT — Leverage + Validation (2026-05-09 → ?) (18 lines) -->
+<!-- ~ CAPABILITY_REGISTRY.md (17 lines) -->
 
 > ⚠️ **PROPAGATED FROM KERNEL** — Edits to this block are overwritten by next `bun governance:sync:exec`.
 > Edit kernel `egos/AGENTS.md` section between `<!-- PROPAGATE-RULES-BEGIN -->` and `<!-- PROPAGATE-RULES-END -->` instead.
