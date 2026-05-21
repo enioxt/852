@@ -71,3 +71,5 @@ venv/
 docs/_context_snapshots/.state.json
 error.log
 .claude/commands/
+.eos
+.husky/pre-commit.backup-*
