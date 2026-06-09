@@ -1,11 +1,9 @@
 import { createOpenAI } from '@ai-sdk/openai';
 
 export const PRICING: Record<string, { input: number; output: number; free?: boolean }> = {
-  'qwen-turbo': { input: 0.0001, output: 0.0002 },
-  'qwen-plus': { input: 0.0008, output: 0.002 },
-  'qwen-max': { input: 0.0016, output: 0.007 },
-  'google/gemini-2.0-flash-001': { input: 0, output: 0, free: false },
-  'gpt-4o-mini': { input: 0.00015, output: 0.0006 },
+  'google/gemini-2.0-flash-001': { input: 0.0001, output: 0.0004 },
+  'google/gemini-2.5-pro':       { input: 0.0025, output: 0.0100 },
+  'gpt-4o-mini':                 { input: 0.00015, output: 0.0006 },
 };
 
 export type ModelTask =
@@ -26,19 +24,8 @@ export interface ModelConfig {
   routingReason: string;
 }
 
-function hasDashScope() {
-  return Boolean(process.env.DASHSCOPE_API_KEY && process.env.DASHSCOPE_API_KEY !== 'your_dashscope_api_key_here');
-}
-
 function hasOpenRouter() {
   return Boolean(process.env.OPENROUTER_API_KEY);
-}
-
-function createDashScopeProvider() {
-  return createOpenAI({
-    apiKey: process.env.DASHSCOPE_API_KEY || '',
-    baseURL: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
-  });
 }
 
 function createOpenRouterProvider() {
@@ -53,124 +40,30 @@ function createOpenAIProvider() {
 }
 
 export function hasAvailableProvider() {
-  return Boolean(
-    hasDashScope() ||
-    hasOpenRouter() ||
-    process.env.OPENAI_API_KEY
-  );
+  return Boolean(hasOpenRouter() || process.env.OPENAI_API_KEY);
 }
 
 export function getModelConfig(task: ModelTask = 'chat'): ModelConfig {
-  const budgetMode = process.env.AI_BUDGET_MODE || 'balanced';
-
-  if (task === 'intelligence_report') {
-    if (hasDashScope()) {
-      const modelId = budgetMode === 'conservative'
-        ? (process.env.DASHSCOPE_CHAT_MODEL || 'qwen-plus')
-        : (process.env.DASHSCOPE_INTELLIGENCE_MODEL || 'qwen-max');
-      return {
-        modelId,
-        provider: createDashScopeProvider(),
-        providerLabel: 'Alibaba DashScope',
-        pricing: PRICING[modelId] || PRICING['qwen-max'],
-        routingReason: budgetMode === 'conservative'
-          ? 'Budget mode conservador: relatório de inteligência rebaixado para modelo balanceado.'
-          : 'Relatório de inteligência usa modelo premium para síntese agregada e geração de issues.',
-      };
-    }
-
-    if (hasOpenRouter()) {
-      const modelId = 'google/gemini-2.0-flash-001';
-      return {
-        modelId,
-        provider: createOpenRouterProvider(),
-        providerLabel: 'OpenRouter (paid)',
-        pricing: PRICING[modelId] || { input: 0, output: 0 },
-        routingReason: 'Fallback de relatório de inteligência via OpenRouter por indisponibilidade da DashScope.',
-      };
-    }
-  }
-
-  if (task === 'name_validation') {
-    if (hasOpenRouter()) {
-      const modelId = 'google/gemini-2.0-flash-001';
-      return {
-        modelId,
-        provider: createOpenRouterProvider(),
-        providerLabel: 'OpenRouter (paid)',
-        pricing: PRICING[modelId] || { input: 0, output: 0 },
-        routingReason: 'Validação de nome anônimo via Gemini Flash (OpenRouter).',
-      };
-    }
-
-    if (hasDashScope()) {
-      const modelId = process.env.DASHSCOPE_CHAT_MODEL || 'qwen-plus';
-      return {
-        modelId,
-        provider: createDashScopeProvider(),
-        providerLabel: 'Alibaba DashScope',
-        pricing: PRICING[modelId] || PRICING['qwen-plus'],
-        routingReason: 'Validação de nome via DashScope (fallback).',
-      };
-    }
-  }
-
-  // news_summarization: use qwen-turbo (fast + cheap ~$0.0001/1K tokens)
-  if (task === 'news_summarization') {
-    if (hasDashScope()) {
-      return {
-        modelId: 'qwen-turbo',
-        provider: createDashScopeProvider(),
-        providerLabel: 'Alibaba DashScope (qwen-turbo)',
-        pricing: PRICING['qwen-turbo'],
-        routingReason: 'Sumarização de notícias usa qwen-turbo — rápido e econômico (~$0.0001/1K tokens).',
-      };
-    }
-  }
-
-  if (task === 'review' || task === 'html_report' || task === 'conversation_summary' || task === 'correlation') {
-    if (hasOpenRouter()) {
-      const modelId = 'google/gemini-2.0-flash-001';
-      return {
-        modelId,
-        provider: createOpenRouterProvider(),
-        providerLabel: 'OpenRouter (paid)',
-        pricing: PRICING[modelId] || { input: 0, output: 0 },
-        routingReason: 'Tarefa estruturada/auxiliar roteada para modelo rápido e econômico.',
-      };
-    }
-
-    if (hasDashScope()) {
-      const modelId = process.env.DASHSCOPE_AUX_MODEL || 'qwen-plus';
-      return {
-        modelId,
-        provider: createDashScopeProvider(),
-        providerLabel: 'Alibaba DashScope',
-        pricing: PRICING[modelId] || PRICING['qwen-plus'],
-        routingReason: 'Tarefa estruturada/auxiliar usando modelo balanceado da DashScope.',
-      };
-    }
-  }
-
-  if (hasDashScope()) {
-    const modelId = process.env.DASHSCOPE_CHAT_MODEL || 'qwen-plus';
-    return {
-      modelId,
-      provider: createDashScopeProvider(),
-      providerLabel: 'Alibaba DashScope',
-      pricing: PRICING[modelId] || PRICING['qwen-plus'],
-      routingReason: 'Chat principal prioriza consistência no provedor primário.',
-    };
-  }
-
   if (hasOpenRouter()) {
     const modelId = 'google/gemini-2.0-flash-001';
+    const pricing = PRICING[modelId] || { input: 0.0001, output: 0.0004 };
+
+    const routingReasons: Partial<Record<ModelTask, string>> = {
+      intelligence_report: 'Relatório de inteligência via OpenRouter gemini-2.0-flash-001.',
+      name_validation:     'Validação de nome via OpenRouter gemini-2.0-flash-001.',
+      news_summarization:  'Sumarização de notícias via OpenRouter gemini-2.0-flash-001.',
+      review:              'Revisão via OpenRouter gemini-2.0-flash-001.',
+      html_report:         'HTML report via OpenRouter gemini-2.0-flash-001.',
+      conversation_summary:'Resumo de conversa via OpenRouter gemini-2.0-flash-001.',
+      correlation:         'Correlação via OpenRouter gemini-2.0-flash-001.',
+    };
+
     return {
       modelId,
       provider: createOpenRouterProvider(),
-      providerLabel: 'OpenRouter (paid)',
-      pricing: PRICING[modelId] || { input: 0, output: 0 },
-      routingReason: 'Fallback geral via OpenRouter.',
+      providerLabel: 'OpenRouter',
+      pricing,
+      routingReason: routingReasons[task] ?? 'OpenRouter gemini-2.0-flash-001 (primary).',
     };
   }
 
